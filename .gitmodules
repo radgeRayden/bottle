@@ -1,0 +1,6 @@
+[submodule "dependencies/wgpu-native"]
+	path = dependencies/wgpu-native
+	url = https://github.com/gfx-rs/wgpu-native/
+[submodule "dependencies/SDL"]
+	path = dependencies/SDL
+	url = https://github.com/libsdl-org/SDL
