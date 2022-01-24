@@ -1,6 +1,7 @@
 using import struct
 
 let sdl = (import ..FFI.sdl)
+import .callbacks
 
 struct SysEventsState
     really-quit? : bool
@@ -20,10 +21,21 @@ fn quit ()
     ;
 
 fn dispatch ()
+    using import .keyconstants
+
     local event : sdl.Event
     while (sdl.PollEvent &event)
-        if (event.type == sdl.SDL_QUIT)
-            really-quit!;
+        switch event.type
+        case sdl.SDL_QUIT
+            let result = (callbacks.on-quit)
+            istate.really-quit? =
+                (none? result) or (imply result bool)
+        case sdl.SDL_KEYDOWN
+            callbacks.on-key-pressed (event.key.keysym.sym as Key)
+        case sdl.SDL_KEYUP
+            callbacks.on-key-released (event.key.keysym.sym as Key)
+        default
+            ;
 
 do
     let
