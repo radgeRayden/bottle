@@ -2,6 +2,7 @@ using import struct
 using import ..helpers
 using import .istate
 using import .errors
+using import .render-pass
 
 import ..window
 
@@ -92,8 +93,9 @@ let vshader-WGSL =
         [[stage(vertex)]]
         fn vs_main([[builtin(vertex_index)]] vindex: u32) -> VertexOutput {
             var out: VertexOutput;
-            out.vcolor = attrs.data[vindex].color;
-            out.position = vec4<f32>(attrs.data[vindex].position, 1.0);
+            var vertex = attrs.data[vindex];
+            out.vcolor = vertex.color;
+            out.position = vec4<f32>(vertex.position, 1.0);
             return out;
         }
 
@@ -210,7 +212,7 @@ fn make-default-pipeline ()
                             writeMask = wgpu.ColorWriteMask.All
 
 fn bind-buffer (render-pass buffer)
-    wgpu.RenderPassEncoderSetBindGroup render-pass 0
+    wgpu.RenderPassEncoderSetBindGroup render-pass._handle 0
         buffer.bgroup
         0
         null
@@ -264,22 +266,19 @@ fn begin-frame ()
             (&local wgpu.CommandEncoderDescriptor)
 
     let render-pass =
-        wgpu.CommandEncoderBeginRenderPass cmd-encoder
-            &local wgpu.RenderPassDescriptor
-                label = "my render pass"
-                colorAttachmentCount = 1
-                colorAttachments =
-                    &local wgpu.RenderPassColorAttachment
-                        view = swapchain-image
-                        clearColor = (typeinit 0.017 0.017 0.017 1.0)
+        RenderPass cmd-encoder
+            arrayof wgpu.RenderPassColorAttachment
+                typeinit
+                    view = swapchain-image
+                    clearColor = (typeinit 0.017 0.017 0.017 1.0)
 
-    _ render-pass cmd-encoder
+    _ render-pass
 
-fn present (render-pass cmd-encoder)
-    wgpu.RenderPassEncoderEndPass render-pass
+fn present (render-pass)
+    wgpu.RenderPassEncoderEndPass render-pass._handle
 
     local cmd-buf =
-        wgpu.CommandEncoderFinish cmd-encoder
+        wgpu.CommandEncoderFinish render-pass._cmd-encoder
             (&local wgpu.CommandBufferDescriptor)
 
     wgpu.QueueSubmit istate.queue 1 &cmd-buf

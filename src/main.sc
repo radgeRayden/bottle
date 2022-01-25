@@ -20,9 +20,9 @@ fn run ()
         update;
 
         try
-            let render-pass cmd-encoder = (gpu.begin-frame)
+            let render-pass = (gpu.begin-frame)
             draw render-pass
-            gpu.present render-pass cmd-encoder
+            gpu.present render-pass
         else
             return;
 
