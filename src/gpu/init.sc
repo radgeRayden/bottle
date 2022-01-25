@@ -98,8 +98,6 @@ let vshader-WGSL =
             return out;
         }
 
-print (slice vshader-WGSL 505 533)
-
 fn fshader ()
     using import glsl
     using import glm
