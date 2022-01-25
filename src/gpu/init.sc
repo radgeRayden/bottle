@@ -1,25 +1,13 @@
 using import struct
 
-using import .helpers
+using import ..helpers
 
-import .window
+import ..window
 
-let sdl = (import .FFI.sdl)
-let wgpu = (import .FFI.wgpu)
+let sdl = (import ..FFI.sdl)
+let wgpu = (import ..FFI.wgpu)
 
-struct GfxState plain
-    surface : wgpu.Surface
-    adapter : wgpu.Adapter
-    device  : wgpu.Device
-    swapchain : wgpu.SwapChain
-    queue : wgpu.Queue
-
-    # we're probably gonna remove these
-    default-pipeline : wgpu.RenderPipeline
-    default-bgroup-layout : wgpu.BindGroupLayout
-    default-bgroup : wgpu.BindGroup
-
-global istate : GfxState
+using import .istate
 
 # MODULE FUNCTIONS START HERE
 # ================================================================================
