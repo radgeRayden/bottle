@@ -18,7 +18,12 @@ fn run ()
     while (not (sysevents.really-quit?))
         sysevents.dispatch;
         update;
-        gpu.present draw
+
+        let render-pass cmd-encoder =
+            try (gpu.begin-frame)
+            else (return)
+        draw render-pass
+        gpu.present render-pass cmd-encoder
     ;
 
 do

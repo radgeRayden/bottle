@@ -1,13 +1,12 @@
 using import struct
-
 using import ..helpers
+using import .istate
+using import .errors
 
 import ..window
 
 let sdl = (import ..FFI.sdl)
 let wgpu = (import ..FFI.wgpu)
-
-using import .istate
 
 # MODULE FUNCTIONS START HERE
 # ================================================================================
@@ -160,7 +159,8 @@ fn make-default-pipeline ()
     let vertex-module fragment-module =
         shader-module-from-WGSL
             vshader-WGSL
-            # static-compile-spirv 0x10000 'vertex (static-typify vshader)
+        # shader-module-from-SPIRV
+        #     static-compile-spirv 0x10000 'vertex (static-typify vshader) 'dump-disassembly
         shader-module-from-SPIRV
             static-compile-spirv 0x10000 'fragment (static-typify fshader)
 
@@ -209,9 +209,8 @@ fn make-default-pipeline ()
                                             operation = wgpu.BlendOperation.Add
                             writeMask = wgpu.ColorWriteMask.All
 
-fn bind-buffer (buffer)
-    assert (istate.current-render-pass != null)
-    wgpu.RenderPassEncoderSetBindGroup istate.current-render-pass 0
+fn bind-buffer (render-pass buffer)
+    wgpu.RenderPassEncoderSetBindGroup render-pass 0
         buffer.bgroup
         0
         null
@@ -254,11 +253,11 @@ fn init ()
     assert (istate.default-pipeline != null)
     ;
 
-inline present (drawfn)
+fn begin-frame ()
     let swapchain-image = (wgpu.SwapChainGetCurrentTextureView istate.swapchain)
     if (swapchain-image == null)
         istate.swapchain = (create-swapchain (window.get-size))
-        return;
+        raise GPUError.OutdatedSwapchain
 
     let cmd-encoder =
         wgpu.DeviceCreateCommandEncoder istate.device
@@ -274,13 +273,9 @@ inline present (drawfn)
                         view = swapchain-image
                         clearColor = (typeinit 0.017 0.017 0.017 1.0)
 
-    # hate this
-    istate.current-render-pass = render-pass
+    _ render-pass cmd-encoder
 
-    drawfn;
-    wgpu.RenderPassEncoderSetPipeline render-pass istate.default-pipeline
-    wgpu.RenderPassEncoderDraw render-pass 3 1 0 0
-
+fn present (render-pass cmd-encoder)
     wgpu.RenderPassEncoderEndPass render-pass
 
     local cmd-buf =
@@ -292,5 +287,5 @@ inline present (drawfn)
     ;
 
 do
-    let init present bind-buffer
+    let init begin-frame present bind-buffer
     locals;
