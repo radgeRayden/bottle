@@ -19,12 +19,12 @@ fn run ()
         sysevents.dispatch;
         update;
 
-        let render-pass cmd-encoder =
-            try (gpu.begin-frame)
-            else (return)
-        draw render-pass
-        gpu.present render-pass cmd-encoder
-    ;
+        try
+            let render-pass cmd-encoder = (gpu.begin-frame)
+            draw render-pass
+            gpu.present render-pass cmd-encoder
+        else
+            return;
 
 do
     let run load update draw
