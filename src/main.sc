@@ -18,8 +18,7 @@ fn run ()
     while (not (sysevents.really-quit?))
         sysevents.dispatch;
         update;
-        draw;
-        gpu.present;
+        gpu.present draw
     ;
 
 do
