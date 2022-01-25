@@ -52,171 +52,6 @@ fn create-swapchain (width height)
             height = (height as u32)
             presentMode = wgpu.PresentMode.Fifo
 
-fn vshader ()
-    using import glsl
-    using import glm
-    struct VertexAttributes plain
-        position : vec3
-        color : vec4
-
-    buffer attrs :
-        struct AttributeArray plain
-            data : (array VertexAttributes)
-        set = 0
-        binding = 0
-
-    out vcolor : vec4
-        location = 0
-
-    let vertex = (attrs.data @ gl_VertexIndex)
-
-    gl_Position = (vec4 vertex.position 1)
-    vcolor = vertex.color
-
-let vshader-WGSL =
-    """"struct VertexAttributes {
-            position : vec3<f32>;
-            color : vec4<f32>;
-        };
-
-        struct Attributes {
-            data : [[stride(32)]] array<VertexAttributes>;
-        };
-
-        [[group(0), binding(0)]] var<storage, read> attrs : Attributes;
-
-        struct VertexOutput {
-            [[location(0)]] vcolor: vec4<f32>;
-            [[builtin(position)]] position: vec4<f32>;
-        };
-
-        [[stage(vertex)]]
-        fn vs_main([[builtin(vertex_index)]] vindex: u32) -> VertexOutput {
-            var out: VertexOutput;
-            var vertex = attrs.data[vindex];
-            out.vcolor = vertex.color;
-            out.position = vec4<f32>(vertex.position, 1.0);
-            return out;
-        }
-
-fn fshader ()
-    using import glsl
-    using import glm
-
-    in vcolor : vec4
-        location = 0
-    out fcolor : vec4
-        location = 0
-
-    fcolor = vcolor
-
-inline shader-module-from-SPIRV (code)
-    local desc : wgpu.ShaderModuleSPIRVDescriptor
-        chain =
-            wgpu.ChainedStruct
-                sType = wgpu.SType.ShaderModuleSPIRVDescriptor
-        codeSize = ((countof code) // 4)
-        code = (code as rawstring as (@ u32))
-
-    let module =
-        wgpu.DeviceCreateShaderModule
-            istate.device
-            &local wgpu.ShaderModuleDescriptor
-                nextInChain = (&desc as (mutable@ wgpu.ChainedStruct))
-    module
-
-inline shader-module-from-WGSL (code)
-    local desc : wgpu.ShaderModuleWGSLDescriptor
-        chain =
-            wgpu.ChainedStruct
-                sType = wgpu.SType.ShaderModuleWGSLDescriptor
-        code = (code as rawstring)
-
-    let module =
-        wgpu.DeviceCreateShaderModule
-            istate.device
-            &local wgpu.ShaderModuleDescriptor
-                nextInChain = (&desc as (mutable@ wgpu.ChainedStruct))
-    module
-
-fn make-default-bgroup-layout ()
-    local entries =
-        arrayof wgpu.BindGroupLayoutEntry
-            typeinit
-                binding = 0
-                visibility = wgpu.ShaderStage.Vertex
-                buffer =
-                    wgpu.BufferBindingLayout
-                        type = wgpu.BufferBindingType.ReadOnlyStorage
-                        hasDynamicOffset = false
-                        minBindingSize = 0
-
-    wgpu.DeviceCreateBindGroupLayout istate.device
-        &local wgpu.BindGroupLayoutDescriptor
-            label = "bottle bind group layout"
-            entryCount = 1
-            entries = &entries
-
-fn make-default-pipeline ()
-    let vertex-module fragment-module =
-        shader-module-from-WGSL
-            vshader-WGSL
-        # shader-module-from-SPIRV
-        #     static-compile-spirv 0x10000 'vertex (static-typify vshader) 'dump-disassembly
-        shader-module-from-SPIRV
-            static-compile-spirv 0x10000 'fragment (static-typify fshader)
-
-    let pip-layout =
-        wgpu.DeviceCreatePipelineLayout istate.device
-            &local wgpu.PipelineLayoutDescriptor
-                bindGroupLayoutCount = 1
-                bindGroupLayouts = &istate.default-bgroup-layout
-
-    wgpu.DeviceCreateRenderPipeline istate.device
-        &local wgpu.RenderPipelineDescriptor
-            label = "bottle render pipeline"
-            layout = pip-layout
-            vertex =
-                wgpu.VertexState
-                    module = vertex-module
-                    entryPoint = "vs_main"
-            primitive =
-                wgpu.PrimitiveState
-                    topology = wgpu.PrimitiveTopology.TriangleList
-                    frontFace = wgpu.FrontFace.CCW
-            multisample =
-                wgpu.MultisampleState
-                    count = 1
-                    mask = (~ 0:u32)
-                    alphaToCoverageEnabled = false
-            fragment =
-                &local wgpu.FragmentState
-                    module = fragment-module
-                    entryPoint = "main"
-                    targetCount = 1
-                    targets =
-                        &local wgpu.ColorTargetState
-                            format = (wgpu.SurfaceGetPreferredFormat istate.surface istate.adapter)
-                            blend =
-                                &local wgpu.BlendState
-                                    color =
-                                        typeinit
-                                            srcFactor = wgpu.BlendFactor.One
-                                            dstFactor = wgpu.BlendFactor.Zero
-                                            operation = wgpu.BlendOperation.Add
-                                    alpha =
-                                        typeinit
-                                            srcFactor = wgpu.BlendFactor.One
-                                            dstFactor = wgpu.BlendFactor.Zero
-                                            operation = wgpu.BlendOperation.Add
-                            writeMask = wgpu.ColorWriteMask.All
-
-fn bind-buffer (render-pass buffer)
-    wgpu.RenderPassEncoderSetBindGroup render-pass._handle 0
-        buffer.bgroup
-        0
-        null
-
 fn init ()
     istate.surface = (create-surface)
 
@@ -248,11 +83,6 @@ fn init ()
 
     istate.swapchain = (create-swapchain (window.get-size))
     istate.queue = (wgpu.DeviceGetQueue istate.device)
-
-    istate.default-bgroup-layout = (make-default-bgroup-layout)
-    assert (istate.default-bgroup-layout != null)
-    istate.default-pipeline = (make-default-pipeline)
-    assert (istate.default-pipeline != null)
     ;
 
 fn begin-frame ()
@@ -275,7 +105,7 @@ fn begin-frame ()
     _ render-pass
 
 fn present (render-pass)
-    wgpu.RenderPassEncoderEndPass render-pass._handle
+    'finish render-pass
 
     local cmd-buf =
         wgpu.CommandEncoderFinish render-pass._cmd-encoder
@@ -286,5 +116,13 @@ fn present (render-pass)
     ;
 
 do
-    let init begin-frame present bind-buffer
+    let init begin-frame present
+
+    vvv bind types
+    do
+        from (import .pipeline)    let GPUPipeline GPUShaderModule
+        from (import .render-pass) let RenderPass
+        from (import .buffer)      let GPUBuffer
+        locals;
+
     locals;

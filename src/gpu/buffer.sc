@@ -19,13 +19,15 @@ struct GPUBuffer
     bgroup : wgpu.BindGroup
     size : usize
 
-    inline __typecall (cls size)
+    # FIXME: makes no sense that this needs the layout.
+    # We won't be creating bind groups inside buffer in the future.
+    inline __typecall (cls size layout)
         let handle = (make-buffer size)
         let bgroup =
             wgpu.DeviceCreateBindGroup istate.device
                 &local wgpu.BindGroupDescriptor
                     label = "bottle bind group"
-                    layout = istate.default-bgroup-layout
+                    layout = layout
                     entryCount = 1
                     entries =
                         &local wgpu.BindGroupEntry

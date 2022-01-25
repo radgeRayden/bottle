@@ -19,6 +19,21 @@ struct RenderPass
             _handle = handle
             _cmd-encoder = cmd-encoder
 
+    fn set-pipeline (self pipeline)
+        wgpu.RenderPassEncoderSetPipeline self._handle pipeline._handle
+
+    fn bind-buffer (self buffer)
+        wgpu.RenderPassEncoderSetBindGroup self._handle 0
+            buffer.bgroup
+            0
+            null
+
+    fn draw (self vertex-count instance-count first-vertex first-instance)
+        wgpu.RenderPassEncoderDraw self._handle vertex-count instance-count first-vertex first-instance
+
+    fn finish (self)
+        wgpu.RenderPassEncoderEndPass self._handle
+
 do
     let RenderPass
     locals;
