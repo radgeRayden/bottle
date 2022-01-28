@@ -1,5 +1,5 @@
 using import struct
-using import .istate
+using import .common
 using import ..helpers
 let wgpu = (import ..FFI.wgpu)
 

@@ -1,5 +1,6 @@
 using import struct
 using import ..helpers
+using import .common
 let wgpu = (import ..FFI.wgpu)
 
 struct RenderPass

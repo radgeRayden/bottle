@@ -1,6 +1,6 @@
 using import struct
 using import ..helpers
-using import .istate
+using import .common
 using import .errors
 using import .render-pass
 
@@ -123,6 +123,7 @@ do
         from (import .pipeline)    let GPUPipeline GPUShaderModule
         from (import .render-pass) let RenderPass
         from (import .buffer)      let GPUBuffer
+        from (import .common)      let GPUResourceBinding
         locals;
 
     locals;

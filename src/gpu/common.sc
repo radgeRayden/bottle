@@ -3,7 +3,7 @@ using import struct
 
 let wgpu = (import ..FFI.wgpu)
 
-enum GPUResourceBindingType
+enum GPUResourceBinding
     Buffer :
         buffer = wgpu.Buffer
         offset = u64
