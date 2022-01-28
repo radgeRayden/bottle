@@ -61,7 +61,6 @@ struct GPUShaderModule
             _handle = module
 
     inline __drop (self)
-        dump "dropping shader"
         wgpu.ShaderModuleDrop self._handle
 
     unlet shader-module-from-SPIRV shader-module-from-WGSL
