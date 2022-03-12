@@ -157,7 +157,7 @@ struct GPUPipeline
         wgpu.PipelineLayoutDrop pip-layout
         _ pipeline pip-layout bgroup-layout
 
-    inline __typecall (cls vertex-shader fragment-shader)
+    inline __typecall (cls interface vertex-shader fragment-shader)
         let handle layout bgroup-layout = (make-pipeline vertex-shader fragment-shader)
         super-type.__typecall cls
             _handle = handle

@@ -6,6 +6,7 @@ let wgpu = (import ..FFI.wgpu)
 struct RenderPass
     _handle : wgpu.RenderPassEncoder
     _cmd-encoder : wgpu.CommandEncoder
+    _pipeline : wgpu.RenderPipeline
 
     inline __typecall (cls cmd-encoder color-attachments)
         let handle =
@@ -23,9 +24,9 @@ struct RenderPass
     fn set-pipeline (self pipeline)
         wgpu.RenderPassEncoderSetPipeline self._handle pipeline._handle
 
-    fn bind-buffer (self buffer)
+    fn set-bindings (self bindings...)
         wgpu.RenderPassEncoderSetBindGroup self._handle 0
-            buffer.bgroup
+            'get-bind-group istate bindings...
             0
             null
 

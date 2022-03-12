@@ -1,42 +1,11 @@
-using import enum
 using import struct
 
 let wgpu = (import ..FFI.wgpu)
 
-enum GPUResourceBinding
-    Buffer :
-        buffer = wgpu.Buffer
-        offset = u64
-        size = u64
-    Sampler : wgpu.Sampler
-    TextureView : wgpu.TextureView
-
-    fn make-wgpu-descriptor (self)
-        dispatch self
-        case Buffer (handle offset size)
-            wgpu.BindGroupEntry
-                buffer = handle
-                offset = offset
-                size = size
-        case Sampler (handle)
-            wgpu.BindGroupEntry
-                sampler = handle
-        case TextureView (handle)
-            wgpu.BindGroupEntry
-                textureView = handle
-        default
-            unreachable;
-
-    inline __hash (self)
-        dispatch self
-        case Buffer (handle offset size)
-            hash handle offset size
-        case Sampler (handle)
-            hash handle
-        case TextureView (handle)
-            hash handle
-        default
-            unreachable;
+struct GfxDummyResources
+    buffer : wgpu.Buffer
+    sampler : wgpu.Sampler
+    texture-view : wgpu.TextureView
 
 struct GfxState
     surface : wgpu.Surface
@@ -44,6 +13,8 @@ struct GfxState
     device  : wgpu.Device
     swapchain : wgpu.SwapChain
     queue : wgpu.Queue
+
+    dummy-resources : GfxDummyResources
 
 global istate : GfxState
 

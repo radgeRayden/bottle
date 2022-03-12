@@ -4,6 +4,7 @@ using import .common
 using import .errors
 using import .render-pass
 
+import .binding-interface
 import ..window
 
 let sdl = (import ..FFI.sdl)
@@ -83,6 +84,8 @@ fn init ()
 
     istate.swapchain = (create-swapchain (window.get-size))
     istate.queue = (wgpu.DeviceGetQueue istate.device)
+
+    binding-interface.make-dummy-resources istate
     ;
 
 fn begin-frame ()
@@ -123,7 +126,7 @@ do
         from (import .pipeline)    let GPUPipeline GPUShaderModule
         from (import .render-pass) let RenderPass
         from (import .buffer)      let GPUBuffer
-        from (import .common)      let GPUResourceBinding
+        # from (import .common)      let GPUResourceBinding
         locals;
 
     locals;
