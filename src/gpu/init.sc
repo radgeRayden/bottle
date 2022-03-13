@@ -86,6 +86,7 @@ fn init ()
     istate.queue = (wgpu.DeviceGetQueue istate.device)
 
     binding-interface.make-dummy-resources istate
+    binding-interface.make-default-pipeline-layouts istate
     ;
 
 fn begin-frame ()

@@ -1,6 +1,7 @@
 using import enum
 using import struct
 using import Array
+using import String
 
 using import ..helpers
 
@@ -72,6 +73,9 @@ enum GPUResourceBinding
         default
             unreachable;
 
+# so we can "use" the enum later without duplicating the type
+run-stage;
+
 # DEFAULT INTERFACES
 # ================================================================================
 using GPUResourceBinding
@@ -100,6 +104,7 @@ enum GPUBindingLayout
             inline (T self)
                 getattr (elementof T.Type 0) attr
 
+# To be used when no resource is specified for a certain slot in a bind group
 fn make-dummy-resources (istate)
     let dummies = istate.dummy-resources
 
@@ -169,13 +174,97 @@ fn make-dummy-resources (istate)
                 aspect = wgpu.TextureAspect.All
     ;
 
+inline bind-group-layout-from-interface (istate name interface)
+    inline make-entry (i ...)
+        wgpu.BindGroupLayoutEntry
+            binding = (i as u32)
+            visibility = (wgpu.ShaderStage.Vertex | wgpu.ShaderStage.Fragment | wgpu.ShaderStage.Compute)
+            ...
+
+    local bgroup-entries : (Array wgpu.BindGroupLayoutEntry)
+
+    va-map
+        inline (i)
+            entry := (interface.entries @ i)
+
+            'append bgroup-entries
+                match entry
+                case GPUResourceBinding.Buffer
+                    make-entry i
+                        buffer =
+                            wgpu.BufferBindingLayout
+                                type = wgpu.BufferBindingType.ReadOnlyStorage
+                case GPUResourceBinding.Sampler
+                    make-entry i
+                        sampler =
+                            wgpu.SamplerBindingLayout
+                                type = wgpu.SamplerBindingType.Filtering
+                case GPUResourceBinding.TextureView
+                    make-entry i
+                        texture =
+                            wgpu.TextureBindingLayout
+                                sampleType = wgpu.TextureSampleType.Float
+                                viewDimension = wgpu.TextureViewDimension.2D
+                default
+                    assert false
+                    unreachable;
+
+        va-range ((countof interface.entries) as i32)
+
+    wgpu.DeviceCreateBindGroupLayout istate.device
+        &local wgpu.BindGroupLayoutDescriptor
+            label = (.. name " Bottle Bind Group Layout")
+            entryCount = ((countof interface.entries) as u32)
+            entries = (imply bgroup-entries pointer)
+
+spice gen-bgroup-layouts (istate cache)
+    let expr = (sc_expression_new)
+    for k v in sets
+        let name = (k as Symbol as string)
+        sc_expression_append expr
+            spice-quote
+                'set cache (String [name])
+                    bind-group-layout-from-interface istate name v
+    expr
+run-stage;
+
 fn make-default-pipeline-layouts (istate)
-    # let bgroup-layouts =
-    #     arrayof wgpu.BindGroupLayout
-    #         va-map
-    # let pipeline-layouts =
-    #     arrayof wgpu.PipelineLayout
-    #         va-map
+    let bgroup-layout-cache = istate.cached-layouts.bind-group-layouts
+    let pip-layout-cache = istate.cached-layouts.pipeline-layouts
+
+    # Populate Bind Group Layout cache
+    gen-bgroup-layouts istate bgroup-layout-cache
+
+    # Generate Pipeline Layouts
+    va-map
+        inline (f)
+            let Name Type = (f.Name as string) (elementof f.Type 0)
+
+            local bgroup-layouts : (Array wgpu.BindGroupLayout)
+            let bgroup-count = (countof Type.entries)
+            va-map
+                inline (i)
+                    let T = (Type.entries @ i)
+                    'append bgroup-layouts
+                        try
+                            'get bgroup-layout-cache (String (tostring T))
+                        except (ex)
+                            assert false (tostring T)
+                            unreachable;
+                    ;
+                va-range (bgroup-count as i32)
+
+            let pip-layout =
+                wgpu.DeviceCreatePipelineLayout istate.device
+                    &local wgpu.PipelineLayoutDescriptor
+                        label = (.. Name " Bottle Pipeline Layout")
+                        bindGroupLayoutCount = (bgroup-count as u32)
+                        bindGroupLayouts = (imply bgroup-layouts pointer)
+
+            'set pip-layout-cache (String Name) pip-layout
+
+        GPUBindingLayout.__fields__
+    ;
 
 do
     let
