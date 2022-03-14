@@ -53,6 +53,9 @@ fn create-swapchain (width height)
             height = (height as u32)
             presentMode = wgpu.PresentMode.Fifo
 
+fn update-render-area ()
+    istate.swapchain = (create-swapchain (window.get-size))
+
 fn init ()
     istate.surface = (create-surface)
 
@@ -92,7 +95,6 @@ fn init ()
 fn begin-frame ()
     let swapchain-image = (wgpu.SwapChainGetCurrentTextureView istate.swapchain)
     if (swapchain-image == null)
-        istate.swapchain = (create-swapchain (window.get-size))
         raise GPUError.OutdatedSwapchain
 
     let cmd-encoder =
@@ -120,7 +122,7 @@ fn present (render-pass)
     ;
 
 do
-    let init begin-frame present
+    let init update-render-area begin-frame present
 
     vvv bind types
     do

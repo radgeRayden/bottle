@@ -2,6 +2,7 @@ using import struct
 
 let sdl = (import ..FFI.sdl)
 import .callbacks
+import ..gpu
 
 struct SysEventsState
     really-quit? : bool
@@ -34,6 +35,12 @@ fn dispatch ()
             callbacks.on-key-pressed (event.key.keysym.sym as Key)
         case sdl.SDL_KEYUP
             callbacks.on-key-released (event.key.keysym.sym as Key)
+        case sdl.SDL_WINDOWEVENT
+            switch event.window.event
+            case sdl.SDL_WINDOWEVENT_RESIZED
+                gpu.update-render-area;
+            default
+                ;
         default
             ;
 
