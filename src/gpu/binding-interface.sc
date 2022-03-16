@@ -94,6 +94,8 @@ run-stage;
 
 using sets
 enum GPUBindingLayout
+    Empty :
+        define-interface Empty
     Basic :
         define-interface Basic
             StreamingMesh
@@ -103,6 +105,9 @@ enum GPUBindingLayout
         'apply self
             inline (T self)
                 getattr (elementof T.Type 0) attr
+
+# DEFAULT RESOURCE GENERATION
+# ================================================================================
 
 # To be used when no resource is specified for a certain slot in a bind group
 fn make-dummy-resources (istate)

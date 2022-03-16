@@ -67,45 +67,8 @@ struct GPUShaderModule
 
 struct GPUPipeline
     _handle : wgpu.RenderPipeline
-    _layout : wgpu.PipelineLayout
-    _bgroup-layout : wgpu.BindGroupLayout
 
-    fn make-bind-group-layout ()
-        local entries =
-            arrayof wgpu.BindGroupLayoutEntry
-                typeinit
-                    binding = 0
-                    visibility = wgpu.ShaderStage.Vertex
-                    buffer =
-                        wgpu.BufferBindingLayout
-                            type = wgpu.BufferBindingType.ReadOnlyStorage
-                            hasDynamicOffset = false
-                            minBindingSize = 0
-
-        let layout =
-            wgpu.DeviceCreateBindGroupLayout istate.device
-                &local wgpu.BindGroupLayoutDescriptor
-                    label = "Bottle bind group layout"
-                    entryCount = 1
-                    entries = &entries
-
-        assert (layout != null)
-        layout
-
-    fn make-pipeline-layout ()
-        local bgroup-layout = (make-bind-group-layout)
-
-        let pip-layout =
-            wgpu.DeviceCreatePipelineLayout istate.device
-                &local wgpu.PipelineLayoutDescriptor
-                    bindGroupLayoutCount = 1
-                    bindGroupLayouts = &bgroup-layout
-        assert (pip-layout != null)
-
-        wgpu.BindGroupLayoutDrop bgroup-layout
-        _ pip-layout bgroup-layout
-
-    fn make-pipeline (vertex-module fragment-module)
+    fn make-pipeline (layout-name vertex-module fragment-module)
         # FIXME: gotta clean this up. Overloads?
         let vertex-module fragment-module =
             static-if (none? fragment-module)
@@ -113,11 +76,17 @@ struct GPUPipeline
             else
                 _ vertex-module._handle fragment-module._handle
 
-        let pip-layout bgroup-layout = (make-pipeline-layout)
+        let pip-layout =
+            try
+                'get istate.cached-layouts.pipeline-layouts layout-name
+            else
+                assert false ((String "unknown pipeline layout: ") .. layout-name)
+                unreachable;
+
         let pipeline =
             wgpu.DeviceCreateRenderPipeline istate.device
                 &local wgpu.RenderPipelineDescriptor
-                    label = "bottle render pipeline"
+                    label = "Bottle Render Pipeline"
                     layout = pip-layout
                     vertex =
                         wgpu.VertexState
@@ -155,22 +124,14 @@ struct GPUPipeline
                                     writeMask = wgpu.ColorWriteMask.All
 
         wgpu.PipelineLayoutDrop pip-layout
-        _ pipeline pip-layout bgroup-layout
+        _ pipeline
 
-    inline __typecall (cls interface vertex-shader fragment-shader)
-        let handle layout bgroup-layout = (make-pipeline vertex-shader fragment-shader)
+    inline __typecall (cls interface-name vertex-shader fragment-shader)
         super-type.__typecall cls
-            _handle = handle
-            _layout = layout
-            _bgroup-layout = bgroup-layout
-
-    fn get-binding-layout (self)
-        self._bgroup-layout
+            _handle = (make-pipeline interface-name vertex-shader fragment-shader)
 
     inline __drop (self)
         wgpu.RenderPipelineDrop self._handle
-
-    unlet make-bind-group-layout make-pipeline-layout
 
 do
     let GPUPipeline GPUShaderModule
