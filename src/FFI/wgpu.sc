@@ -18,7 +18,7 @@ fold (scope = (Scope)) for k v in header.enum
     let T = (v as type)
     for k v in ('symbols T)
         let sname = (k as Symbol as string)
-        let match? start end = ('match? "^.+_" sname)
+        let match? start end = ('match? str"^.+_" sname)
         if match?
             'set-symbol T (Symbol (rslice sname end)) v
             'set-symbol T '__typecall enum-constructor
