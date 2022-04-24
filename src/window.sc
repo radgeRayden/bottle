@@ -1,5 +1,7 @@
 let sdl = (import .FFI.sdl)
 
+from (import .config) let istate-cfg
+
 global handle : (mutable@ sdl.Window)
 
 fn get-handle ()
@@ -29,16 +31,18 @@ fn get-size ()
     _ w h
 
 fn init ()
+    cfg := istate-cfg.window
+
     sdl.Init
         sdl.SDL_INIT_VIDEO
 
     handle =
         sdl.CreateWindow
-            "Game from Scratch Re:Birth"
+            cfg.title
             sdl.SDL_WINDOWPOS_UNDEFINED
             sdl.SDL_WINDOWPOS_UNDEFINED
-            640
-            480
+            cfg.width
+            cfg.height
             sdl.SDL_WINDOW_RESIZABLE
     ;
 

@@ -8,7 +8,7 @@ let syscallbacks = (import .src.sysevents.callbacks)
 
 vvv bind bottle
 do
-    from main let run load update draw
+    using main
     using syscallbacks
 
     let
