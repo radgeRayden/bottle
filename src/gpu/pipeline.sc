@@ -39,13 +39,14 @@ struct GPUShaderModule
         module
 
     inline __typecall (cls source flavor stage)
+        let T = (typeof source)
+
         vvv bind source
-        static-match (typeof source)
-        case String
-            source
-        case function
+        static-if ((T < zarray) or (T == String))
+            source as String
+        elseif (T == function)
             static-compile-spirv 0x10000 stage (static-typify source)
-        default
+        else
             static-error "unknown shader source type"
 
         vvv bind module
@@ -80,7 +81,7 @@ struct GPUPipeline
             try
                 'get istate.cached-layouts.pipeline-layouts layout-name
             else
-                assert false (string (S"unknown pipeline layout: " .. layout-name))
+                assert false ("unknown pipeline layout: " .. layout-name)
                 unreachable;
 
         let pipeline =
@@ -127,6 +128,7 @@ struct GPUPipeline
         _ pipeline
 
     inline __typecall (cls interface-name vertex-shader fragment-shader)
+        interface-name as:= String
         super-type.__typecall cls
             _handle = (make-pipeline interface-name vertex-shader fragment-shader)
 
