@@ -80,7 +80,7 @@ struct GPUPipeline
             try
                 'get istate.cached-layouts.pipeline-layouts layout-name
             else
-                assert false (string ((String "unknown pipeline layout: ") .. layout-name))
+                assert false (string (S"unknown pipeline layout: " .. layout-name))
                 unreachable;
 
         let pipeline =
