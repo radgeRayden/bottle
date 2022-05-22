@@ -3,11 +3,12 @@ using import Map
 using import String
 
 import wgpu
+from (import .binding-interface) let GPUResourceBinding
 
 struct GfxDummyResources
-    buffer : wgpu.Buffer
-    sampler : wgpu.Sampler
-    texture-view : wgpu.TextureView
+    buffer : GPUResourceBinding
+    sampler : GPUResourceBinding
+    texture-view : GPUResourceBinding
 
 struct GfxCachedLayouts
     bind-group-layouts : (Map String wgpu.BindGroupLayout)

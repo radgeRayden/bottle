@@ -24,6 +24,9 @@ struct RenderPass
     fn set-pipeline (self pipeline)
         wgpu.RenderPassEncoderSetPipeline self._handle pipeline._handle
 
+    fn set-bindgroup (self binding group)
+        wgpu.RenderPassEncoderSetBindGroup self._handle binding group 0 null
+
     fn set-bindings (self bindings...)
         wgpu.RenderPassEncoderSetBindGroup self._handle 0
             'get-bind-group istate bindings...

@@ -39,6 +39,7 @@ sugar define-interface (name elements...)
 run-stage;
 
 enum GPUResourceBinding
+    Invalid
     Buffer :
         buffer = wgpu.Buffer
         offset = u64
@@ -48,9 +49,9 @@ enum GPUResourceBinding
 
     fn make-wgpu-descriptor (self)
         dispatch self
-        case Buffer (handle offset size)
+        case Buffer (buffer offset size)
             wgpu.BindGroupEntry
-                buffer = handle
+                buffer = buffer
                 offset = offset
                 size = size
         case Sampler (handle)
@@ -72,6 +73,9 @@ enum GPUResourceBinding
             hash handle
         default
             unreachable;
+
+    inline __typecall (cls)
+        this-type.Invalid;
 
 # so we can "use" the enum later without duplicating the type
 run-stage;
@@ -114,30 +118,37 @@ fn make-dummy-resources (istate)
     let dummies = istate.dummy-resources
 
     let buffer-size = ((sizeof f32) * 4)
-    dummies.buffer =
+    local buf =
         wgpu.DeviceCreateBuffer istate.device
             &local wgpu.BufferDescriptor
                 label = "Dummy Bottle Buffer"
                 usage = wgpu.BufferUsage.Storage
                 size = buffer-size
                 mappedAtCreation = true
-
-    let bufdata = (wgpu.BufferGetMappedRange dummies.buffer 0 buffer-size)
+    let bufdata = (wgpu.BufferGetMappedRange buf 0 buffer-size)
     for i in (range 4)
         (bufdata as (mutable@ f32)) @ i = 1.0
-    wgpu.BufferUnmap dummies.buffer
+    wgpu.BufferUnmap buf
+
+    dummies.buffer =
+        GPUResourceBinding.Buffer
+            buffer = buf
+            offset = 0
+            size = buffer-size
+
 
     dummies.sampler =
-        wgpu.DeviceCreateSampler istate.device
-            &local wgpu.SamplerDescriptor
-                label = "Dummy Bottle Sampler"
-                addressModeU = wgpu.AddressMode.Repeat
-                addressModeV = wgpu.AddressMode.Repeat
-                addressModeW = wgpu.AddressMode.Repeat
-                magFilter = wgpu.FilterMode.Linear
-                minFilter = wgpu.FilterMode.Linear
-                mipmapFilter = wgpu.MipmapFilterMode.Linear
-                # might need to configure extra stuff
+        GPUResourceBinding.Sampler
+            wgpu.DeviceCreateSampler istate.device
+                &local wgpu.SamplerDescriptor
+                    label = "Dummy Bottle Sampler"
+                    addressModeU = wgpu.AddressMode.Repeat
+                    addressModeV = wgpu.AddressMode.Repeat
+                    addressModeW = wgpu.AddressMode.Repeat
+                    magFilter = wgpu.FilterMode.Linear
+                    minFilter = wgpu.FilterMode.Linear
+                    mipmapFilter = wgpu.MipmapFilterMode.Linear
+                    # might need to configure extra stuff
 
     # let this leak?
     local dummy-texture =
@@ -168,15 +179,16 @@ fn make-dummy-resources (istate)
         &local wgpu.Extent3D (width as u32) (height as u32) 1
 
     dummies.texture-view =
-        wgpu.TextureCreateView dummy-texture
-            &local wgpu.TextureViewDescriptor
-                format = wgpu.TextureFormat.RGBA8UnormSrgb
-                dimension = wgpu.TextureViewDimension.2D
-                baseMipLevel = 0
-                mipLevelCount = 1
-                baseArrayLayer = 0
-                arrayLayerCount = 1
-                aspect = wgpu.TextureAspect.All
+        GPUResourceBinding.TextureView
+            wgpu.TextureCreateView dummy-texture
+                &local wgpu.TextureViewDescriptor
+                    format = wgpu.TextureFormat.RGBA8UnormSrgb
+                    dimension = wgpu.TextureViewDimension.2D
+                    baseMipLevel = 0
+                    mipLevelCount = 1
+                    baseArrayLayer = 0
+                    arrayLayerCount = 1
+                    aspect = wgpu.TextureAspect.All
     ;
 
 inline bind-group-layout-from-interface (istate name interface)
@@ -275,4 +287,5 @@ do
     let
         make-dummy-resources
         make-default-pipeline-layouts
+        GPUResourceBinding
     locals;
