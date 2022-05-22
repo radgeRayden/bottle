@@ -7,8 +7,8 @@ using import .render-pass
 import .binding-interface
 import ..window
 
-let sdl = (import ..FFI.sdl)
-let wgpu = (import ..FFI.wgpu)
+import sdl
+import wgpu
 
 # MODULE FUNCTIONS START HERE
 # ================================================================================
@@ -20,10 +20,10 @@ fn create-surface ()
             &local wgpu.SurfaceDescriptor
                 nextInChain =
                     as
-                        &local wgpu.SurfaceDescriptorFromXlib
+                        &local wgpu.SurfaceDescriptorFromXlibWindow
                             chain =
                                 wgpu.ChainedStruct
-                                    sType = wgpu.SType.SurfaceDescriptorFromXlib
+                                    sType = wgpu.SType.SurfaceDescriptorFromXlibWindow
                             display = (x11-display as voidstar)
                             window = (x11-window as u32)
                         mutable@ wgpu.ChainedStruct
@@ -80,9 +80,24 @@ fn init ()
 
     wgpu.DeviceSetUncapturedErrorCallback istate.device
         fn (errtype message userdata)
+            raising noreturn
             print
                 errtype as wgpu.ErrorType
-                string message
+                "\n"
+                # FIXME: replace by something less stupid later; we don't want to use `string` anyway.
+                loop (result next = str"" (string message))
+                    let match? start end =
+                        try
+                            ('match? str"\\\\n" next) # for some reason newlines are escaped in shader error messages
+                        else
+                            _ false 0 0
+                    if match?
+                        _
+                            .. result (lslice next start) "\n"
+                            rslice next end
+                    else
+                        break (result .. next)
+            ;
         null
 
     istate.swapchain = (create-swapchain (window.get-size))
@@ -106,7 +121,9 @@ fn begin-frame ()
             arrayof wgpu.RenderPassColorAttachment
                 typeinit
                     view = swapchain-image
-                    clearColor = (typeinit 0.017 0.017 0.017 1.0)
+                    loadOp = wgpu.LoadOp.Clear
+                    storeOp = wgpu.StoreOp.Store
+                    clearValue = (typeinit 0.017 0.017 0.017 1.0)
 
     _ render-pass
 

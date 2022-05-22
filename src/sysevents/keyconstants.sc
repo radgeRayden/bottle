@@ -1,6 +1,6 @@
 using import enum
 
-let sdl = (import ..FFI.sdl)
+import sdl
 
 enum Key plain
     Unknown = sdl.SDLK_UNKNOWN

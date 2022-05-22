@@ -1,7 +1,5 @@
 using import FunctionChain
 
-let sdl = (import .FFI.sdl)
-
 import .sysevents
 import .window
 import .gpu

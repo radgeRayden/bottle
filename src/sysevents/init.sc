@@ -1,6 +1,6 @@
 using import struct
 
-let sdl = (import ..FFI.sdl)
+import sdl
 import .callbacks
 import ..gpu
 

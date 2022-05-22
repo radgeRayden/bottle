@@ -2,7 +2,7 @@ using import struct
 using import Map
 using import String
 
-let wgpu = (import ..FFI.wgpu)
+import wgpu
 
 struct GfxDummyResources
     buffer : wgpu.Buffer

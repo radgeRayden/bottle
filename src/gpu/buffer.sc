@@ -1,7 +1,7 @@
 using import struct
 using import .common
 using import ..helpers
-let wgpu = (import ..FFI.wgpu)
+import wgpu
 
 fn make-buffer (size)
     let handle =

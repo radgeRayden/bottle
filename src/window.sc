@@ -1,4 +1,4 @@
-let sdl = (import .FFI.sdl)
+import sdl
 
 from (import .config) let istate-cfg
 
@@ -11,7 +11,7 @@ fn get-native-info ()
     local info : sdl.SysWMinfo
     sdl.SDL_VERSION &info.version
 
-    assert (sdl.GetWindowWMInfo handle &info)
+    assert (storagecast (sdl.GetWindowWMInfo handle &info))
 
     let info = info.info
 

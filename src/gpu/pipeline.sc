@@ -4,7 +4,7 @@ using import String
 using import .common
 using import ..helpers
 
-let wgpu = (import ..FFI.wgpu)
+import wgpu
 
 struct GPUShaderModule
     _handle : wgpu.ShaderModule

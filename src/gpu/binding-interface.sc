@@ -5,7 +5,7 @@ using import String
 
 using import ..helpers
 
-let wgpu = (import ..FFI.wgpu)
+import wgpu
 
 sugar define-interface (name elements...)
     inline define-interface (name elements...)
@@ -136,7 +136,7 @@ fn make-dummy-resources (istate)
                 addressModeW = wgpu.AddressMode.Repeat
                 magFilter = wgpu.FilterMode.Linear
                 minFilter = wgpu.FilterMode.Linear
-                mipmapFilter = wgpu.FilterMode.Linear
+                mipmapFilter = wgpu.MipmapFilterMode.Linear
                 # might need to configure extra stuff
 
     # let this leak?

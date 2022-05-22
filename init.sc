@@ -1,5 +1,3 @@
-import .src.runtime
-
 let window = (import .src.window)
 let gpu = (import .src.gpu)
 let main = (import .src.main)

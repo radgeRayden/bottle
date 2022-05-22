@@ -1,7 +1,7 @@
 using import struct
 using import ..helpers
 using import .common
-let wgpu = (import ..FFI.wgpu)
+import wgpu
 
 struct RenderPass
     _handle : wgpu.RenderPassEncoder
@@ -34,7 +34,7 @@ struct RenderPass
         wgpu.RenderPassEncoderDraw self._handle vertex-count instance-count first-vertex first-instance
 
     fn finish (self)
-        wgpu.RenderPassEncoderEndPass self._handle
+        wgpu.RenderPassEncoderEnd self._handle
 
 do
     let RenderPass
