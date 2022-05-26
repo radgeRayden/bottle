@@ -10,35 +10,20 @@ fn make-buffer (size)
                 label = "Bottle Storage buffer"
                 usage = (wgpu.BufferUsage.Storage | wgpu.BufferUsage.CopyDst | wgpu.BufferUsage.CopySrc)
                 size = (imply size u64)
-
     handle
 
 
 struct GPUBuffer
     handle : wgpu.Buffer
-    bgroup : wgpu.BindGroup
     size : usize
 
     # FIXME: makes no sense that this needs the layout.
     # We won't be creating bind groups inside buffer in the future.
-    inline __typecall (cls size layout)
+    inline __typecall (cls size)
         let handle = (make-buffer size)
-        let bgroup =
-            wgpu.DeviceCreateBindGroup istate.device
-                &local wgpu.BindGroupDescriptor
-                    label = "bottle bind group"
-                    layout = layout
-                    entryCount = 1
-                    entries =
-                        &local wgpu.BindGroupEntry
-                            binding = 0
-                            buffer = handle
-                            offset = 0
-                            size = size
 
         super-type.__typecall cls
             handle = handle
-            bgroup = bgroup
             size = size
 
     # currently you can only write all the data.
