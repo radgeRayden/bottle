@@ -1,3 +1,4 @@
+using import Array
 using import struct
 using import .common
 using import ..helpers
@@ -13,28 +14,28 @@ fn make-buffer (size)
     handle
 
 
-struct GPUBuffer
-    handle : wgpu.Buffer
-    size : usize
+type GPUBuffer < Struct
+    @@ memo
+    inline __typecall (cls T)
+        struct (.. "GPUBuffer<" (tostring T) ">") < this-type
+            _handle : wgpu.Buffer
+            _size : usize
 
-    # FIXME: makes no sense that this needs the layout.
-    # We won't be creating bind groups inside buffer in the future.
-    inline __typecall (cls size)
-        let handle = (make-buffer size)
+            inline __typecall (cls max-elements)
+                size   := max-elements * (sizeof T)
+                handle := (make-buffer size)
 
-        super-type.__typecall cls
-            handle = handle
-            size = size
+                Struct.__typecall cls
+                    _handle = handle
+                    _size = size
 
-    # currently you can only write all the data.
-    # this is all pretty unsafe! Might add some more validation later.
-    fn write (self data)
-        let T = (typeof data)
-        assert ((sizeof T.ElementType) * (countof data) >= self.size)
-        wgpu.QueueWriteBuffer istate.queue self.handle 0 ((imply data pointer) as voidstar) self.size
+            fn... write (self, data : (Array T))
+                data-size := (sizeof ((typeof data) . ElementType)) * (countof data)
+                assert (data-size <= self._size)
+                wgpu.QueueWriteBuffer istate.queue self._handle 0 ((imply data pointer) as voidstar) self._size
 
-    inline __drop (self)
-        wgpu.BufferDrop self.handle
+            inline __drop (self)
+                wgpu.BufferDrop self._handle
 
 do
     let GPUBuffer
