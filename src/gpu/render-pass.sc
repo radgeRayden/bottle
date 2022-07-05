@@ -26,7 +26,7 @@ struct RenderPass
         wgpu.RenderPassEncoderSetPipeline self._handle pipeline._handle
 
     fn set-bindgroup (self binding group)
-        wgpu.RenderPassEncoderSetBindGroup self._handle binding group 0 null
+        wgpu.RenderPassEncoderSetBindGroup self._handle binding group._handle 0 null
 
     fn... set-index-buffer (self, ibuffer : GPUIndexBuffer)
         let format =
