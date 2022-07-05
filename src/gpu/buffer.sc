@@ -31,6 +31,7 @@ inline gen-buffer-type (prefix backing-type usage-flags)
             super-type.__typecall cls
                 _handle = handle
                 _size = size
+                _usage = usage-flags
 
         # if usage flags aren't statically provided, it means they must be passed at runtime
         let __typecall =
