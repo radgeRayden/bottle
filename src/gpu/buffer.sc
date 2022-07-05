@@ -8,7 +8,7 @@ fn make-buffer (size usage-flags)
     let handle =
         wgpu.DeviceCreateBuffer istate.device
             &local wgpu.BufferDescriptor
-                label = "Bottle Storage buffer"
+                label = "Bottle buffer"
                 usage = usage-flags
                 size = (imply size u64)
     handle
