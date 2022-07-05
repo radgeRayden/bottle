@@ -63,6 +63,10 @@ type GPUStorageBuffer < GPUBuffer
 
 type GPUIndexBuffer < GPUBuffer
     inline __typecall (cls backing-type)
+        static-if (not ((backing-type == u16) or (backing-type == u32)))
+            hide-traceback;
+            static-error "only u16 and u32 are allowed as index buffer backing types"
+
         gen-buffer-type "GPUIndexBuffer" backing-type
             wgpu.BufferUsage.Index | wgpu.BufferUsage.CopyDst | wgpu.BufferUsage.CopySrc
 
