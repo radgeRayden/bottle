@@ -145,7 +145,7 @@ do
     do
         from (import .pipeline)    let GPUPipeline GPUShaderModule
         from (import .render-pass) let RenderPass
-        from (import .buffer)      let GPUBuffer
+        from (import .buffer)      let GPUBuffer GPUStorageBuffer GPUIndexBuffer GPUUniformBuffer
         # from (import .common)      let GPUResourceBinding
         locals;
 
