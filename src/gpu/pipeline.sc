@@ -109,7 +109,7 @@ struct GPUPipeline
                             targetCount = 1
                             targets =
                                 &local wgpu.ColorTargetState
-                                    format = (wgpu.SurfaceGetPreferredFormat istate.surface istate.adapter)
+                                    format = (get-preferred-surface-format)
                                     blend =
                                         &local wgpu.BlendState
                                             color =

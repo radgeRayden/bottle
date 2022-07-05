@@ -48,7 +48,7 @@ fn create-swapchain (width height)
         &local wgpu.SwapChainDescriptor
             label = "swapchain"
             usage = wgpu.TextureUsage.RenderAttachment
-            format = (wgpu.SurfaceGetPreferredFormat istate.surface istate.adapter)
+            format = (get-preferred-surface-format)
             width = (width as u32)
             height = (height as u32)
             presentMode = wgpu.PresentMode.Fifo
