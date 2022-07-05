@@ -16,8 +16,8 @@ fn make-buffer (size usage-flags)
 type GPUBuffer < Struct
 
 @@ memo
-inline gen-buffer-type (prefix backing-type usage-flags)
-    struct (.. prefix "<" (tostring backing-type) ">") < GPUBuffer
+inline gen-buffer-type (parent-type prefix backing-type usage-flags)
+    struct (.. prefix "<" (tostring backing-type) ">") < parent-type
         _handle : wgpu.Buffer
         _size : usize
         _usage : wgpu.BufferUsage
@@ -25,10 +25,12 @@ inline gen-buffer-type (prefix backing-type usage-flags)
         let BackingType = backing-type
 
         inline constructor (cls max-elements usage-flags)
+            # TODO: ensure size obeys alignment rules
             size   := max-elements * (sizeof BackingType)
             handle := (make-buffer size usage-flags)
 
-            super-type.__typecall cls
+            # use Struct directly to avoid hierarchy issues
+            Struct.__typecall cls
                 _handle = handle
                 _size = size
                 _usage = usage-flags
@@ -54,11 +56,11 @@ inline gen-buffer-type (prefix backing-type usage-flags)
 
 type GPUGenericBuffer < GPUBuffer
     inline __typecall (cls backing-type)
-        gen-buffer-type "GPUBuffer" backing-type
+        gen-buffer-type this-type "GPUBuffer" backing-type
 
 type GPUStorageBuffer < GPUBuffer
     inline __typecall (cls backing-type)
-        gen-buffer-type "GPUStorageBuffer" backing-type
+        gen-buffer-type this-type "GPUStorageBuffer" backing-type
             wgpu.BufferUsage.Storage | wgpu.BufferUsage.CopyDst | wgpu.BufferUsage.CopySrc
 
 type GPUIndexBuffer < GPUBuffer
@@ -67,12 +69,12 @@ type GPUIndexBuffer < GPUBuffer
             hide-traceback;
             static-error "only u16 and u32 are allowed as index buffer backing types"
 
-        gen-buffer-type "GPUIndexBuffer" backing-type
+        gen-buffer-type this-type "GPUIndexBuffer" backing-type
             wgpu.BufferUsage.Index | wgpu.BufferUsage.CopyDst | wgpu.BufferUsage.CopySrc
 
 type GPUUniformBuffer < GPUBuffer
     inline __typecall (cls backing-type)
-        gen-buffer-type "GPUUniformBuffer" backing-type
+        gen-buffer-type this-type "GPUUniformBuffer" backing-type
             wgpu.BufferUsage.Uniform | wgpu.BufferUsage.CopyDst | wgpu.BufferUsage.CopySrc
 
 do

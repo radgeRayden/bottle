@@ -1,6 +1,7 @@
 using import struct
 using import ..helpers
 using import .common
+using import .buffer
 import wgpu
 
 struct RenderPass
@@ -26,6 +27,18 @@ struct RenderPass
 
     fn set-bindgroup (self binding group)
         wgpu.RenderPassEncoderSetBindGroup self._handle binding group 0 null
+
+    fn... set-index-buffer (self, ibuffer : GPUIndexBuffer)
+        let format =
+            static-match ((typeof ibuffer) . BackingType)
+            case u16
+                wgpu.IndexFormat.Uint16
+            case u32
+                wgpu.IndexFormat.Uint32
+            default
+                static-error "invalid index buffer type"
+
+        wgpu.RenderPassEncoderSetIndexBuffer self._handle ibuffer._handle format 0 ibuffer._size
 
     fn set-bindings (self bindings...)
         wgpu.RenderPassEncoderSetBindGroup self._handle 0
