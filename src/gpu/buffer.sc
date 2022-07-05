@@ -41,7 +41,7 @@ inline gen-buffer-type (prefix backing-type usage-flags)
                 inline __typecall (cls max-elements)
                     constructor cls max-elements usage-flags
 
-        fn... write (self, data : (Array backing-type))
+        fn... write (self, data : (Array BackingType))
             data-size := (sizeof ((typeof data) . ElementType)) * (countof data)
             assert (data-size <= self._size)
             wgpu.QueueWriteBuffer istate.queue self._handle 0 ((imply data pointer) as voidstar) self._size
