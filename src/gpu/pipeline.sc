@@ -114,13 +114,13 @@ struct GPUPipeline
                                         &local wgpu.BlendState
                                             color =
                                                 typeinit
-                                                    srcFactor = wgpu.BlendFactor.One
-                                                    dstFactor = wgpu.BlendFactor.Zero
+                                                    srcFactor = wgpu.BlendFactor.SrcAlpha
+                                                    dstFactor = wgpu.BlendFactor.OneMinusSrcAlpha
                                                     operation = wgpu.BlendOperation.Add
                                             alpha =
                                                 typeinit
-                                                    srcFactor = wgpu.BlendFactor.One
-                                                    dstFactor = wgpu.BlendFactor.Zero
+                                                    srcFactor = wgpu.BlendFactor.SrcAlpha
+                                                    dstFactor = wgpu.BlendFactor.OneMinusSrcAlpha
                                                     operation = wgpu.BlendOperation.Add
                                     writeMask = wgpu.ColorWriteMask.All
 
