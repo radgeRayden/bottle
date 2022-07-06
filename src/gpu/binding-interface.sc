@@ -44,12 +44,21 @@ enum GPUResourceBinding
         buffer = wgpu.Buffer
         offset = u64
         size = u64
+    UniformBuffer :
+        buffer = wgpu.Buffer
+        offset = u64
+        size = u64
     Sampler : wgpu.Sampler
     TextureView : wgpu.TextureView
 
     fn make-wgpu-descriptor (self)
         dispatch self
         case Buffer (buffer offset size)
+            wgpu.BindGroupEntry
+                buffer = buffer
+                offset = offset
+                size = size
+        case UniformBuffer (buffer offset size)
             wgpu.BindGroupEntry
                 buffer = buffer
                 offset = offset
@@ -91,7 +100,7 @@ do
         TextureView
 
     define-interface Uniforms
-        Buffer
+        UniformBuffer
 
     locals;
 run-stage;
@@ -211,6 +220,11 @@ inline bind-group-layout-from-interface (istate name interface)
                         buffer =
                             wgpu.BufferBindingLayout
                                 type = wgpu.BufferBindingType.ReadOnlyStorage
+                case GPUResourceBinding.UniformBuffer
+                    make-entry i
+                        buffer =
+                            wgpu.BufferBindingLayout
+                                type = wgpu.BufferBindingType.Uniform
                 case GPUResourceBinding.Sampler
                     make-entry i
                         sampler =
