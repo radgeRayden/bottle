@@ -145,6 +145,23 @@ fn make-dummy-resources (istate)
             offset = 0
             size = buffer-size
 
+    local buf =
+        wgpu.DeviceCreateBuffer istate.device
+            &local wgpu.BufferDescriptor
+                label = "Dummy Bottle Buffer"
+                usage = wgpu.BufferUsage.Uniform
+                size = buffer-size
+                mappedAtCreation = true
+    let bufdata = (wgpu.BufferGetMappedRange buf 0 buffer-size)
+    for i in (range 4)
+        (bufdata as (mutable@ f32)) @ i = 1.0
+    wgpu.BufferUnmap buf
+
+    dummies.uniform-buffer =
+        GPUResourceBinding.UniformBuffer
+            buffer = buf
+            offset = 0
+            size = buffer-size
 
     dummies.sampler =
         GPUResourceBinding.Sampler

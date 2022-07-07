@@ -7,6 +7,7 @@ from (import .binding-interface) let GPUResourceBinding
 
 struct GfxDummyResources
     buffer : GPUResourceBinding
+    uniform-buffer : GPUResourceBinding
     sampler : GPUResourceBinding
     texture-view : GPUResourceBinding
 
