@@ -1,4 +1,5 @@
 using import struct
+using import String
 using import ..helpers
 using import .common
 using import .errors
@@ -12,6 +13,21 @@ import wgpu
 
 # MODULE FUNCTIONS START HERE
 # ================================================================================
+struct GPUBackendInfo
+    gpu : String
+
+fn get-backend-info ()
+    local properties : wgpu.AdapterProperties
+    wgpu.AdapterGetProperties istate.adapter &properties
+
+    local info : GPUBackendInfo
+    let strlen = (extern 'strlen (function usize (@ char)))
+
+    if (properties.name != null)
+        info.gpu = (String properties.name (strlen properties.name))
+
+    info
+
 fn create-surface ()
     static-match operating-system
     case 'linux
@@ -140,12 +156,14 @@ fn present (render-pass)
 
 do
     let init update-render-area begin-frame present
+    let get-backend-info
 
     vvv bind types
     do
         from (import .pipeline)    let GPUPipeline GPUShaderModule
         from (import .render-pass) let RenderPass
         from (import .buffer)      let GPUBuffer GPUStorageBuffer GPUIndexBuffer GPUUniformBuffer
+        from (import .texture)     let GPUTexture
         # from (import .common)      let GPUResourceBinding
         locals;
 
