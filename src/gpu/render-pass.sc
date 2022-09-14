@@ -49,6 +49,9 @@ struct RenderPass
     fn draw (self vertex-count instance-count first-vertex first-instance)
         wgpu.RenderPassEncoderDraw self._handle vertex-count instance-count first-vertex first-instance
 
+    fn draw-indexed (self index-count instance-count first-index first-instance)
+        wgpu.RenderPassEncoderDrawIndexed self._handle index-count instance-count first-index 0:u32 first-instance
+
     fn finish (self)
         wgpu.RenderPassEncoderEnd self._handle
 
