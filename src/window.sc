@@ -30,8 +30,22 @@ fn get-size ()
     sdl.GetWindowSize handle &w &h
     _ w h
 
+fn get-drawable-size ()
+    local w : i32
+    local h : i32
+    sdl.GetWindowSizeInPixels handle &w &h
+    _ w h
+
+fn get-desktop-scaling-factor ()
+    let scaled = (get-size)
+    let drawable = (get-drawable-size)
+    drawable / scaled
+
 fn init ()
     cfg := istate-cfg.window
+
+    if (operating-system == 'windows)
+        sdl.SetHint sdl.SDL_HINT_WINDOWS_DPI_SCALING "1"
 
     sdl.Init
         sdl.SDL_INIT_VIDEO
@@ -53,4 +67,6 @@ do
 
         init
         get-size
+        get-drawable-size
+        get-desktop-scaling-factor
     locals;
