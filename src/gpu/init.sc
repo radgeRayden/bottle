@@ -70,7 +70,7 @@ fn create-swapchain (width height)
             presentMode = wgpu.PresentMode.Fifo
 
 fn update-render-area ()
-    istate.swapchain = (create-swapchain (window.get-size))
+    istate.swapchain = (create-swapchain (window.get-drawable-size))
 
 fn init ()
     istate.surface = (create-surface)
@@ -116,7 +116,7 @@ fn init ()
             ;
         null
 
-    istate.swapchain = (create-swapchain (window.get-size))
+    istate.swapchain = (create-swapchain (window.get-drawable-size))
     istate.queue = (wgpu.DeviceGetQueue istate.device)
 
     binding-interface.make-dummy-resources istate
