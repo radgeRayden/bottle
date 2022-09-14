@@ -15,6 +15,7 @@ import wgpu
 # ================================================================================
 struct GPUBackendInfo
     gpu : String
+    backend : String
 
 fn get-backend-info ()
     local properties : wgpu.AdapterProperties
@@ -25,6 +26,27 @@ fn get-backend-info ()
 
     if (properties.name != null)
         info.gpu = (String properties.name (strlen properties.name))
+    info.backend =
+        do
+            switch properties.backendType
+            case wgpu.BackendType.Null
+                S"Null"
+            case wgpu.BackendType.WebGPU
+                S"WebGPU"
+            case wgpu.BackendType.D3D11
+                S"D3D11"
+            case wgpu.BackendType.D3D12
+                S"D3D12"
+            case wgpu.BackendType.Metal
+                S"Metal"
+            case wgpu.BackendType.Vulkan
+                S"Vulkan"
+            case wgpu.BackendType.OpenGL
+                S"OpenGL"
+            case wgpu.BackendType.OpenGLES
+                S"OpenGLES"
+            default
+                S"Unknown"
 
     info
 
