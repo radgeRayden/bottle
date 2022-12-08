@@ -44,10 +44,14 @@ inline gen-buffer-type (parent-type prefix backing-type usage-flags)
                 inline __typecall (cls max-elements)
                     constructor cls max-elements usage-flags
 
-        fn... write (self, data : (Array BackingType))
-            data-size := (sizeof ((typeof data) . ElementType)) * (countof data)
+        fn... write (self, data : (Array BackingType), offset : usize, count : usize)
+            data-size := (sizeof ((typeof data) . ElementType)) * count
             assert (data-size <= self._size)
-            wgpu.QueueWriteBuffer istate.queue self._handle 0 ((imply data pointer) as voidstar) self._size
+            wgpu.QueueWriteBuffer istate.queue self._handle offset ((imply data pointer) as voidstar) data-size
+        case (self, data : (Array BackingType), offset : usize)
+            this-function self data offset (countof data)
+        case (self, data : (Array BackingType))
+            this-function self data 0 (countof data)
 
         inline __drop (self)
             wgpu.BufferDrop self._handle
