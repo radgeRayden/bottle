@@ -4,6 +4,7 @@ import .sysevents
 import .window
 import .gpu
 import .config
+import .timer
 
 fnchain load
 fnchain update
@@ -15,11 +16,14 @@ fn run ()
 
     window.init;
     gpu.init;
+    timer.init;
     load;
 
     while (not (sysevents.really-quit?))
         sysevents.dispatch;
-        update;
+
+        timer.step;
+        update (timer.get-delta-time)
 
         try
             let render-pass = (gpu.begin-frame)
