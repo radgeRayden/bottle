@@ -41,6 +41,11 @@ fn get-desktop-scaling-factor ()
     let drawable = (get-drawable-size)
     drawable / scaled
 
+fn minimized? ()
+    as
+        (sdl.GetWindowFlags handle) & sdl.SDL_WINDOW_MINIMIZED
+        bool
+
 fn init ()
     cfg := istate-cfg.window
 
@@ -69,4 +74,5 @@ do
         get-size
         get-drawable-size
         get-desktop-scaling-factor
+        minimized?
     locals;
