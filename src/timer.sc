@@ -10,7 +10,7 @@ fn init ()
 
 
 fn get-delta-time ()
-    delta-time
+    deref delta-time
 
 fn step ()
     let now = (get-time)
