@@ -39,6 +39,8 @@ fn dispatch ()
             switch event.window.event
             case sdl.SDL_WINDOWEVENT_RESIZED
                 gpu.update-render-area;
+            case sdl.SDL_WINDOWEVENT_RESTORED
+                gpu.update-render-area;
             default
                 ;
         default

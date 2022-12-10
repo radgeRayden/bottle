@@ -30,7 +30,7 @@ fn run ()
             draw render-pass
             gpu.present render-pass
         else
-            return;
+            ()
 
 do
     let run load update draw configure
