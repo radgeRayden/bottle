@@ -1,6 +1,7 @@
 using import struct
 using import Map
 using import String
+using import glm
 
 import wgpu
 from (import .binding-interface) let GPUResourceBinding
@@ -24,6 +25,8 @@ struct GfxState
 
     dummy-resources : GfxDummyResources
     cached-layouts  : GfxCachedLayouts
+
+    clear-color = (vec4 0.017 0.017 0.017 1.0)
 
 global istate : GfxState
 

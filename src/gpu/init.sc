@@ -145,6 +145,9 @@ fn init ()
     binding-interface.make-default-pipeline-layouts istate
     ;
 
+fn set-clear-color (color)
+    istate.clear-color = color
+
 fn begin-frame ()
     let swapchain-image = (wgpu.SwapChainGetCurrentTextureView istate.swapchain)
     if (swapchain-image == null)
@@ -161,7 +164,7 @@ fn begin-frame ()
                     view = swapchain-image
                     loadOp = wgpu.LoadOp.Clear
                     storeOp = wgpu.StoreOp.Store
-                    clearValue = (typeinit 0.017 0.017 0.017 1.0)
+                    clearValue = (typeinit (unpack istate.clear-color))
 
     _ render-pass
 
@@ -177,7 +180,7 @@ fn present (render-pass)
     ;
 
 do
-    let init update-render-area begin-frame present
+    let init update-render-area set-clear-color begin-frame present
     let get-backend-info
 
     vvv bind types
