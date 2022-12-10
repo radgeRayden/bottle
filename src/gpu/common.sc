@@ -17,6 +17,7 @@ struct GfxCachedLayouts
     pipeline-layouts : (Map String wgpu.PipelineLayout)
 
 struct GfxState
+    instance  : wgpu.Instance
     surface   : wgpu.Surface
     adapter   : wgpu.Adapter
     device    : wgpu.Device

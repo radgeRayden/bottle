@@ -54,7 +54,7 @@ fn create-surface ()
     static-match operating-system
     case 'linux
         let x11-display x11-window = (window.get-native-info)
-        wgpu.InstanceCreateSurface null
+        wgpu.InstanceCreateSurface istate.instance
             &local wgpu.SurfaceDescriptor
                 nextInChain =
                     as
@@ -67,7 +67,7 @@ fn create-surface ()
                         mutable@ wgpu.ChainedStruct
     case 'windows
         let hinstance hwnd = (window.get-native-info)
-        wgpu.InstanceCreateSurface null
+        wgpu.InstanceCreateSurface istate.instance
             &local wgpu.SurfaceDescriptor
                 nextInChain =
                     as
@@ -95,10 +95,14 @@ fn update-render-area ()
     istate.swapchain = (create-swapchain (window.get-drawable-size))
 
 fn init ()
+    istate.instance =
+        wgpu.CreateInstance
+            &local wgpu.InstanceDescriptor
+
     istate.surface = (create-surface)
 
     # FIXME: check for status code!
-    wgpu.InstanceRequestAdapter null
+    wgpu.InstanceRequestAdapter istate.instance
         &local wgpu.RequestAdapterOptions
             compatibleSurface = istate.surface
             powerPreference = wgpu.PowerPreference.HighPerformance
