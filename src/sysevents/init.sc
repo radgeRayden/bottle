@@ -3,6 +3,7 @@ using import struct
 import sdl
 import .callbacks
 import ..gpu
+import ..enums
 
 struct SysEventsState
     really-quit? : bool
@@ -22,7 +23,7 @@ fn quit ()
     ;
 
 fn dispatch ()
-    using import .keyconstants
+    from enums let Key
 
     local event : sdl.Event
     while (sdl.PollEvent &event)

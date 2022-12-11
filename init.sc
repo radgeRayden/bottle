@@ -3,6 +3,7 @@ let gpu = (import .src.gpu)
 let main = (import .src.main)
 let sysevents = (import .src.sysevents)
 let syscallbacks = (import .src.sysevents.callbacks)
+let enums = (import .src.enums)
 
 vvv bind bottle
 do
@@ -12,7 +13,7 @@ do
     let
         window
         gpu
-        sysevents
+        enums
 
     locals;
 
