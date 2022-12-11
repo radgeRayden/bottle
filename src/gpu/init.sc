@@ -153,6 +153,9 @@ fn set-clear-color (color)
     istate.clear-color = color
 
 fn begin-frame ()
+    if (window.minimized?)
+        raise GPUError.OutdatedSwapchain
+
     let swapchain-image = (wgpu.SwapChainGetCurrentTextureView istate.swapchain)
     if (swapchain-image == null)
         raise GPUError.OutdatedSwapchain
