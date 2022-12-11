@@ -29,13 +29,13 @@ fn dispatch ()
     while (sdl.PollEvent &event)
         switch event.type
         case sdl.SDL_QUIT
-            let result = (callbacks.on-quit)
+            let result = (callbacks.quit)
             istate.really-quit? =
                 (none? result) or (imply result bool)
         case sdl.SDL_KEYDOWN
-            callbacks.on-key-pressed (event.key.keysym.sym as Key)
+            callbacks.key-pressed (event.key.keysym.sym as Key)
         case sdl.SDL_KEYUP
-            callbacks.on-key-released (event.key.keysym.sym as Key)
+            callbacks.key-released (event.key.keysym.sym as Key)
         case sdl.SDL_WINDOWEVENT
             switch event.window.event
             case sdl.SDL_WINDOWEVENT_RESIZED

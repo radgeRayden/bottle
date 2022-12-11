@@ -1,7 +1,7 @@
 using import FunctionChain
 
 do
-    fnchain on-quit
-    fnchain on-key-pressed
-    fnchain on-key-released
+    fnchain quit
+    fnchain key-pressed
+    fnchain key-released
     locals;
