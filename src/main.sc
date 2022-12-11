@@ -33,5 +33,7 @@ fn run ()
             ()
 
 do
+    using import .sysevents.callbacks
+
     let run load update draw configure
     locals;
