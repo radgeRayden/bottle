@@ -15,6 +15,8 @@ do
         gpu
         enums
 
+    let quit! = sysevents.quit
+
     locals;
 
 bottle
