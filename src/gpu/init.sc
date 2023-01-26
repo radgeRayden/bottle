@@ -115,7 +115,38 @@ fn init ()
         &local wgpu.DeviceDescriptor
             requiredLimits =
                 &local wgpu.RequiredLimits
+                    limits =
+                        wgpu.Limits
+                            maxBindGroups = wgpu.WGPU_LIMIT_U32_UNDEFINED
+                            maxTextureDimension1D = wgpu.WGPU_LIMIT_U32_UNDEFINED
+                            maxTextureDimension2D = wgpu.WGPU_LIMIT_U32_UNDEFINED
+                            maxTextureDimension3D = wgpu.WGPU_LIMIT_U32_UNDEFINED
+                            maxTextureArrayLayers = wgpu.WGPU_LIMIT_U32_UNDEFINED
+                            maxDynamicUniformBuffersPerPipelineLayout = wgpu.WGPU_LIMIT_U32_UNDEFINED
+                            maxDynamicStorageBuffersPerPipelineLayout = wgpu.WGPU_LIMIT_U32_UNDEFINED
+                            maxSampledTexturesPerShaderStage = wgpu.WGPU_LIMIT_U32_UNDEFINED
+                            maxSamplersPerShaderStage = wgpu.WGPU_LIMIT_U32_UNDEFINED
+                            maxStorageBuffersPerShaderStage = wgpu.WGPU_LIMIT_U32_UNDEFINED
+                            maxStorageTexturesPerShaderStage = wgpu.WGPU_LIMIT_U32_UNDEFINED
+                            maxUniformBuffersPerShaderStage = wgpu.WGPU_LIMIT_U32_UNDEFINED
+                            maxUniformBufferBindingSize = wgpu.WGPU_LIMIT_U64_UNDEFINED
+                            maxStorageBufferBindingSize = wgpu.WGPU_LIMIT_U64_UNDEFINED
+                            minUniformBufferOffsetAlignment = wgpu.WGPU_LIMIT_U32_UNDEFINED
+                            minStorageBufferOffsetAlignment = wgpu.WGPU_LIMIT_U32_UNDEFINED
+                            maxVertexBuffers = wgpu.WGPU_LIMIT_U32_UNDEFINED
+                            maxBufferSize = wgpu.WGPU_LIMIT_U64_UNDEFINED
+                            maxVertexAttributes = wgpu.WGPU_LIMIT_U32_UNDEFINED
+                            maxVertexBufferArrayStride = wgpu.WGPU_LIMIT_U32_UNDEFINED
+                            maxInterStageShaderComponents = wgpu.WGPU_LIMIT_U32_UNDEFINED
+                            maxComputeWorkgroupStorageSize = wgpu.WGPU_LIMIT_U32_UNDEFINED
+                            maxComputeInvocationsPerWorkgroup = wgpu.WGPU_LIMIT_U32_UNDEFINED
+                            maxComputeWorkgroupSizeX = wgpu.WGPU_LIMIT_U32_UNDEFINED
+                            maxComputeWorkgroupSizeY = wgpu.WGPU_LIMIT_U32_UNDEFINED
+                            maxComputeWorkgroupSizeZ = wgpu.WGPU_LIMIT_U32_UNDEFINED
+                            maxComputeWorkgroupsPerDimension = wgpu.WGPU_LIMIT_U32_UNDEFINED
         fn (status result msg userdata)
+            if (status != wgpu.RequestDeviceStatus.Success)
+                print (String msg) # FIXME: don't use print! need logging
             istate.device = result
             ;
         null
