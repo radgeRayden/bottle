@@ -1,0 +1,115 @@
+# This recipe builds most of stb's libraries as a single shared library. Libraries that needed additional
+# code or mandatory configuration were excluded.
+
+VERSION := "master"
+SUMMARY := "stb single-file public domain libraries for C/C++"
+
+amalgamated-source :=
+    tempfile
+        """"#define STB_HEXWAVE_IMPLEMENTATION
+            #include "stb_hexwave.h"
+
+            #define STB_IMAGE_IMPLEMENTATION
+            #include "stb_image.h"
+
+            #define STB_RECT_PACK_IMPLEMENTATION
+            #include "stb_rect_pack.h"
+
+            #define STB_TRUETYPE_IMPLEMENTATION
+            #include "stb_truetype.h"
+
+            #define STB_IMAGE_WRITE_IMPLEMENTATION
+            #include "stb_image_write.h"
+
+            #define STB_IMAGE_RESIZE_IMPLEMENTATION
+            #include "stb_image_resize.h"
+
+            #define STB_SPRINTF_IMPLEMENTATION
+            #include "stb_sprintf.h"
+
+            #define STB_VOXEL_RENDER_IMPLEMENTATION
+            #define STBVOX_CONFIG_MODE 0
+            #include "stb_voxel_render.h"
+
+            #define STB_DXT_IMPLEMENTATION
+            #include "stb_dxt.h"
+
+            #define STB_HERRINGBONE_WANG_TILE_IMPLEMENTATION
+            #include "stb_herringbone_wang_tile.h"
+
+            #define STB_C_LEXER_IMPLEMENTATION
+            #include "stb_c_lexer.h"
+
+            #define STB_DIVIDE_IMPLEMENTATION
+            #include "stb_divide.h"
+
+            #define STB_LEAKCHECK_IMPLEMENTATION
+            #include "stb_leakcheck.h"
+
+            #define STB_INCLUDE_IMPLEMENTATION
+            #define STB_INCLUDE_LINE_GLSL
+            #include "stb_include.h"
+
+archive := (download "https://github.com/nothings/stb/archive/{VERSION}.tar.gz")
+source-path := (commonpath (extract archive))
+
+fn shared-library (libname)
+    then
+        bindir := (mkdir "{source-path}/build")
+        cmd := (shell bindir)
+        cmd "gcc -shared -fPIC -O2 -o {libname} -I.. -x c {amalgamated-source} ../stb_vorbis.c"
+        "{bindir}/{libname}"
+
+bindings := (commonpath (extract (download "https://github.com/ScopesCommunity/eo-packages/archive/master.tar.gz")))
+
+package stb
+    summary SUMMARY
+    platform linux unknown
+    version VERSION
+
+    libname := "libstb.so"
+    alias "/lib/{libname}" (shared-library libname)
+
+    alias "/include/stb_hexwave.h" "{source-path}/stb_hexwave.h"
+    alias "/include/stb_image.h" "{source-path}/stb_image.h"
+    alias "/include/stb_rect_pack.h" "{source-path}/stb_rect_pack.h"
+    alias "/include/stb_truetype.h" "{source-path}/stb_truetype.h"
+    alias "/include/stb_image_write.h" "{source-path}/stb_image_write.h"
+    alias "/include/stb_image_resize.h" "{source-path}/stb_image_resize.h"
+    alias "/include/stb_sprintf.h" "{source-path}/stb_sprintf.h"
+    alias "/include/stb_voxel_render.h" "{source-path}/stb_voxel_render.h"
+    alias "/include/stb_dxt.h" "{source-path}/stb_dxt.h"
+    alias "/include/stb_herringbone_wang_tile.h" "{source-path}/stb_herringbone_wang_tile.h"
+    alias "/include/stb_c_lexer.h" "{source-path}/stb_c_lexer.h"
+    alias "/include/stb_divide.h" "{source-path}/stb_divide.h"
+    alias "/include/stb_leakcheck.h" "{source-path}/stb_leakcheck.h"
+    alias "/include/stb_include.h" "{source-path}/stb_include.h"
+    alias "/include/stb_vorbis.c" "{source-path}/stb_vorbis.c"
+
+    in "/lib/scopes/packages" "{bindings}/bindings/stb"
+
+package stb
+    summary SUMMARY
+    platform windows-mingw
+    version VERSION
+
+    libname := "libstb.dll"
+    alias "/lib/{libname}" (shared-library libname)
+
+    alias "/include/stb_hexwave.h" "{source-path}/stb_hexwave.h"
+    alias "/include/stb_image.h" "{source-path}/stb_image.h"
+    alias "/include/stb_rect_pack.h" "{source-path}/stb_rect_pack.h"
+    alias "/include/stb_truetype.h" "{source-path}/stb_truetype.h"
+    alias "/include/stb_image_write.h" "{source-path}/stb_image_write.h"
+    alias "/include/stb_image_resize.h" "{source-path}/stb_image_resize.h"
+    alias "/include/stb_sprintf.h" "{source-path}/stb_sprintf.h"
+    alias "/include/stb_voxel_render.h" "{source-path}/stb_voxel_render.h"
+    alias "/include/stb_dxt.h" "{source-path}/stb_dxt.h"
+    alias "/include/stb_herringbone_wang_tile.h" "{source-path}/stb_herringbone_wang_tile.h"
+    alias "/include/stb_c_lexer.h" "{source-path}/stb_c_lexer.h"
+    alias "/include/stb_divide.h" "{source-path}/stb_divide.h"
+    alias "/include/stb_leakcheck.h" "{source-path}/stb_leakcheck.h"
+    alias "/include/stb_include.h" "{source-path}/stb_include.h"
+    alias "/include/stb_vorbis.c" "{source-path}/stb_vorbis.c"
+
+    in "/lib/scopes/packages" "{bindings}/bindings/stb"

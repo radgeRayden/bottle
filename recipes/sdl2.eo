@@ -1,0 +1,43 @@
+# modified from https://hg.sr.ht/~duangle/majoreo/browse/testing/recipes/sdl2.eo?rev=tip
+VERSION := "SDL2"
+SUMMARY := "Simple DirectMedia Layer"
+
+archive :=
+    download
+        "https://github.com/libsdl-org/SDL/archive/{VERSION}.tar.gz"
+
+preinstall-dir :=
+    then
+        build-path :=
+            commonpath
+                extract archive
+        build-command :=
+            shell
+                mkdir "{build-path}/build"
+                dict
+                    CFLAGS = "-fPIC"
+                    CXXFLAGS = "-fPIC"
+        install-tmp-dir := (tempdir)
+        build-command "sh ../configure --prefix {install-tmp-dir}"
+        build-command "make -j {cpu-core-count}"
+        build-command "make install"
+        install-tmp-dir
+
+bindings :=
+    download "https://raw.githubusercontent.com/ScopesCommunity/eo-packages/main/bindings/sdl.sc"
+
+package sdl2
+    summary SUMMARY
+    version VERSION
+    platform linux unknown
+    alias "/lib/libSDL2.so" "{preinstall-dir}/lib/libSDL2.so"
+    alias "/lib/scopes/packages/sdl.sc" bindings
+    in "/include" "{preinstall-dir}/include/SDL2"
+
+package sdl2
+    summary SUMMARY
+    version VERSION
+    platform windows-mingw
+    alias "/lib/SDL2.dll" "{preinstall-dir}/bin/SDL2.dll"
+    alias "/lib/scopes/packages/sdl.sc" bindings
+    in "/include" "{preinstall-dir}/include/SDL2"
