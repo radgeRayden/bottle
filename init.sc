@@ -1,5 +1,6 @@
 let window = (import .src.window)
 let gpu = (import .src.gpu)
+let timer = (import .src.timer)
 let main = (import .src.main)
 let sysevents = (import .src.sysevents)
 let syscallbacks = (import .src.sysevents.callbacks)
@@ -14,6 +15,7 @@ do
         window
         gpu
         enums
+        timer
 
     let quit! = sysevents.quit
 
