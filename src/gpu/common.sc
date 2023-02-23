@@ -32,21 +32,21 @@ struct GfxState
 global istate : GfxState
 
 fn get-preferred-surface-format ()
-    local count : u64
-    let supported-formats = (wgpu.SurfaceGetSupportedFormats istate.surface istate.adapter &count)
+    local capabilities : wgpu.SurfaceCapabilities
+    wgpu.SurfaceGetCapabilities istate.surface istate.adapter &capabilities
 
-    let selected-format =
-        fold (selected-format = wgpu.TextureFormat.Undefined) for i in (range count)
-            let format = (supported-formats @ i)
-            if (format == wgpu.TextureFormat.BGRA8UnormSrgb)
-                break (copy format)
-            else
-                selected-format
+    let selected-format = wgpu.TextureFormat.BGRA8UnormSrgb
+        # FIXME: currently the surface format array is not getting filled, so we can't iterate over it
+        # fold (selected-format = wgpu.TextureFormat.Undefined) for i in (range capabilities.formatCount)
+        #     let format = (capabilities.formats @ i)
+        #     if (format == wgpu.TextureFormat.BGRA8UnormSrgb)
+        #         break (copy format)
+        #     else
+        #         selected-format
 
     assert (selected-format != wgpu.TextureFormat.Undefined)
         "it was not possible to select an appropriate surface format on this platform"
 
-    wgpu.Free supported-formats ((sizeof wgpu.TextureFormat) * count) (alignof wgpu.TextureFormat)
     selected-format
 
 do
