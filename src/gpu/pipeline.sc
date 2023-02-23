@@ -124,7 +124,6 @@ struct GPUPipeline
                                                     operation = wgpu.BlendOperation.Add
                                     writeMask = wgpu.ColorWriteMask.All
 
-        wgpu.PipelineLayoutDrop pip-layout
         _ pipeline
 
     inline __typecall (cls interface-name vertex-shader fragment-shader)
