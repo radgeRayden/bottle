@@ -50,7 +50,8 @@ fn init ()
     cfg := istate-cfg.window
 
     if (operating-system == 'windows)
-        sdl.SetHint sdl.SDL_HINT_WINDOWS_DPI_SCALING "1"
+        sdl.SetHint sdl.SDL_HINT_WINDOWS_DPI_AWARENESS "permonitorv2"
+        sdl.SetHint sdl.SDL_HINT_WINDOWS_DPI_SCALING "0"
 
     sdl.Init
         sdl.SDL_INIT_VIDEO
