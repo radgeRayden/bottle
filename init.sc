@@ -1,10 +1,11 @@
-let window = (import .src.window)
-let gpu = (import .src.gpu)
-let timer = (import .src.timer)
-let main = (import .src.main)
-let sysevents = (import .src.sysevents)
-let syscallbacks = (import .src.sysevents.callbacks)
 let enums = (import .src.enums)
+let font = (import .src.font)
+let gpu = (import .src.gpu)
+let main = (import .src.main)
+let syscallbacks = (import .src.sysevents.callbacks)
+let sysevents = (import .src.sysevents)
+let timer = (import .src.timer)
+let window = (import .src.window)
 
 vvv bind bottle
 do
@@ -12,10 +13,11 @@ do
     using syscallbacks
 
     let
-        window
-        gpu
         enums
+        font
+        gpu
         timer
+        window
 
     let quit! = sysevents.quit
 
