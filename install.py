@@ -18,6 +18,6 @@ shutil.copyfile(f"{bottle_src}/README.md", f"{bottle_dst}/README.md")
 
 eo_url = "https://hg.sr.ht/~duangle/majoreo/raw/eo?rev=tip"
 urllib.request.urlretrieve(eo_url, "eo")
-os.system("python eo init && python eo install -y wgpu-native-release sdl2 stb")
+os.system("python eo init && python eo install -y wgpu-native-release sdl2 stb fontdue")
 
 open("__env.sc", 'a').close()

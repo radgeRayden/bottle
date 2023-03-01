@@ -1,0 +1,37 @@
+VERSION := "main"
+SUMMARY := "The fastest font renderer in the world, written in pure rust."
+
+archive :=
+    download
+        "https://codeberg.org/spindlebink/fontdue-native/archive/{VERSION}.tar.gz"
+
+preinstall-dir :=
+    then
+        build-path :=
+            commonpath
+                extract archive
+        cmd :=
+            shell build-path (dict)
+        cmd "cargo build --release"
+        build-path
+
+bindings :=
+    download "https://raw.githubusercontent.com/ScopesCommunity/eo-packages/main/bindings/fontdue.sc"
+
+package fontdue-native
+    platform linux unknown
+    version VERSION
+    summary SUMMARY
+
+    alias "/include/fontdue.h" "{preinstall-dir}/ffi/fontdue.h"
+    alias "/lib/libfontdue_native.so" "{preinstall-dir}/target/release/libfontdue_native.so"
+    alias "/lib/scopes/packages/fontdue.sc" bindings
+
+package fontdue-native
+    platform windows-mingw
+    version VERSION
+    summary SUMMARY
+
+    alias "/include/fontdue.h" "{preinstall-dir}/ffi/fontdue.h"
+    alias "/lib/fontdue_native.dll" "{preinstall-dir}/target/release/fontdue_native.dll"
+    alias "/lib/scopes/packages/fontdue.sc" bindings
