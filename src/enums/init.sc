@@ -2,6 +2,9 @@ import wgpu
 
 do
     let GPUTextureFormat = wgpu.TextureFormat
-    let Key = ((import .keyconstants) . Key)
-    let MouseButton = ((import .mousebuttons) . MouseButton)
+
+    from (import .keyconstants) let KeyboardKey
+    from (import .mousebuttons) let MouseButton
+    from (import .controllerconstants) let ControllerAxis ControllerButton
+
     locals;

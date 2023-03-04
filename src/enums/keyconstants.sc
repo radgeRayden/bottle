@@ -2,7 +2,7 @@ using import enum
 
 import sdl
 
-enum Key plain
+enum KeyboardKey plain
     Unknown = sdl.SDLK_UNKNOWN
     Return = sdl.SDLK_RETURN
     Escape = sdl.SDLK_ESCAPE
