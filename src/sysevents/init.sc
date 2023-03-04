@@ -23,7 +23,7 @@ fn quit ()
     ;
 
 fn dispatch ()
-    from enums let Key MouseButton
+    from enums let KeyboardKey MouseButton ControllerButton ControllerAxis
 
     local event : sdl.Event
     while (sdl.PollEvent &event)
@@ -34,10 +34,10 @@ fn dispatch ()
                 (none? result) or (imply result bool)
 
         case sdl.SDL_KEYDOWN
-            callbacks.key-pressed (event.key.keysym.sym as Key)
+            callbacks.key-pressed (event.key.keysym.sym as KeyboardKey)
 
         case sdl.SDL_KEYUP
-            callbacks.key-released (event.key.keysym.sym as Key)
+            callbacks.key-released (event.key.keysym.sym as KeyboardKey)
 
         case sdl.SDL_MOUSEMOTION
             edata := event.motion
@@ -67,6 +67,25 @@ fn dispatch ()
                 gpu.update-render-area;
             default
                 ;
+
+        case sdl.SDL_CONTROLLERDEVICEADDED
+            callbacks.controller-added event.cdevice.which
+
+        case sdl.SDL_CONTROLLERDEVICEREMOVED
+            callbacks.controller-removed event.cdevice.which
+
+        case sdl.SDL_CONTROLLERBUTTONDOWN
+            edata := event.cbutton
+            callbacks.controller-button-pressed edata.which (edata.button as ControllerButton)
+
+        case sdl.SDL_CONTROLLERBUTTONUP
+            edata := event.cbutton
+            callbacks.controller-button-released edata.which (edata.button as ControllerButton)
+
+        case sdl.SDL_CONTROLLERAXISMOTION
+            edata := event.caxis
+            callbacks.controller-axis-moved edata.which (edata.axis as ControllerAxis) edata.value
+
         default
             ;
 

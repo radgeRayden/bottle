@@ -9,4 +9,10 @@ do
     fnchain mouse-released
     fnchain wheel-scrolled
     fnchain text-input
+    fnchain controller-added
+    fnchain controller-removed
+    fnchain controller-button-pressed
+    fnchain controller-button-released
+    fnchain controller-axis-moved
+
     locals;

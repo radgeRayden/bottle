@@ -53,8 +53,9 @@ fn init ()
         sdl.SetHint sdl.SDL_HINT_WINDOWS_DPI_AWARENESS "permonitorv2"
         sdl.SetHint sdl.SDL_HINT_WINDOWS_DPI_SCALING "0"
 
+    # FIXME: maybe SDL initialization shouldn't be in the window module as we might want to make it optional in the future.
     sdl.Init
-        sdl.SDL_INIT_VIDEO
+        sdl.SDL_INIT_EVERYTHING
 
     handle =
         sdl.CreateWindow

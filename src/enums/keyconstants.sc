@@ -264,5 +264,5 @@ enum KeyboardKey plain
     AudioFastForward = sdl.SDLK_AUDIOFASTFORWARD
 
 do
-    let Key
+    let KeyboardKey
     locals;
