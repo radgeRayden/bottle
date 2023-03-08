@@ -1,6 +1,7 @@
 let enums = (import .src.enums)
 let font = (import .src.font)
 let gpu = (import .src.gpu)
+let input = (import .src.input)
 let main = (import .src.main)
 let syscallbacks = (import .src.sysevents.callbacks)
 let sysevents = (import .src.sysevents)
@@ -16,6 +17,7 @@ do
         enums
         font
         gpu
+        input
         timer
         window
 
