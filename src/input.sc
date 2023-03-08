@@ -67,17 +67,17 @@ struct InputLayer
     binding-lookup : (Map String (Array InputBinding))
 
     fn... create-mapping (self, mapping, command : CommandFunction)
-        'set self.mappings (copy mapping) command
-        'set self.binding-lookup mapping ((Array InputBinding))
+        'set self.mappings (String mapping) command
+        'set self.binding-lookup (String mapping) ((Array InputBinding))
 
     fn bind-input (self mapping input pressed?)
         # if the mapping doesn't exist, nothing happens.
         try
-            'append ('get self.binding-lookup mapping)
+            'append ('get self.binding-lookup (String mapping))
                 InputBinding input pressed?
             'set self.input-bindings
                 InputBinding input pressed?
-                mapping
+                String mapping
         else
             ;
 
@@ -85,7 +85,7 @@ struct InputLayer
     fn clear-mapping (self mapping)
         # if the mapping doesn't exist, nothing happens.
         try
-            bindings := ('get self.binding-lookup mapping)
+            bindings := ('get self.binding-lookup (String mapping))
             for b in bindings
                 'discard self.input-bindings b
 
