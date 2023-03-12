@@ -263,6 +263,13 @@ enum KeyboardKey plain
     AudioRewind = sdl.SDLK_AUDIOREWIND
     AudioFastForward = sdl.SDLK_AUDIOFASTFORWARD
 
+    inline __imply (lhsT rhsT)
+        static-if (rhsT == sdl.KeyCode)
+            inline (self)
+                bitcast ((storagecast self) as u32) sdl.KeyCode
+        else
+            super-type.__imply lhsT rhsT
+
 do
     let KeyboardKey
     locals;

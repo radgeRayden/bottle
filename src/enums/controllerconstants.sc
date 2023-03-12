@@ -9,6 +9,13 @@ enum ControllerAxis : u8
     TriggerLeft = sdl.SDL_CONTROLLER_AXIS_TRIGGERLEFT
     TriggerRight = sdl.SDL_CONTROLLER_AXIS_TRIGGERRIGHT
 
+    inline __imply (lhsT rhsT)
+        static-if (rhsT == sdl.GameControllerAxis)
+            inline (self)
+                bitcast ((storagecast self) as i32) sdl.GameControllerAxis
+        else
+            super-type.__imply lhsT rhsT
+
 enum ControllerButton : u8
     A = sdl.SDL_CONTROLLER_BUTTON_A
     B = sdl.SDL_CONTROLLER_BUTTON_B
@@ -31,6 +38,13 @@ enum ControllerButton : u8
     Paddle3 = sdl.SDL_CONTROLLER_BUTTON_PADDLE3
     Paddle4 = sdl.SDL_CONTROLLER_BUTTON_PADDLE4
     Touchpad = sdl.SDL_CONTROLLER_BUTTON_TOUCHPAD
+
+    inline __imply (lhsT rhsT)
+        static-if (rhsT == sdl.GameControllerButton)
+            inline (self)
+                bitcast ((storagecast self) as i32) sdl.GameControllerButton
+        else
+            super-type.__imply lhsT rhsT
 
 do
     let ControllerAxis ControllerButton
