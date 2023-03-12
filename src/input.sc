@@ -151,18 +151,18 @@ struct InputLayer
         try
             button-name := (String button-name)
             bindings := ('get self.virtual-buttons button-name)
-            fold (down? = false) for binding in bindings
+            fold (down? = false) for input-kind binding in bindings
                 vvv bind result
                 dispatch binding
                 case Button (button)
-                    bool (sdl.GameControllerGetButton (get-controller 0) (button as sdl.GameControllerButton))
+                    bool (sdl.GameControllerGetButton (get-controller 0) button)
                 case Key (key)
                     kbstate := (sdl.GetKeyboardState null)
-                    bool (kbstate @ (sdl.GetScancodeFromKey (key as sdl.KeyCode)))
+                    bool (kbstate @ (sdl.GetScancodeFromKey key))
                 case Axis (axis threshold)
                     axis :=
                         normalize-axis
-                            sdl.GameControllerGetAxis (get-controller 0) (axis as sdl.GameControllerAxis)
+                            sdl.GameControllerGetAxis (get-controller 0) axis
 
                     let result =
                         if (threshold > 0)
@@ -186,21 +186,21 @@ struct InputLayer
             bindings := ('get self.virtual-axis axis-name)
 
             vvv bind result
-            fold (result = 0.0) for binding in bindings
+            fold (result = 0.0) for input-kind binding in bindings
                 vvv bind value
                 dispatch binding
                 case Axis (axis)
                     axis :=
                         normalize-axis
-                            sdl.GameControllerGetAxis (get-controller 0) (axis as sdl.GameControllerAxis)
+                            sdl.GameControllerGetAxis (get-controller 0) axis
                 case Button (button value)
                     down? :=
-                        bool (sdl.GameControllerGetButton (get-controller 0) (button as sdl.GameControllerButton))
+                        bool (sdl.GameControllerGetButton (get-controller 0) button)
                     ? down? value 0.0
                 case Key (key value)
                     kbstate := (sdl.GetKeyboardState null)
                     down? :=
-                        bool (kbstate @ (sdl.GetScancodeFromKey (key as sdl.KeyCode)))
+                        bool (kbstate @ (sdl.GetScancodeFromKey key))
                     ? down? value 0.0
                 default
                     assert false
@@ -285,7 +285,7 @@ fn register-layer (layer)
     'append istate.active-layers layer
 
 fn get-controller (id)
-    'getdefault istate.controllers id null
+    'getdefault istate.controllers id (nullof (mutable@ sdl.GameController))
 
 # HOOKS
 # ================================================================================
