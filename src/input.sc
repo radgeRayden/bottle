@@ -275,22 +275,14 @@ struct InputLayer
 
 struct InputState
     controllers : (Map i32 (mutable@ sdl.GameController))
-    active-layers : (Map String (Rc InputLayer))
+    active-layers : (Array (Rc InputLayer))
 
 global istate : InputState
 
-fn register-layer (name)
+fn new-layer ()
     layer := (Rc.wrap (InputLayer))
-    'set istate.active-layers (String name) (copy layer)
+    'append istate.active-layers (copy layer)
     layer
-
-fn get-layer (name)
-    try
-        (Option (Rc InputLayer))
-            copy
-                'get istate.active-layers (String name)
-    else
-        (Option (Rc InputLayer)) none
 
 fn get-controller (id)
     'getdefault istate.controllers id (nullof (mutable@ sdl.GameController))
@@ -310,30 +302,30 @@ fn (id)
 
 @@ 'on cb.controller-button-pressed
 fn (idx button)
-    for name layer in istate.active-layers
+    for layer in istate.active-layers
         'trigger-input layer button (pressed? = true)
 
 @@ 'on cb.controller-button-released
 fn (idx button)
-    for name layer in istate.active-layers
+    for layer in istate.active-layers
         'trigger-input layer button (pressed? = false)
 
 @@ 'on cb.key-pressed
 fn (key)
-    for name layer in istate.active-layers
+    for layer in istate.active-layers
         'trigger-input layer key (pressed? = true)
 
 @@ 'on cb.key-released
 fn (key)
-    for name layer in istate.active-layers
+    for layer in istate.active-layers
         'trigger-input layer key (pressed? = false)
 
 @@ 'on cb.controller-axis-moved
 fn (idx axis value)
-    for name layer in istate.active-layers
+    for layer in istate.active-layers
         'trigger-input layer axis (value = (normalize-axis value))
 
 do
     let InputLayer ButtonInput
-    let register-layer get-layer
+    let new-layer
     locals;
