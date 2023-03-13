@@ -14,6 +14,8 @@
 using import Array
 using import enum
 using import Map
+using import Option
+using import Rc
 using import Set
 using import String
 using import struct
@@ -268,24 +270,27 @@ struct InputLayer
                     action.command 0.0
             default
                 value := (va-option value ... 0.0)
-                if (none? value)
-                    return;
-
                 action.command value
-
         else ()
 
 struct InputState
     controllers : (Map i32 (mutable@ sdl.GameController))
-    active-layers : (Map String InputLayer)
+    active-layers : (Map String (Rc InputLayer))
 
 global istate : InputState
 
 fn register-layer (name)
-    'set istate.active-layers (String name) (InputLayer)
+    layer := (Rc.wrap (InputLayer))
+    'set istate.active-layers (String name) (copy layer)
+    layer
 
 fn get-layer (name)
-    'get istate.active-layers (String name)
+    try
+        (Option (Rc InputLayer))
+            copy
+                'get istate.active-layers (String name)
+    else
+        (Option (Rc InputLayer)) none
 
 fn get-controller (id)
     'getdefault istate.controllers id (nullof (mutable@ sdl.GameController))
