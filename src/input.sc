@@ -21,6 +21,7 @@ using import String
 using import struct
 
 import .enums
+import .mouse
 import sdl
 
 using enums
@@ -44,19 +45,22 @@ struct AxisAction plain
     command : AxisCommand
 
 enum ButtonBinding
-    Button : ControllerButton
-    Key    : KeyboardKey
-    Axis   : ControllerAxis f32
+    Button    : ControllerButton
+    Key       : KeyboardKey
+    Click     : MouseButton
+    Axis      : ControllerAxis f32
 
 enum AxisBinding
     Button : ControllerButton f32
     Key    : KeyboardKey f32
+    Click  : MouseButton f32
     Axis   : ControllerAxis
 
 # for lookup
 enum InputType
     Button : ControllerButton
     Key    : KeyboardKey
+    Click  : MouseButton
     Axis   : ControllerAxis
 
 fn normalize-axis (value)
@@ -116,6 +120,8 @@ struct InputLayer
         _bind-to-button self button-name 'Button controller-button
     case (self, button-name, keyboard-key : KeyboardKey)
         _bind-to-button self button-name 'Key keyboard-key
+    case (self, button-name, mouse-button : MouseButton)
+        _bind-to-button self button-name 'Click mouse-button
     case (self, button-name, controller-axis : ControllerAxis, threshold : f32)
         _bind-to-button self button-name 'Axis controller-axis threshold
 
@@ -144,6 +150,8 @@ struct InputLayer
         _bind-to-axis self axis-name 'Button controller-button value
     case (self, axis-name, keyboard-key : KeyboardKey, value : f32)
         _bind-to-axis self axis-name 'Key keyboard-key value
+    case (self, axis-name, mouse-button : MouseButton, value : f32)
+        _bind-to-axis self axis-name 'Click mouse-button value
     case (self, axis-name, controller-axis : ControllerAxis)
         _bind-to-axis self axis-name 'Axis controller-axis
 
@@ -161,6 +169,8 @@ struct InputLayer
                 case Key (key)
                     kbstate := (sdl.GetKeyboardState null)
                     bool (kbstate @ (sdl.GetScancodeFromKey key))
+                case Click (button)
+                    mouse.down? button
                 case Axis (axis threshold)
                     axis :=
                         normalize-axis
@@ -204,6 +214,8 @@ struct InputLayer
                     down? :=
                         bool (kbstate @ (sdl.GetScancodeFromKey key))
                     ? down? value 0.0
+                case Click (button value)
+                    ? (mouse.down? button) value 0.0
                 default
                     assert false
                     unreachable;
@@ -225,6 +237,8 @@ struct InputLayer
                 InputType.Key input
             case ControllerAxis
                 InputType.Axis input
+            case MouseButton
+                InputType.Click input
             default
                 unreachable;
 
@@ -255,19 +269,24 @@ struct InputLayer
         try
             action := ('get self.axis-actions binding-name)
             binding := ('get ('get self.virtual-axis binding-name) lookup-key)
+
+            inline button-as-axis (value)
+                pressed? := (va-option pressed? ... false)
+                if pressed?
+                    action.command value
+                else
+                    action.command 0.0
+
             dispatch binding
             case Button (button value)
-                pressed? := (va-option pressed? ... false)
-                if pressed?
-                    action.command value
-                else
-                    action.command 0.0
+                button-as-axis value
+
             case Key (key value)
-                pressed? := (va-option pressed? ... false)
-                if pressed?
-                    action.command value
-                else
-                    action.command 0.0
+                button-as-axis value
+
+            case Click (button value)
+                button-as-axis value
+
             default
                 value := (va-option value ... 0.0)
                 action.command value
@@ -310,6 +329,11 @@ fn (idx button)
     for layer in istate.active-layers
         'trigger-input layer button (pressed? = false)
 
+@@ 'on cb.controller-axis-moved
+fn (idx axis value)
+    for layer in istate.active-layers
+        'trigger-input layer axis (value = (normalize-axis value))
+
 @@ 'on cb.key-pressed
 fn (key)
     for layer in istate.active-layers
@@ -320,10 +344,15 @@ fn (key)
     for layer in istate.active-layers
         'trigger-input layer key (pressed? = false)
 
-@@ 'on cb.controller-axis-moved
-fn (idx axis value)
+@@ 'on cb.mouse-pressed
+fn (button x y clicks)
     for layer in istate.active-layers
-        'trigger-input layer axis (value = (normalize-axis value))
+        'trigger-input layer button (pressed? = true)
+
+@@ 'on cb.mouse-released
+fn (button x y clicks)
+    for layer in istate.active-layers
+        'trigger-input layer button (pressed? = false)
 
 do
     let InputLayer ButtonInput
