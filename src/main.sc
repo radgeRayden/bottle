@@ -50,5 +50,5 @@ fn run ()
             ()
 
 do
-    let run load update draw configure
+    let run load update fixed-update draw configure
     locals;
