@@ -8,6 +8,7 @@ import .timer
 
 fnchain load
 fnchain update
+fnchain fixed-update
 fnchain draw
 fnchain configure
 
@@ -34,8 +35,9 @@ fn run ()
             dt-accumulator += dt
 
             while (dt-accumulator > FIXED_TIMESTEP)
-                update FIXED_TIMESTEP
+                fixed-update FIXED_TIMESTEP
                 dt-accumulator -= FIXED_TIMESTEP
+            update dt
         else
             update dt
 
