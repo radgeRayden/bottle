@@ -22,6 +22,7 @@ using import struct
 
 import .enums
 import .mouse
+import .keyboard
 import sdl
 
 using enums
@@ -167,8 +168,7 @@ struct InputLayer
                 case Button (button)
                     bool (sdl.GameControllerGetButton (get-controller 0) button)
                 case Key (key)
-                    kbstate := (sdl.GetKeyboardState null)
-                    bool (kbstate @ (sdl.GetScancodeFromKey key))
+                    keyboard.down? key
                 case Click (button)
                     mouse.down? button
                 case Axis (axis threshold)
@@ -210,9 +210,7 @@ struct InputLayer
                         bool (sdl.GameControllerGetButton (get-controller 0) button)
                     ? down? value 0.0
                 case Key (key value)
-                    kbstate := (sdl.GetKeyboardState null)
-                    down? :=
-                        bool (kbstate @ (sdl.GetScancodeFromKey key))
+                    down? := (keyboard.down? key)
                     ? down? value 0.0
                 case Click (button value)
                     ? (mouse.down? button) value 0.0
