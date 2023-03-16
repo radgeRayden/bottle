@@ -11,14 +11,8 @@ struct GPUTexture
     _height : u32
 
     inline __typecall (cls data width height ...)
-        let format = (va-option format ...)
-        let format = (format or wgpu.TextureFormat.RGBA8UnormSrgb)
-        let channels = (va-option channels ...)
-        let channels =
-            static-if (none? channels)
-                4
-            else
-                channels
+        let format = (va-option format ... wgpu.TextureFormat.RGBA8UnormSrgb)
+        let channels = (va-option channels ... 4)
 
         let handle =
             wgpu.DeviceCreateTexture istate.device
