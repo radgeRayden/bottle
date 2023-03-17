@@ -1,6 +1,7 @@
 using import struct
 using import String
 using import ..helpers
+using import ..logger
 using import .common
 using import .errors
 using import .render-pass
@@ -146,7 +147,7 @@ fn init ()
                             maxComputeWorkgroupsPerDimension = wgpu.WGPU_LIMIT_U32_UNDEFINED
         fn (status result msg userdata)
             if (status != wgpu.RequestDeviceStatus.Success)
-                print (String msg) # FIXME: don't use print! need logging
+                print msg
             istate.device = result
             ;
         null
@@ -154,22 +155,24 @@ fn init ()
     wgpu.DeviceSetUncapturedErrorCallback istate.device
         fn (errtype message userdata)
             raising noreturn
-            print
-                errtype as wgpu.ErrorType
-                "\n"
-                # FIXME: replace by something less stupid later; we don't want to use `string` anyway.
-                loop (result next = str"" (string message))
-                    let match? start end =
-                        try
-                            ('match? str"\\\\n" next) # for some reason newlines are escaped in shader error messages
-                        else
-                            _ false 0 0
-                    if match?
-                        _
-                            .. result (lslice next start) "\n"
-                            rslice next end
-                    else
-                        break (result .. next)
+            print message
+            # TODO: rework functionality here to work AOT
+            # print
+            #     errtype as wgpu.ErrorType
+            #     "\n"
+            #     # FIXME: replace by something less stupid later; we don't want to use `string` anyway.
+            #     loop (result next = str"" (string message))
+            #         let match? start end =
+            #             try
+            #                 ('match? str"\\\\n" next) # for some reason newlines are escaped in shader error messages
+            #             else
+            #                 _ false 0 0
+            #         if match?
+            #             _
+            #                 .. result (lslice next start) "\n"
+            #                 rslice next end
+            #         else
+            #             break (result .. next)
             ;
         null
 

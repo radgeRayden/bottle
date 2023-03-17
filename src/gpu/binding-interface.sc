@@ -263,7 +263,7 @@ inline bind-group-layout-from-interface (istate name interface)
 
     wgpu.DeviceCreateBindGroupLayout istate.device
         &local wgpu.BindGroupLayoutDescriptor
-            label = (.. name " Bottle Bind Group Layout")
+            label = (.. (String name) " Bottle Bind Group Layout")
             entryCount = ((countof interface.entries) as u32)
             entries = (imply bgroup-entries pointer)
 
@@ -274,7 +274,7 @@ spice gen-bgroup-layouts (istate cache)
         sc_expression_append expr
             spice-quote
                 'set cache (String [name])
-                    bind-group-layout-from-interface istate name v
+                    bind-group-layout-from-interface istate [name] v
     expr
 run-stage;
 
@@ -288,7 +288,7 @@ fn make-default-pipeline-layouts (istate)
     # Generate Pipeline Layouts
     va-map
         inline (f)
-            let Name Type = (f.Name as string) (elementof f.Type 0)
+            let Name Type = (tostring f.Name) (elementof f.Type 0)
 
             local bgroup-layouts : (Array wgpu.BindGroupLayout)
             let bgroup-count = (countof Type.entries)
@@ -307,7 +307,7 @@ fn make-default-pipeline-layouts (istate)
             let pip-layout =
                 wgpu.DeviceCreatePipelineLayout istate.device
                     &local wgpu.PipelineLayoutDescriptor
-                        label = (.. Name " Bottle Pipeline Layout")
+                        label = (.. (String Name) " Bottle Pipeline Layout")
                         bindGroupLayoutCount = (bgroup-count as u32)
                         bindGroupLayouts = (imply bgroup-layouts pointer)
 

@@ -23,9 +23,11 @@ using import struct
 import .enums
 import .mouse
 import .keyboard
+import .logger
 import sdl
 
 using enums
+using logger
 
 # ================================================================================
 enum ButtonInput plain
@@ -90,6 +92,7 @@ struct InputLayer
             'set self.button-actions button-name (ButtonAction command input)
         else
             report "tried to map an action to an unknown virtual button"
+            ;
     case (self, axis-name, command : AxisCommand)
         axis-name := (String axis-name)
 
@@ -97,6 +100,7 @@ struct InputLayer
             'set self.axis-actions axis-name (AxisAction command)
         else
             report "tried to map an action to an unknown virtual axis"
+            ;
 
     inline _bind-to-button (self button-name input-kind input threshold)
         let lookupT bindingT = (getattr InputType input-kind) (getattr ButtonBinding input-kind)
