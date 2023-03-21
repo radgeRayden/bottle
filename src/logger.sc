@@ -27,6 +27,7 @@ fn print (...)
                     else
                         (tostring arg) as rawstring
             ...
+    ;
 
 spice report (args...)
     anchor := (tostring `[('anchor args)])
