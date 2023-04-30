@@ -237,13 +237,13 @@ inline bind-group-layout-from-interface (istate name interface)
                         buffer =
                             wgpu.BufferBindingLayout
                                 type = wgpu.BufferBindingType.ReadOnlyStorage
-                                minBindingSize = wgpu.WGPU_WHOLE_SIZE
+                                minBindingSize = 0
                 case GPUResourceBinding.UniformBuffer
                     make-entry i
                         buffer =
                             wgpu.BufferBindingLayout
                                 type = wgpu.BufferBindingType.Uniform
-                                minBindingSize = wgpu.WGPU_WHOLE_SIZE
+                                minBindingSize = 0
                 case GPUResourceBinding.Sampler
                     make-entry i
                         sampler =
