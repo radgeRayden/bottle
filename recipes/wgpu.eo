@@ -1,5 +1,5 @@
 VERSION := "master"
-TAG := "v0.15.1.2"
+TAG := "v0.16.0.1"
 SUMMARY := "Native WebGPU implementation based on wgpu-core "
 
 LIBNAME := "wgpu_native"

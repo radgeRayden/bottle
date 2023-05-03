@@ -257,7 +257,6 @@ inline bind-group-layout-from-interface (istate name interface)
                                 viewDimension = wgpu.TextureViewDimension.2D
                 default
                     assert false
-                    unreachable;
 
         va-range ((countof interface.entries) as i32)
 
@@ -300,7 +299,6 @@ fn make-default-pipeline-layouts (istate)
                             'get bgroup-layout-cache (String (tostring T))
                         except (ex)
                             assert false (tostring T)
-                            unreachable;
                     ;
                 va-range (bgroup-count as i32)
 
