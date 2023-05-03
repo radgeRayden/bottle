@@ -82,7 +82,6 @@ struct GPUPipeline
                 'get istate.cached-layouts.pipeline-layouts layout-name
             else
                 assert false ("unknown pipeline layout: " .. layout-name)
-                unreachable;
 
         let pipeline =
             wgpu.DeviceCreateRenderPipeline istate.device
