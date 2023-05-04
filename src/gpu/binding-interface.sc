@@ -174,6 +174,7 @@ fn make-dummy-resources (istate)
                     magFilter = wgpu.FilterMode.Linear
                     minFilter = wgpu.FilterMode.Linear
                     mipmapFilter = wgpu.MipmapFilterMode.Linear
+                    maxAnisotropy = 1
                     # might need to configure extra stuff
 
     # let this leak?
