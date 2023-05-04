@@ -54,19 +54,23 @@ enum GPUResourceBinding
     fn make-wgpu-descriptor (self)
         dispatch self
         case Buffer (buffer offset size)
+            assert (buffer != null)
             wgpu.BindGroupEntry
                 buffer = buffer
                 offset = offset
                 size = size
         case UniformBuffer (buffer offset size)
+            assert (buffer != null)
             wgpu.BindGroupEntry
                 buffer = buffer
                 offset = offset
                 size = size
         case Sampler (handle)
+            assert (handle != null)
             wgpu.BindGroupEntry
                 sampler = handle
         case TextureView (handle)
+            assert (handle != null)
             wgpu.BindGroupEntry
                 textureView = handle
         default
