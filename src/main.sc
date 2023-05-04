@@ -42,10 +42,10 @@ fn run ()
             update dt
 
         try
-            let render-pass = (gpu.begin-frame)
+            let render-pass cmd-encoder = (gpu.begin-frame)
             # TODO: pass in dt remainder, after we adapt the timer module to be aware of it
             draw render-pass
-            gpu.present render-pass
+            gpu.present render-pass cmd-encoder
         else
             ()
 

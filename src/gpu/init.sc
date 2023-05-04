@@ -4,13 +4,13 @@ using import ..helpers
 using import ..logger
 using import .common
 using import .errors
-using import .render-pass
+# using import .render-pass
 
 import .binding-interface
 import ..window
 
 import sdl
-import wgpu
+import .wgpu
 
 # MODULE FUNCTIONS START HERE
 # ================================================================================
@@ -179,8 +179,8 @@ fn init ()
     istate.swapchain = (create-swapchain (window.get-drawable-size))
     istate.queue = (wgpu.DeviceGetQueue istate.device)
 
-    binding-interface.make-dummy-resources istate
-    binding-interface.make-default-pipeline-layouts istate
+    # binding-interface.make-dummy-resources istate
+    # binding-interface.make-default-pipeline-layouts istate
     ;
 
 fn set-clear-color (color)
@@ -198,23 +198,32 @@ fn begin-frame ()
         wgpu.DeviceCreateCommandEncoder istate.device
             (&local wgpu.CommandEncoderDescriptor)
 
+    local color-attachments =
+        arrayof wgpu.RenderPassColorAttachment
+            typeinit
+                view = swapchain-image
+                loadOp = wgpu.LoadOp.Clear
+                storeOp = wgpu.StoreOp.Store
+                clearValue = (typeinit (unpack istate.clear-color))
+
     let render-pass =
-        RenderPass cmd-encoder
-            arrayof wgpu.RenderPassColorAttachment
-                typeinit
-                    view = swapchain-image
-                    loadOp = wgpu.LoadOp.Clear
-                    storeOp = wgpu.StoreOp.Store
-                    clearValue = (typeinit (unpack istate.clear-color))
+        wgpu.CommandEncoderBeginRenderPass cmd-encoder
+            &local wgpu.RenderPassDescriptor
+                label = "Bottle Render Pass"
+                colorAttachmentCount = (countof color-attachments)
+                colorAttachments =
+                    &local color-attachments
 
-    _ render-pass
+    _ render-pass cmd-encoder
 
-fn present (render-pass)
-    'finish render-pass
+fn present (render-pass cmd-encoder)
+    wgpu.RenderPassEncoderEnd render-pass
 
     local cmd-buf =
-        wgpu.CommandEncoderFinish render-pass._cmd-encoder
+        wgpu.CommandEncoderFinish cmd-encoder
             (&local wgpu.CommandBufferDescriptor)
+
+    lose cmd-encoder
 
     wgpu.QueueSubmit istate.queue 1 &cmd-buf
     wgpu.SwapChainPresent istate.swapchain
