@@ -223,8 +223,6 @@ fn present (render-pass cmd-encoder)
         wgpu.CommandEncoderFinish cmd-encoder
             (&local wgpu.CommandBufferDescriptor)
 
-    lose cmd-encoder
-
     wgpu.QueueSubmit istate.queue 1 &cmd-buf
     wgpu.SwapChainPresent istate.swapchain
     ;

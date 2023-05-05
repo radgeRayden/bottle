@@ -12,7 +12,6 @@ inline define-object (name super destructor)
             bitcast null cls
 
         inline __drop (self)
-            print "dropping" this-type
             destructor (bitcast self super)
 
         inline __rimply (otherT thisT)
@@ -74,10 +73,9 @@ do
     CreateInstance := wrap-constructor wgpu.CreateInstance Instance
 
     # special cases that transform input
-    inline CommandEncoderFinish (desc cmd-encoder)
-        local cmd-encoder = cmd-encoder
+    inline CommandEncoderFinish (cmd-encoder desc)
         result :=
-            wgpu.CommandEncoderFinish desc cmd-encoder
+            wgpu.CommandEncoderFinish cmd-encoder desc
 
         lose cmd-encoder
         imply result CommandBuffer
