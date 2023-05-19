@@ -1,3 +1,5 @@
+using import Array
+using import String
 import wgpu
 
 inline wrap-constructor (f T)
@@ -23,6 +25,63 @@ inline define-object (name super destructor)
             static-if (otherT == super)
                 inline (self)
                     bitcast self otherT
+
+fn CEnum->String (T)
+    T as:= type
+    inline gen-switch (value)
+        local tags : (Array (tuple (value = u64) (name = string)))
+        sw := (sc_switch_new value)
+        for k v in ('symbols T)
+            if (('typeof v) < CEnum)
+                'append tags
+                    typeinit
+                        value = (sc_const_int_extract v)
+                        name = k as Symbol as string
+        'sort tags
+
+        # deduplicate
+        fold (prev-value prev-name = -1:u64 str"") for i in (rrange (countof tags))
+            t := tags @ i
+            value name := (deref t.value), (deref t.name)
+
+            let name =
+                if (t.value == prev-value)
+                    'remove tags (i + 1)
+                    .. name "|" prev-name
+                else
+                    name
+
+            t.name = name
+
+            _ value name
+
+        for t in tags
+            sc_switch_append_case sw (sc_const_int_new T t.value)
+                spice-quote
+                    String [t.name]
+
+        sc_switch_append_default sw
+            spice-quote
+                String "?invalid?"
+        sw
+
+    spice-quote
+        fn (value)
+            [(gen-switch value)]
+
+for scope in ('lineage wgpu)
+    for k v in scope
+        vvv bind T
+        if (('typeof v) == type)
+            v as type
+        else
+            continue;
+
+        if (T < CEnum)
+            'set-symbol T '__tostring
+                CEnum->String T
+
+run-stage;
 
 do
     using wgpu
