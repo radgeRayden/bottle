@@ -49,6 +49,9 @@ fn run ()
         else
             ()
 
+static-if main-module?
+    run;
+
 do
     let run load update fixed-update draw configure
     locals;
