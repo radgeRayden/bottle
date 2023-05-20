@@ -49,9 +49,11 @@ fn run ()
         else
             ()
 
-static-if main-module?
-    run;
-
-do
-    let run load update fixed-update draw configure
-    locals;
+sugar-if main-module?
+    name argc argv := (script-launch-args)
+    demo := "hello-triangle"
+    require-from (module-dir .. "/..") (.. ".demos." demo) __env
+else
+    do
+        let run load update fixed-update draw configure
+        locals;
