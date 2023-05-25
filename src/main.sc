@@ -9,7 +9,7 @@ import .timer
 fnchain load
 fnchain update
 fnchain fixed-update
-fnchain draw
+fnchain render
 fnchain configure
 
 fn run ()
@@ -44,7 +44,7 @@ fn run ()
         try
             let render-pass cmd-encoder = (gpu.begin-frame)
             # TODO: pass in dt remainder, after we adapt the timer module to be aware of it
-            draw render-pass
+            render render-pass
             gpu.present render-pass cmd-encoder
         else
             ()
@@ -55,5 +55,5 @@ sugar-if main-module?
     require-from (module-dir .. "/..") (.. ".demos." demo) __env
 else
     do
-        let run load update fixed-update draw configure
+        let run load update fixed-update render configure
         locals;
