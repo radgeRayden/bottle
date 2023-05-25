@@ -1,4 +1,5 @@
 using import enum
+using import String
 using import struct
 
 using import .common
