@@ -229,15 +229,6 @@ fn present (render-pass cmd-encoder)
 
 do
     let init update-render-area set-clear-color begin-frame present
-    let get-backend-info
-
-    vvv bind types
-    do
-        from (import .pipeline)    let GPUPipeline GPUShaderModule
-        from (import .render-pass) let RenderPass
-        from (import .buffer)      let GPUBuffer GPUStorageBuffer GPUIndexBuffer GPUUniformBuffer
-        from (import .texture)     let GPUTexture
-        # from (import .common)      let GPUResourceBinding
-        locals;
+    let types
 
     locals;
