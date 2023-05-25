@@ -1,7 +1,8 @@
 import wgpu
 
 do
-    let TextureFormat = wgpu.TextureFormat
+    TextureFormat := wgpu.TextureFormat
+    ShaderStage   := wgpu.ShaderStage
 
     from (import ..gpu.ShaderModule) let ShaderLanguage
     from (import .keyconstants) let KeyboardKey

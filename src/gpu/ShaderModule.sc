@@ -3,6 +3,7 @@ using import String
 using import struct
 
 using import .common
+using import ..helpers
 import .wgpu
 
 enum ShaderLanguage plain
@@ -15,7 +16,7 @@ fn shader-module-from-SPIRV (code)
         chain =
             wgpu.ChainedStruct
                 sType = wgpu.SType.ShaderModuleSPIRVDescriptor
-        codeSize = ((countof code) // 4)
+        codeSize = ((countof code) // 4) as u32
         code = (code as rawstring as (@ u32))
 
     let module =
@@ -40,12 +41,19 @@ fn shader-module-from-WGSL (code)
     module
 
 fn shader-module-from-GLSL (code stage)
+    local defines =
+        arrayof wgpu.ShaderDefine
+            typeinit "gl_VertexID" "gl_VertexIndex"
+            typeinit "gl_InstanceID" "gl_InstanceIndex"
+
     local desc : wgpu.ShaderModuleGLSLDescriptor
         chain =
             wgpu.ChainedStruct
-                sType = wgpu.NativeSType.ShaderModuleGLSLDescriptor
+                sType = bitcast wgpu.NativeSType.ShaderModuleGLSLDescriptor wgpu.SType
         stage = stage
         code = (code as rawstring)
+        defineCount = (countof defines)
+        defines = &defines
 
     let module =
         wgpu.DeviceCreateShaderModule
@@ -56,9 +64,10 @@ fn shader-module-from-GLSL (code stage)
 
 struct ShaderModule
     _handle : wgpu.ShaderModule
-    inline... __typecall (cls, source : String, source-language : ShaderLanguage, stage)
+    inline... __typecall (cls, source : String, source-language : ShaderLanguage, ...)
+        stage := ...
         let module =
-            switch source-language
+            static-match source-language
             case ShaderLanguage.WGSL
                 shader-module-from-WGSL source
             case ShaderLanguage.GLSL
@@ -73,12 +82,13 @@ struct ShaderModule
 
         super-type.__typecall cls
             _handle = module
-    case (cls, f : function, source-language : ShaderLanguage, stage)
+    case (cls, f : Closure, source-language : ShaderLanguage, ...)
+        stage := ...
         static-if (none? stage)
             static-error "scopes shaders require stage information"
 
-        vvv bind stage
-        switch stage
+        vvv bind target
+        static-match stage
         case wgpu.ShaderStage.Vertex
             'vertex
         case wgpu.ShaderStage.Fragment
@@ -89,11 +99,13 @@ struct ShaderModule
             assert false "invalid shader stage"
 
         vvv bind code
-        switch source-language
+        static-match source-language
         case ShaderLanguage.GLSL
-            static-compile-glsl 450 stage (static-typify f)
+            String
+                static-compile-glsl 450 target (static-typify f)
         case ShaderLanguage.SPIRV
-            static-compile-spirv 0x10500 stage (static-typify f)
+            String
+                static-compile-spirv 0x10400 target (static-typify f)
         default
             assert false "invalid shader source type, only SPIRV and GLSL allowed"
 
