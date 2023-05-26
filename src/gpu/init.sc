@@ -1,55 +1,15 @@
-using import struct
 using import String
-using import ..helpers
-using import ..logger
-using import .common
-using import .errors
-# using import .render-pass
-
-import .binding-interface
-import ..window
+using import struct
 
 import sdl
 import .wgpu
+import .types
 
-# MODULE FUNCTIONS START HERE
-# ================================================================================
-struct GPUBackendInfo
-    gpu : String
-    backend : String
+using import ..helpers
+using import .common
+using import .errors
 
-fn get-backend-info ()
-    local properties : wgpu.AdapterProperties
-    wgpu.AdapterGetProperties istate.adapter &properties
-
-    local info : GPUBackendInfo
-    let strlen = (extern 'strlen (function usize (@ char)))
-
-    if (properties.name != null)
-        info.gpu = (String properties.name (strlen properties.name))
-    info.backend =
-        do
-            switch properties.backendType
-            case wgpu.BackendType.Null
-                S"Null"
-            case wgpu.BackendType.WebGPU
-                S"WebGPU"
-            case wgpu.BackendType.D3D11
-                S"D3D11"
-            case wgpu.BackendType.D3D12
-                S"D3D12"
-            case wgpu.BackendType.Metal
-                S"Metal"
-            case wgpu.BackendType.Vulkan
-                S"Vulkan"
-            case wgpu.BackendType.OpenGL
-                S"OpenGL"
-            case wgpu.BackendType.OpenGLES
-                S"OpenGLES"
-            default
-                S"Unknown"
-
-    info
+import ..window
 
 fn create-surface ()
     static-match operating-system
@@ -187,6 +147,8 @@ fn set-clear-color (color)
     istate.clear-color = color
 
 fn begin-frame ()
+    using types
+
     if (window.minimized?)
         raise GPUError.OutdatedSwapchain
 
@@ -194,36 +156,11 @@ fn begin-frame ()
     if (swapchain-image == null)
         raise GPUError.OutdatedSwapchain
 
-    let cmd-encoder =
-        wgpu.DeviceCreateCommandEncoder istate.device
-            (&local wgpu.CommandEncoderDescriptor)
+    color-attachment := ColorAttachment (TextureView swapchain-image) istate.clear-color
+    RenderPass color-attachment
 
-    local color-attachments =
-        arrayof wgpu.RenderPassColorAttachment
-            typeinit
-                view = swapchain-image
-                loadOp = wgpu.LoadOp.Clear
-                storeOp = wgpu.StoreOp.Store
-                clearValue = (typeinit (unpack istate.clear-color))
-
-    let render-pass =
-        wgpu.CommandEncoderBeginRenderPass cmd-encoder
-            &local wgpu.RenderPassDescriptor
-                label = "Bottle Render Pass"
-                colorAttachmentCount = (countof color-attachments)
-                colorAttachments =
-                    &local color-attachments
-
-    _ render-pass cmd-encoder
-
-fn present (render-pass cmd-encoder)
-    wgpu.RenderPassEncoderEnd render-pass
-
-    local cmd-buf =
-        wgpu.CommandEncoderFinish cmd-encoder
-            (&local wgpu.CommandBufferDescriptor)
-
-    wgpu.QueueSubmit istate.queue 1 &cmd-buf
+fn present (render-pass)
+    'submit ('finish render-pass)
     wgpu.SwapChainPresent istate.swapchain
     ;
 
