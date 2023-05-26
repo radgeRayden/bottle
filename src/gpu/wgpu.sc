@@ -2,6 +2,8 @@ using import Array
 using import String
 import wgpu
 
+LOSE-ENCODERS-ON-FINISH := false
+
 inline wrap-constructor (f T)
     inline (...)
         bitcast
@@ -80,16 +82,17 @@ do
     inline CommandEncoderFinish (cmd-encoder desc)
         result :=
             wgpu.CommandEncoderFinish cmd-encoder desc
-
-        lose cmd-encoder
+        static-if LOSE-ENCODERS-ON-FINISH
+            lose cmd-encoder
         imply result CommandBuffer
+
+    inline RenderPassEncoderEnd (render-pass)
+        wgpu.RenderPassEncoderEnd render-pass
+        static-if LOSE-ENCODERS-ON-FINISH
+            lose render-pass
 
     inline QueueSubmit (queue count cmd-buffers)
         wgpu.QueueSubmit queue count cmd-buffers
         lose cmd-buffers
-
-    inline RenderPassEncoderEnd (render-pass)
-        wgpu.RenderPassEncoderEnd render-pass
-        lose render-pass
 
     locals;

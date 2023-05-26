@@ -62,10 +62,10 @@ struct RenderPass
             _handle = handle
             _cmd-encoder = cmd-encoder
 
-    fn finish (self)
-        # TODO: fix lifetimes
-        wgpu.RenderPassEncoderEnd (copy self._handle)
-        cmd-buf := wgpu.CommandEncoderFinish (copy self._cmd-encoder) null
+    inline finish (self)
+        wgpu.RenderPassEncoderEnd self._handle
+        cmd-buf := wgpu.CommandEncoderFinish self._cmd-encoder null
+        lose self
         CommandBuffer cmd-buf
 
 do
