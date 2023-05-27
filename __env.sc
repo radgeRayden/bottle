@@ -1,4 +1,5 @@
 'bind-symbols __env
+    bottle = import .init
     module-search-path =
         ..
             list

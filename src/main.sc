@@ -52,7 +52,7 @@ fn run ()
 sugar-if main-module?
     name argc argv := (script-launch-args)
     demo := "hello-triangle"
-    require-from (module-dir .. "/..") (.. ".demos." demo) __env
+    require-from (module-dir .. "/..") (.. ".demos.gpu." demo) __env
 else
     do
         let run load update fixed-update render configure
