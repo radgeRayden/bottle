@@ -62,8 +62,7 @@ fn shader-module-from-GLSL (code stage)
                 nextInChain = (&desc as (mutable@ wgpu.ChainedStruct))
     module
 
-struct ShaderModule
-    _handle : wgpu.ShaderModule
+type ShaderModule < Struct :: (storageof wgpu.ShaderModule)
     inline... __typecall (cls, source : String, source-language : ShaderLanguage, ...)
         stage := ...
         let module =
@@ -80,8 +79,7 @@ struct ShaderModule
             default
                 assert false "invalid shader source type"
 
-        super-type.__typecall cls
-            _handle = module
+        bitcast module cls
     case (cls, f : Closure, source-language : ShaderLanguage, ...)
         stage := ...
         static-if (none? stage)
