@@ -1,8 +1,10 @@
 import wgpu
 
 do
-    TextureFormat := wgpu.TextureFormat
+    FrontFace := wgpu.FrontFace
+    PrimitiveTopology := wgpu.PrimitiveTopology
     ShaderStage   := wgpu.ShaderStage
+    TextureFormat := wgpu.TextureFormat
 
     from (import ..gpu.ShaderModule) let ShaderLanguage
     from (import .keyconstants) let KeyboardKey
