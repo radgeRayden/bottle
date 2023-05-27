@@ -167,5 +167,6 @@ fn present (render-pass)
 do
     let init update-render-area set-clear-color begin-frame present
     let types
+    let get-preferred-surface-format
 
     locals;
