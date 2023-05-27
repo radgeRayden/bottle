@@ -63,11 +63,27 @@ struct RenderPass
             _handle = handle
             _cmd-encoder = cmd-encoder
 
+    inline __imply (this other)
+        static-if (imply? wgpu.RenderPassEncoder other)
+            inline (self)
+                self._handle
+        elseif (imply? wgpu.CommandEncoder other)
+            inline (self)
+                self._cmd-encoder
+
     inline finish (self)
         wgpu.RenderPassEncoderEnd self._handle
         cmd-buf := wgpu.CommandEncoderFinish self._cmd-encoder null
+        # gets transmogrified into CommandBuffer, so no need to drop
         lose self
         CommandBuffer cmd-buf
+
+    fn... set-pipeline (self, pipeline : RenderPipeline)
+        wgpu.RenderPassEncoderSetPipeline (view self) (view pipeline)
+
+    fn... cmd-draw (self, vertex-count : u32, instance-count = 0:u32, first-vertex = 0:u32, first-instance = 0:u32)
+        self ... := *...
+        wgpu.RenderPassEncoderDraw (view self._handle) ...
 
 do
     let ColorAttachment CommandBuffer RenderPass
