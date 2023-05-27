@@ -5,9 +5,10 @@ using import struct
 using import .common
 using import ..helpers
 from (import .Texture) let TextureView
+using import .RenderPipeline
 import .wgpu
 
-type ColorAttachment < Struct :: (storageof wgpu.RenderPassColorAttachment)
+type ColorAttachment <: wgpu.RenderPassColorAttachment
     inline... __typecall (cls, view : TextureView, clear-color : vec4)
         let attachment =
             wgpu.RenderPassColorAttachment
@@ -17,7 +18,7 @@ type ColorAttachment < Struct :: (storageof wgpu.RenderPassColorAttachment)
                 clearValue = wgpu.Color (unpack clear-color)
         bitcast attachment cls
 
-type CommandBuffer < Struct :: (storageof wgpu.CommandBuffer)
+copy-type CommandBuffer wgpu.CommandBuffer
     inline... __typecall (cls, value : wgpu.CommandBuffer)
         bitcast value cls
 

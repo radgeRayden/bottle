@@ -62,7 +62,7 @@ fn shader-module-from-GLSL (code stage)
                 nextInChain = (&desc as (mutable@ wgpu.ChainedStruct))
     module
 
-type ShaderModule < Struct :: (storageof wgpu.ShaderModule)
+copy-type ShaderModule wgpu.ShaderModule
     inline... __typecall (cls, source : String, source-language : ShaderLanguage, ...)
         stage := ...
         let module =
