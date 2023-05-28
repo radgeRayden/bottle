@@ -21,20 +21,30 @@ type VertexStage <: wgpu.VertexState
     inline... __typecall (cls, shader : ShaderModule, entry-point : String)
         bitcast
             wgpu.VertexState
-                module = (storagecast (view shader))
+                module = (view shader)
                 entryPoint = entry-point
             cls
+
+    inline __imply (this other)
+        static-if (other == (superof this-type))
+            inline (self)
+                bitcast self other
 
 type FragmentStage <: wgpu.FragmentState
     inline... __typecall (cls, shader : ShaderModule, entry-point : String, color-targets)
         count ptr := array->ptr color-targets
         bitcast
             wgpu.FragmentState
-                module = (storagecast (view shader))
+                module = (view shader)
                 entryPoint = entry-point
                 targetCount = count as u32
                 targets = ptr as (@ wgpu.ColorTargetState)
             cls
+
+    inline __imply (this other)
+        static-if (other == (superof this-type))
+            inline (self)
+                bitcast self other
 
 struct BindGroupLayoutEntry
 
