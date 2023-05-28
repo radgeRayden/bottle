@@ -75,49 +75,22 @@ type PipelineLayout <:: wgpu.PipelineLayout
             make-pipeline-layout 0:u32 null
 
 fn make-pipeline (layout topology winding vertex-stage fragment-stage)
-    # let pipeline =
-    #     wgpu.DeviceCreateRenderPipeline istate.device
-    #         &local wgpu.RenderPipelineDescriptor
-    #             label = "Bottle Render Pipeline"
-    #             layout = pip-layout
-    #             vertex =
-    #                 wgpu.VertexState
-    #                     module = vertex-module
-    #                     entryPoint = "vs_main"
-    #             primitive =
-    #                 wgpu.PrimitiveState
-    #                     topology = wgpu.PrimitiveTopology.TriangleList
-    #                     frontFace = wgpu.FrontFace.CCW
-    #             multisample =
-    #                 wgpu.MultisampleState
-    #                     count = 1
-    #                     mask = (~ 0:u32)
-    #                     alphaToCoverageEnabled = false
-    #             fragment =
-    #                 &local wgpu.FragmentState
-    #                     module = fragment-module
-    #                     entryPoint = "fs_main"
-    #                     targetCount = 1
-    #                     targets =
-    #                         &local wgpu.ColorTargetState
-    #                             format = (get-preferred-surface-format)
-    #                             blend =
-    #                                 &local wgpu.BlendState
-    #                                     color =
-    #                                         typeinit
-    #                                             srcFactor = wgpu.BlendFactor.SrcAlpha
-    #                                             dstFactor = wgpu.BlendFactor.OneMinusSrcAlpha
-    #                                             operation = wgpu.BlendOperation.Add
-    #                                     alpha =
-    #                                         typeinit
-    #                                             srcFactor = wgpu.BlendFactor.SrcAlpha
-    #                                             dstFactor = wgpu.BlendFactor.OneMinusSrcAlpha
-    #                                             operation = wgpu.BlendOperation.Add
-    #                             writeMask = wgpu.ColorWriteMask.All
+    wgpu.DeviceCreateRenderPipeline istate.device
+        &local wgpu.RenderPipelineDescriptor
+            label = "Bottle Render Pipeline"
+            layout = layout
+            vertex = vertex-stage
+            primitive =
+                wgpu.PrimitiveState
+                    topology = topology
+                    frontFace = winding
+            multisample =
+                wgpu.MultisampleState
+                    count = 1
+                    mask = (~ 0:u32)
+                    alphaToCoverageEnabled = false
+            fragment = (&local (imply fragment-stage (superof fragment-stage)))
 
-    bitcast null wgpu.RenderPipeline
-
-copy-type RenderPipeline wgpu.RenderPipeline
 type RenderPipeline <:: wgpu.RenderPipeline
     inline... __typecall (cls,
                           layout         : PipelineLayout,
@@ -127,10 +100,7 @@ type RenderPipeline <:: wgpu.RenderPipeline
                           fragment-stage : FragmentStage)
 
         cls ... := *...
-
-        bitcast
-            make-pipeline ...
-            cls
+        bitcast (make-pipeline ...) cls
 
 do
     let BindGroupLayout
