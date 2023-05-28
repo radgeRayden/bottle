@@ -18,7 +18,7 @@ type ColorAttachment <: wgpu.RenderPassColorAttachment
                 clearValue = wgpu.Color (unpack clear-color)
         bitcast attachment cls
 
-copy-type CommandBuffer wgpu.CommandBuffer
+type CommandBuffer <:: wgpu.CommandBuffer
     inline... __typecall (cls, value : wgpu.CommandBuffer)
         bitcast value cls
 

@@ -11,7 +11,7 @@ inline wrap-constructor (f T)
             T
 
 inline define-object (name super destructor)
-    type (_ name) <:: super
+    type (_ name) < Struct :: super
         inline __typecall (cls)
             bitcast null cls
 

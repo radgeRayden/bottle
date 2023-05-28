@@ -39,7 +39,7 @@ type FragmentStage <: wgpu.FragmentState
 struct BindGroupLayoutEntry
 
 
-copy-type BindGroupLayout wgpu.BindGroupLayout
+type BindGroupLayout <:: wgpu.BindGroupLayout
     inline... __typecall (cls, entries)
 
 fn make-pipeline-layout (count layouts)
@@ -50,7 +50,7 @@ fn make-pipeline-layout (count layouts)
             bindGroupLayoutCount = count
             bindGroupLayouts = layouts
 
-copy-type PipelineLayout wgpu.PipelineLayout
+type PipelineLayout <:: wgpu.PipelineLayout
     inline... __typecall (cls, layout : wgpu.PipelineLayout)
         bitcast layout cls
     case (cls, bind-group-layouts : (Array BindGroupLayout))
@@ -108,6 +108,7 @@ fn make-pipeline (layout topology winding vertex-stage fragment-stage)
     bitcast null wgpu.RenderPipeline
 
 copy-type RenderPipeline wgpu.RenderPipeline
+type RenderPipeline <:: wgpu.RenderPipeline
     inline... __typecall (cls,
                           layout         : PipelineLayout,
                           topology       : wgpu.PrimitiveTopology,

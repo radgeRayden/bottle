@@ -19,9 +19,4 @@ inline array->ptr (value)
         local v = value
         _ 1 &v
 
-sugar copy-type (name super body...)
-    qq
-        [type] [name] < [super] :: ([storageof] [super])
-            unquote-splice body...
-
 local-scope;
