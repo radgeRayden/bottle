@@ -115,7 +115,7 @@ fn init ()
     wgpu.DeviceSetUncapturedErrorCallback istate.device
         fn (errtype message userdata)
             raising noreturn
-            print message
+            print (String message)
             # TODO: rework functionality here to work AOT
             # print
             #     errtype as wgpu.ErrorType
