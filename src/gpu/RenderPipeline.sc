@@ -14,7 +14,7 @@ type ColorTarget <: wgpu.ColorTargetState
         bitcast
             wgpu.ColorTargetState
                 format = format
-                writeMask = ~0:u32
+                writeMask = wgpu.ColorWriteMask.All
             cls
 
 type VertexStage <: wgpu.VertexState
