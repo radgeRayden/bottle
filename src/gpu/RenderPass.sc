@@ -81,9 +81,13 @@ struct RenderPass
     fn... set-pipeline (self, pipeline : RenderPipeline)
         wgpu.RenderPassEncoderSetPipeline (view self) (view pipeline)
 
-    fn... cmd-draw (self, vertex-count : u32, instance-count = 0:u32, first-vertex = 0:u32, first-instance = 0:u32)
+    fn... cmd-draw (self, vertex-count : u32, instance-count = 1:u32, first-vertex = 0:u32, first-instance = 0:u32)
         self ... := *...
         wgpu.RenderPassEncoderDraw (view self._handle) ...
+
+    fn... cmd-draw-indexed (self, index-count : u32, instance-count = 1:u32, first-index = 0:u32, base-vertex = 0:u32, first-instance = 0:u32)
+        self ... := *...
+        wgpu.RenderPassEncoderDrawIndexed (view self._handle) ...
 
 do
     let ColorAttachment CommandBuffer RenderPass
