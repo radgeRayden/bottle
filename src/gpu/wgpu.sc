@@ -23,11 +23,17 @@ inline define-object (name super destructor)
             static-if (otherT == super)
                 inline (incoming)
                     bitcast incoming thisT
+            elseif (otherT == (superof thisT))
+                inline (incoming)
+                    bitcast incoming thisT
 
         inline __imply (thisT otherT)
             static-if (otherT == super)
                 inline (self)
                     bitcast self otherT
+            elseif (otherT == (superof thisT))
+                inline (incoming)
+                    bitcast incoming thisT
 
 run-stage;
 
