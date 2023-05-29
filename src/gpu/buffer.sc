@@ -90,11 +90,13 @@ inline gen-buffer-type (prefix backing-type usage-flags)
 
 type
 
-inline StorageBuffer (cls backing-type)
+@@ memo
+inline StorageBuffer (backing-type)
     gen-buffer-type "StorageBuffer" backing-type
         wgpu.BufferUsage.Storage | wgpu.BufferUsage.CopyDst | wgpu.BufferUsage.CopySrc
 
-inline IndexBuffer (cls backing-type)
+@@ memo
+inline IndexBuffer (backing-type)
     static-if (not ((backing-type == u16) or (backing-type == u32)))
         hide-traceback;
         static-error "only u16 and u32 are allowed as index buffer backing types"
@@ -102,11 +104,13 @@ inline IndexBuffer (cls backing-type)
     gen-buffer-type "IndexBuffer" backing-type
         wgpu.BufferUsage.Index | wgpu.BufferUsage.CopyDst | wgpu.BufferUsage.CopySrc
 
-inline UniformBuffer (cls backing-type)
+@@ memo
+inline UniformBuffer (backing-type)
     gen-buffer-type "UniformBuffer" backing-type
         wgpu.BufferUsage.Uniform | wgpu.BufferUsage.CopyDst | wgpu.BufferUsage.CopySrc
 
-inline GenericGPUBuffer (cls backing-type)
+@@ memo
+inline GenericGPUBuffer (backing-type)
     gen-buffer-type "GenericGPUBuffer" backing-type
 
 do
