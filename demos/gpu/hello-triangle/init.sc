@@ -47,8 +47,6 @@ global render-state : (Option RendererState)
 @@ 'on bottle.configure
 fn (cfg)
     cfg.window.title = "hello, triangle!"
-    cfg.window.width = 800
-    cfg.window.height = 600
     ;
 
 @@ 'on bottle.load

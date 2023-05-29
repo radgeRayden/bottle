@@ -48,7 +48,6 @@ type FragmentStage <: wgpu.FragmentState
 
 struct BindGroupLayoutEntry
 
-
 type BindGroupLayout <:: wgpu.BindGroupLayout
     inline... __typecall (cls, entries)
 
@@ -87,7 +86,8 @@ fn make-pipeline (layout topology winding vertex-stage fragment-stage)
             multisample =
                 wgpu.MultisampleState
                     count = 1
-                    mask = (~ 0:u32)
+                    mask = ~0:u32
+
                     alphaToCoverageEnabled = false
             fragment = (&local (imply fragment-stage (superof fragment-stage)))
 
