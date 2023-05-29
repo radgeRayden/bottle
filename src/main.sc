@@ -46,8 +46,10 @@ fn run ()
             # TODO: pass in dt remainder, after we adapt the timer module to be aware of it
             render render-pass
             gpu.present render-pass
-        else
-            ()
+        except (ex)
+            using gpu.types
+            if (ex == GPUError.ObjectCreationFailed)
+                assert false "unhandled GPU Object creation failure"
 
 sugar-if main-module?
     name argc argv := (script-launch-args)

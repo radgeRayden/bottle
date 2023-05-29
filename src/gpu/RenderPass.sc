@@ -19,9 +19,6 @@ type ColorAttachment <: wgpu.RenderPassColorAttachment
         bitcast attachment cls
 
 type CommandBuffer <:: wgpu.CommandBuffer
-    inline... __typecall (cls, value : wgpu.CommandBuffer)
-        bitcast value cls
-
     fn submit (self)
         local self = (storagecast self)
         wgpu.QueueSubmit istate.queue 1 &self
@@ -60,7 +57,7 @@ struct RenderPass
                     colorAttachments = color-attachments as (@ wgpu.RenderPassColorAttachment)
 
         super-type.__typecall cls
-            _handle = handle
+            _handle = (wrap-nullable-object wgpu.RenderPassEncoder handle)
             _cmd-encoder = cmd-encoder
 
     inline __imply (this other)
@@ -76,7 +73,7 @@ struct RenderPass
         cmd-buf := wgpu.CommandEncoderFinish self._cmd-encoder null
         # gets transmogrified into CommandBuffer, so no need to drop
         lose self
-        CommandBuffer cmd-buf
+        imply cmd-buf CommandBuffer
 
     fn... set-pipeline (self, pipeline : RenderPipeline)
         wgpu.RenderPassEncoderSetPipeline (view self) (view pipeline)
