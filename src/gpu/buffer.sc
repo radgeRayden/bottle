@@ -23,8 +23,8 @@ fn write-buffer (buf data-ptr offset data-size)
 type GPUBuffer < Struct
 
 @@ memo
-inline gen-buffer-type (parent-type prefix backing-type usage-flags)
-    struct (.. prefix "<" (tostring backing-type) ">") < parent-type
+inline gen-buffer-type (prefix backing-type usage-flags)
+    struct (.. prefix "<" (tostring backing-type) ">") < GPUBuffer
         _handle : wgpu.Buffer
         _size : usize
         _usage : wgpu.BufferUsage
@@ -37,8 +37,7 @@ inline gen-buffer-type (parent-type prefix backing-type usage-flags)
             size   := max-elements * (sizeof BackingType)
             handle := make-buffer size usage-flags
 
-            # use Struct directly to avoid hierarchy issues
-            Struct.__typecall cls
+            this-type.__typecall cls
                 _handle = handle
                 _size = size
                 _usage = usage-flags
@@ -52,6 +51,7 @@ inline gen-buffer-type (parent-type prefix backing-type usage-flags)
                 inline __typecall (cls max-elements)
                     constructor cls max-elements usage-flags
 
+        # ------------------------------------------------------------------------------------
         fn... frame-write (self, data : (Array BackingType), offset : usize, count : usize)
             data-size   := ElementSize * count
             byte-offset := ElementSize * offset
@@ -76,6 +76,7 @@ inline gen-buffer-type (parent-type prefix backing-type usage-flags)
             assert ((byte-offset + data-size) <= self._size)
             write-buffer self._handle (&local data) offset data-size
             ()
+        # ------------------------------------------------------------------------------------
 
         inline __imply (this other)
             static-if (other < wgpu.Buffer)
@@ -87,30 +88,27 @@ inline gen-buffer-type (parent-type prefix backing-type usage-flags)
 
         unlet constructor
 
-type GPUGenericBuffer < GPUBuffer
-    inline __typecall (cls backing-type)
-        gen-buffer-type this-type "GPUBuffer" backing-type
+type
 
-type GPUStorageBuffer < GPUBuffer
-    inline __typecall (cls backing-type)
-        gen-buffer-type this-type "GPUStorageBuffer" backing-type
-            wgpu.BufferUsage.Storage | wgpu.BufferUsage.CopyDst | wgpu.BufferUsage.CopySrc
+inline StorageBuffer (cls backing-type)
+    gen-buffer-type "StorageBuffer" backing-type
+        wgpu.BufferUsage.Storage | wgpu.BufferUsage.CopyDst | wgpu.BufferUsage.CopySrc
 
-type GPUIndexBuffer < GPUBuffer
-    inline __typecall (cls backing-type)
-        static-if (not ((backing-type == u16) or (backing-type == u32)))
-            hide-traceback;
-            static-error "only u16 and u32 are allowed as index buffer backing types"
+inline IndexBuffer (cls backing-type)
+    static-if (not ((backing-type == u16) or (backing-type == u32)))
+        hide-traceback;
+        static-error "only u16 and u32 are allowed as index buffer backing types"
 
-        gen-buffer-type this-type "GPUIndexBuffer" backing-type
-            wgpu.BufferUsage.Index | wgpu.BufferUsage.CopyDst | wgpu.BufferUsage.CopySrc
+    gen-buffer-type "IndexBuffer" backing-type
+        wgpu.BufferUsage.Index | wgpu.BufferUsage.CopyDst | wgpu.BufferUsage.CopySrc
 
-type GPUUniformBuffer < GPUBuffer
-    inline __typecall (cls backing-type)
-        gen-buffer-type this-type "GPUUniformBuffer" backing-type
-            wgpu.BufferUsage.Uniform | wgpu.BufferUsage.CopyDst | wgpu.BufferUsage.CopySrc
+inline UniformBuffer (cls backing-type)
+    gen-buffer-type "UniformBuffer" backing-type
+        wgpu.BufferUsage.Uniform | wgpu.BufferUsage.CopyDst | wgpu.BufferUsage.CopySrc
+
+inline GPUBuffer (cls backing-type)
+    gen-buffer-type "GPUBuffer" backing-type
 
 do
-    let GPUBuffer = GPUGenericBuffer
-    let GPUStorageBuffer GPUIndexBuffer GPUUniformBuffer
-    locals;
+    let StorageBuffer IndexBuffer UniformBuffer GPUBuffer
+    local-scope;
