@@ -51,30 +51,31 @@ fn (cfg)
 
 @@ 'on bottle.load
 fn ()
-    vert := ShaderModule shaderf-vert ShaderLanguage.SPIRV ShaderStage.Vertex
-    frag := ShaderModule shaderf-frag ShaderLanguage.SPIRV ShaderStage.Fragment
+    try # resource creation can fail, but in this simple case we don't need to handle it.
+        vert := ShaderModule shaderf-vert ShaderLanguage.SPIRV ShaderStage.Vertex
+        frag := ShaderModule shaderf-frag ShaderLanguage.SPIRV ShaderStage.Fragment
 
-    pipeline :=
-        RenderPipeline
-            layout = (PipelineLayout)
-            topology = PrimitiveTopology.TriangleList
-            winding = FrontFace.CCW
-            vertex-stage =
-                VertexStage
-                    shader = vert
-                    "main"
-            fragment-stage =
-                FragmentStage
-                    shader = frag
-                    "main"
-                    color-targets =
-                        arrayof ColorTarget
-                            typeinit
-                                format = (bottle.gpu.get-preferred-surface-format)
-    render-state =
-        RendererState
-            pipeline = pipeline
-    ;
+        pipeline :=
+            RenderPipeline
+                layout = (PipelineLayout)
+                topology = PrimitiveTopology.TriangleList
+                winding = FrontFace.CCW
+                vertex-stage =
+                    VertexStage
+                        shader = vert
+                        "main"
+                fragment-stage =
+                    FragmentStage
+                        shader = frag
+                        "main"
+                        color-targets =
+                            arrayof ColorTarget
+                                typeinit
+                                    format = (bottle.gpu.get-preferred-surface-format)
+        render-state =
+            RendererState
+                pipeline = pipeline
+    else ()
 
 @@ 'on bottle.render
 fn (render-pass)

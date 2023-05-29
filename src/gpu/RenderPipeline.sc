@@ -46,11 +46,8 @@ type FragmentStage <: wgpu.FragmentState
             inline (self)
                 bitcast self other
 
-struct BindGroupLayoutEntry
 
 type BindGroupLayout <:: wgpu.BindGroupLayout
-    inline... __typecall (cls, entries)
-
 fn make-pipeline-layout (count layouts)
     layouts as:= pointer (storageof wgpu.BindGroupLayout)
     wgpu.DeviceCreatePipelineLayout istate.device
@@ -60,17 +57,15 @@ fn make-pipeline-layout (count layouts)
             bindGroupLayouts = layouts
 
 type PipelineLayout <:: wgpu.PipelineLayout
-    inline... __typecall (cls, layout : wgpu.PipelineLayout)
-        bitcast layout cls
-    case (cls, bind-group-layouts : (Array BindGroupLayout))
-        this-function cls
+    inline... (cls, bind-group-layouts : (Array BindGroupLayout))
+        wrap-nullable-object cls
             make-pipeline-layout (countof bind-group-layouts) (imply bind-group-layouts pointer)
     case (cls, bind-group-layouts : (array BindGroupLayout))
         local layouts = bind-group-layouts
-        this-function cls
+        wrap-nullable-object cls
             make-pipeline-layout (countof layouts) &layouts
     case (cls)
-        this-function cls
+        wrap-nullable-object cls
             make-pipeline-layout 0:u32 null
 
 fn make-pipeline (layout topology winding vertex-stage fragment-stage)
@@ -100,11 +95,10 @@ type RenderPipeline <:: wgpu.RenderPipeline
                           fragment-stage : FragmentStage)
 
         cls ... := *...
-        bitcast (make-pipeline ...) cls
+        wrap-nullable-object cls (make-pipeline ...)
 
 do
     let BindGroupLayout
-        BindGroupLayoutEntry
         ColorTarget
         PipelineLayout
         RenderPipeline

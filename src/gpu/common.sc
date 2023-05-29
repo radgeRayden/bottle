@@ -2,6 +2,7 @@ using import struct
 using import Map
 using import String
 using import glm
+using import .errors
 
 import wgpu
 # from (import .binding-interface) let GPUResourceBinding
@@ -49,6 +50,12 @@ fn get-preferred-surface-format ()
 
     selected-format
 
+inline wrap-nullable-object (cls object)
+    if (object == null)
+        raise GPUError.ObjectCreationFailed
+    else
+        imply object cls
+
 do
-    let istate get-preferred-surface-format
+    let istate get-preferred-surface-format wrap-nullable-object
     locals;

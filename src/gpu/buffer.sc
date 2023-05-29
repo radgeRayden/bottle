@@ -20,15 +20,14 @@ fn write-buffer (buf data-ptr offset data-size)
         data-ptr
         data-size
 
-type GPUBuffer < Struct
+struct GPUBuffer
+    _handle : wgpu.Buffer
+    _size : usize
+    _usage : wgpu.BufferUsage
 
 @@ memo
 inline gen-buffer-type (prefix backing-type usage-flags)
-    struct (.. prefix "<" (tostring backing-type) ">") < GPUBuffer
-        _handle : wgpu.Buffer
-        _size : usize
-        _usage : wgpu.BufferUsage
-
+    type (.. prefix "<" (tostring backing-type) ">") <:: GPUBuffer
         BackingType := backing-type
         ElementSize := (sizeof BackingType)
 
@@ -38,7 +37,7 @@ inline gen-buffer-type (prefix backing-type usage-flags)
             handle := make-buffer size usage-flags
 
             this-type.__typecall cls
-                _handle = handle
+                _handle = (wrap-nullable-object wgpu.Buffer handle)
                 _size = size
                 _usage = usage-flags
 
@@ -83,12 +82,7 @@ inline gen-buffer-type (prefix backing-type usage-flags)
                 inline (self)
                     imply self._handle other
 
-        inline __drop (self)
-            wgpu.BufferDrop self._handle
-
         unlet constructor
-
-type
 
 @@ memo
 inline StorageBuffer (backing-type)

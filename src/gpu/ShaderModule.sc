@@ -79,7 +79,8 @@ type ShaderModule <:: wgpu.ShaderModule
             default
                 assert false "invalid shader source type"
 
-        bitcast module cls
+        wrap-nullable-object cls module
+
     case (cls, f : Closure, source-language : ShaderLanguage, ...)
         stage := ...
         static-if (none? stage)
