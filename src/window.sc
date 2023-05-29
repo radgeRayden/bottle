@@ -2,6 +2,7 @@ from (import .config) let istate-cfg
 cfg := `istate-cfg.window
 run-stage;
 
+using import String
 import sdl
 
 global handle : (mutable@ sdl.Window)
@@ -87,6 +88,10 @@ fn init ()
             width
             height
             sdl.SDL_WINDOW_RESIZABLE
+
+    if (handle == null)
+        print "Error while creating window:" (String (sdl.GetError))
+        exit 1
     ;
 
 do
