@@ -106,9 +106,9 @@ inline UniformBuffer (cls backing-type)
     gen-buffer-type "UniformBuffer" backing-type
         wgpu.BufferUsage.Uniform | wgpu.BufferUsage.CopyDst | wgpu.BufferUsage.CopySrc
 
-inline GPUBuffer (cls backing-type)
-    gen-buffer-type "GPUBuffer" backing-type
+inline GenericGPUBuffer (cls backing-type)
+    gen-buffer-type "GenericGPUBuffer" backing-type
 
 do
-    let StorageBuffer IndexBuffer UniformBuffer GPUBuffer
+    let StorageBuffer IndexBuffer UniformBuffer GenericGPUBuffer
     local-scope;
