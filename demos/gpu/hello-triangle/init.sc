@@ -85,4 +85,11 @@ fn (render-pass)
     'cmd-draw rp 3
     ;
 
-bottle.run;
+fn main (argc argv)
+    bottle.run;
+
+sugar-if main-module?
+    name argc argv := (script-launch-args)
+    main argc argv
+else
+    main
