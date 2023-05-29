@@ -16,7 +16,8 @@ inline define-object (name super destructor)
             bitcast null cls
 
         inline __drop (self)
-            destructor (bitcast self super)
+            if ((storagecast self) != null)
+                destructor (bitcast self super)
 
         inline __rimply (otherT thisT)
             static-if (otherT == super)
