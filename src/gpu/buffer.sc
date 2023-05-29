@@ -69,6 +69,13 @@ inline gen-buffer-type (parent-type prefix backing-type usage-flags)
             this-function
                 self data 0 (countof data)
 
+        case (self, data : BackingType, offset = 0:usize)
+            data-size   := ElementSize
+            byte-offset := ElementSize * offset
+
+            assert ((byte-offset + data-size) <= self._size)
+            write-buffer self._handle (&local data) offset data-size
+            ()
         inline __drop (self)
             wgpu.BufferDrop self._handle
 
