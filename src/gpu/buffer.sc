@@ -2,7 +2,7 @@ using import Array
 using import struct
 using import .common
 using import ..helpers
-import wgpu
+import .wgpu
 
 fn make-buffer (size usage-flags)
     let handle =
@@ -13,6 +13,13 @@ fn make-buffer (size usage-flags)
                 size = (imply size u64)
     handle
 
+fn write-buffer (buf data-ptr offset data-size)
+    wgpu.QueueWriteBuffer istate.queue
+        buf
+        offset
+        data-ptr
+        data-size
+
 type GPUBuffer < Struct
 
 @@ memo
@@ -22,12 +29,13 @@ inline gen-buffer-type (parent-type prefix backing-type usage-flags)
         _size : usize
         _usage : wgpu.BufferUsage
 
-        let BackingType = backing-type
+        BackingType := backing-type
+        ElementSize := (sizeof BackingType)
 
         inline constructor (cls max-elements usage-flags)
             # TODO: ensure size obeys alignment rules
             size   := max-elements * (sizeof BackingType)
-            handle := (make-buffer size usage-flags)
+            handle := make-buffer size usage-flags
 
             # use Struct directly to avoid hierarchy issues
             Struct.__typecall cls
@@ -44,14 +52,22 @@ inline gen-buffer-type (parent-type prefix backing-type usage-flags)
                 inline __typecall (cls max-elements)
                     constructor cls max-elements usage-flags
 
-        fn... write (self, data : (Array BackingType), offset : usize, count : usize)
-            data-size := (sizeof ((typeof data) . ElementType)) * count
-            assert (data-size <= self._size)
-            wgpu.QueueWriteBuffer istate.queue self._handle offset ((imply data pointer) as voidstar) data-size
+        fn... frame-write (self, data : (Array BackingType), offset : usize, count : usize)
+            data-size   := ElementSize * count
+            byte-offset := ElementSize * offset
+            data-ptr    := (imply data pointer) as voidstar
+
+            assert ((byte-offset + data-size) <= self._size)
+            write-buffer self._handle data-ptr offset data-size
+            ()
+
         case (self, data : (Array BackingType), offset : usize)
-            this-function self data offset (countof data)
+            this-function
+                self data offset (countof data)
+
         case (self, data : (Array BackingType))
-            this-function self data 0 (countof data)
+            this-function
+                self data 0 (countof data)
 
         inline __drop (self)
             wgpu.BufferDrop self._handle
