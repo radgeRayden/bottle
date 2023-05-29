@@ -76,6 +76,12 @@ inline gen-buffer-type (parent-type prefix backing-type usage-flags)
             assert ((byte-offset + data-size) <= self._size)
             write-buffer self._handle (&local data) offset data-size
             ()
+
+        inline __imply (this other)
+            static-if (other < wgpu.Buffer)
+                inline (self)
+                    imply self._handle other
+
         inline __drop (self)
             wgpu.BufferDrop self._handle
 
