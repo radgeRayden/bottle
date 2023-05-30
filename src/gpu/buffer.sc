@@ -36,7 +36,7 @@ inline gen-buffer-type (prefix backing-type usage-flags)
             size   := max-elements * (sizeof BackingType)
             handle := make-buffer size usage-flags
 
-            this-type.__typecall cls
+            super-type.__typecall cls
                 _handle = (wrap-nullable-object wgpu.Buffer handle)
                 _size = size
                 _usage = usage-flags
