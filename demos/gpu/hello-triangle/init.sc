@@ -75,6 +75,7 @@ fn ()
         render-state =
             RendererState
                 pipeline = pipeline
+
     else ()
 
 @@ 'on bottle.render
@@ -83,7 +84,7 @@ fn (render-pass)
     ctx := 'force-unwrap render-state
 
     'set-pipeline rp ctx.pipeline
-    'cmd-draw rp 3
+    'draw rp 3
     ;
 
 fn main (argc argv)
