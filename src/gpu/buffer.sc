@@ -26,8 +26,8 @@ struct GPUBuffer
     _usage : wgpu.BufferUsage
 
 @@ memo
-inline gen-buffer-type (prefix backing-type usage-flags)
-    type (.. prefix "<" (tostring backing-type) ">") <:: GPUBuffer
+inline gen-buffer-type (parent-type prefix backing-type usage-flags)
+    type (.. prefix "<" (tostring backing-type) ">") < parent-type :: GPUBuffer
         BackingType := backing-type
         ElementSize := (sizeof BackingType)
 
@@ -36,7 +36,8 @@ inline gen-buffer-type (prefix backing-type usage-flags)
             size   := max-elements * (sizeof BackingType)
             handle := make-buffer size usage-flags
 
-            super-type.__typecall cls
+            # use Struct directly to avoid hierarchy issues
+            Struct.__typecall cls
                 _handle = (wrap-nullable-object wgpu.Buffer handle)
                 _size = size
                 _usage = usage-flags
@@ -84,29 +85,34 @@ inline gen-buffer-type (prefix backing-type usage-flags)
 
         unlet constructor
 
-@@ memo
-inline StorageBuffer (backing-type)
-    gen-buffer-type "StorageBuffer" backing-type
-        wgpu.BufferUsage.Storage | wgpu.BufferUsage.CopyDst | wgpu.BufferUsage.CopySrc
+type GenericBuffer < GPUBuffer
+    @@ memo
+    inline __typecall (cls backing-type)
+        gen-buffer-type cls "GenericBuffer" backing-type
 
-@@ memo
-inline IndexBuffer (backing-type)
-    static-if (not ((backing-type == u16) or (backing-type == u32)))
-        hide-traceback;
-        static-error "only u16 and u32 are allowed as index buffer backing types"
+type StorageBuffer < GPUBuffer
+    @@ memo
+    inline __typecall (cls backing-type)
+        gen-buffer-type cls "StorageBuffer" backing-type
+            wgpu.BufferUsage.Storage | wgpu.BufferUsage.CopyDst | wgpu.BufferUsage.CopySrc
 
-    gen-buffer-type "IndexBuffer" backing-type
-        wgpu.BufferUsage.Index | wgpu.BufferUsage.CopyDst | wgpu.BufferUsage.CopySrc
+type IndexBuffer < GPUBuffer
+    @@ memo
+    inline __typecall (cls backing-type)
+        static-if (not ((backing-type == u16) or (backing-type == u32)))
+            hide-traceback;
+            static-error "only u16 and u32 are allowed as index buffer backing types"
 
-@@ memo
-inline UniformBuffer (backing-type)
-    gen-buffer-type "UniformBuffer" backing-type
-        wgpu.BufferUsage.Uniform | wgpu.BufferUsage.CopyDst | wgpu.BufferUsage.CopySrc
+        gen-buffer-type cls "IndexBuffer" backing-type
+            wgpu.BufferUsage.Index | wgpu.BufferUsage.CopyDst | wgpu.BufferUsage.CopySrc
 
-@@ memo
-inline GenericGPUBuffer (backing-type)
-    gen-buffer-type "GenericGPUBuffer" backing-type
+type UniformBuffer < GPUBuffer
+    @@ memo
+    inline __typecall (cls backing-type)
+        gen-buffer-type cls "UniformBuffer" backing-type
+            wgpu.BufferUsage.Uniform | wgpu.BufferUsage.CopyDst | wgpu.BufferUsage.CopySrc
 
 do
-    let StorageBuffer IndexBuffer UniformBuffer GenericGPUBuffer
+
+    let StorageBuffer IndexBuffer UniformBuffer GenericBuffer
     local-scope;
