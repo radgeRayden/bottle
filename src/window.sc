@@ -89,10 +89,12 @@ fn init ()
             height
             sdl.SDL_WINDOW_RESIZABLE
 
-    if (handle == null)
-        print "Error while creating window:" (String (sdl.GetError))
-        exit 1
+    assert (handle != null) (.. "Error while creating window:" (String (sdl.GetError)))
     ;
+
+fn shutdown ()
+    sdl.DestroyWindow handle
+    sdl.Quit;
 
 do
     let
@@ -104,4 +106,5 @@ do
         get-drawable-size
         get-desktop-scaling-factor
         minimized?
+        shutdown
     locals;

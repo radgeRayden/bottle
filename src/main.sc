@@ -51,6 +51,8 @@ fn run ()
             if (ex == GPUError.ObjectCreationFailed)
                 assert false "unhandled GPU Object creation failure"
 
+    window.shutdown;
+
 sugar-if main-module?
     name argc argv := (script-launch-args)
     demo := "hello-triangle"
