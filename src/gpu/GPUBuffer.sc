@@ -21,13 +21,13 @@ fn write-buffer (buf data-ptr offset data-size)
         data-size
 
 struct GPUBuffer
-    _handle : wgpu.Buffer
-    _size : usize
-    _usage : wgpu.BufferUsage
+    _handle   : wgpu.Buffer
+    _capacity : usize
+    _usage    : wgpu.BufferUsage
 
 @@ memo
 inline gen-buffer-type (parent-type prefix backing-type usage-flags)
-    type (.. prefix "<" (tostring backing-type) ">") < parent-type :: GPUBuffer
+    type (.. prefix "<" (tostring backing-type) ">") < parent-type :: (storageof GPUBuffer)
         BackingType := backing-type
         ElementSize := (sizeof BackingType)
 
@@ -39,7 +39,7 @@ inline gen-buffer-type (parent-type prefix backing-type usage-flags)
             # use Struct directly to avoid hierarchy issues
             Struct.__typecall cls
                 _handle = (wrap-nullable-object wgpu.Buffer handle)
-                _size = size
+                _capacity = max-elements
                 _usage = usage-flags
 
         # if usage flags aren't statically provided, it means they must be passed at runtime
@@ -53,33 +53,33 @@ inline gen-buffer-type (parent-type prefix backing-type usage-flags)
 
         # ------------------------------------------------------------------------------------
         fn... frame-write (self, data : (Array BackingType), offset : usize, count : usize)
-            data-size   := ElementSize * count
-            byte-offset := ElementSize * offset
-            data-ptr    := (imply data pointer) as voidstar
+            data-size     := ElementSize * count
+            byte-offset   := ElementSize * offset
+            byte-capacity := ElementSize * self._capacity
+            data-ptr      := (imply data pointer) as voidstar
 
-            assert ((byte-offset + data-size) <= self._size)
+            assert ((byte-offset + data-size) <= byte-capacity)
             write-buffer self._handle data-ptr offset data-size
             ()
 
         case (self, data : (Array BackingType), offset : usize)
-            this-function
-                self data offset (countof data)
+            this-function self data offset (countof data)
 
         case (self, data : (Array BackingType))
-            this-function
-                self data 0 (countof data)
+            this-function self data 0 (countof data)
 
         case (self, data : BackingType, offset = 0:usize)
-            data-size   := ElementSize
-            byte-offset := ElementSize * offset
+            data-size     := ElementSize
+            byte-offset   := ElementSize * offset
+            byte-capacity := ElementSize * self._capacity
 
-            assert ((byte-offset + data-size) <= self._size)
+            assert ((byte-offset + data-size) <= byte-capacity)
             write-buffer self._handle (&local data) offset data-size
             ()
         # ------------------------------------------------------------------------------------
 
         inline __imply (this other)
-            static-if (other < wgpu.Buffer)
+            static-if (other == (storageof wgpu.Buffer))
                 inline (self)
                     imply self._handle other
 

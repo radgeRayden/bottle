@@ -6,6 +6,7 @@ using import .common
 using import ..helpers
 from (import .Texture) let TextureView
 using import .RenderPipeline
+using import .GPUBuffer
 import .wgpu
 
 type ColorAttachment <: wgpu.RenderPassColorAttachment

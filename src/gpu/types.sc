@@ -1,11 +1,12 @@
 using import .errors
 
 ..
+    import .BindGroup
     import .RenderPass
     import .RenderPipeline
     import .ShaderModule
     import .Texture
-    import .buffer
+    import .GPUBuffer
     do
         let GPUError
         local-scope;
