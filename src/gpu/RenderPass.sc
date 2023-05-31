@@ -79,6 +79,25 @@ struct RenderPass
     fn... set-pipeline (self, pipeline : RenderPipeline)
         wgpu.RenderPassEncoderSetPipeline (view self) (view pipeline)
 
+    fn... set-index-buffer (self, buffer : IndexBuffer, offset = 0:usize, count...)
+        count := va-option count count... (buffer._capacity - offset)
+        assert (offset < buffer._capacity)
+
+        indexT := (typeof buffer) . BackingType
+        offset := (sizeof indexT) * offset
+        size := (sizeof indexT) * count
+
+        let index-format =
+            static-match indexT
+            case u16
+                wgpu.IndexFormat.Uint16
+            case u32
+                wgpu.IndexFormat.Uint32
+            default
+                wgpu.IndexFormat.Undefined
+
+        wgpu.RenderPassEncoderSetIndexBuffer (view self) (view buffer) index-format offset size
+
     fn... draw (self, vertex-count : u32, instance-count = 1:u32, first-vertex = 0:u32, first-instance = 0:u32)
         self ... := *...
         wgpu.RenderPassEncoderDraw (view self._handle) ...
