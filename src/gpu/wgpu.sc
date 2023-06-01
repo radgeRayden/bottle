@@ -35,11 +35,19 @@ inline define-object (name super destructor)
                 inline (incoming)
                     bitcast incoming thisT
 
+inline define-flags (enumT)
+    inline __typecall (cls flags...)
+        flagST := storageof wgpu.Flags
+
+        result :=
+            static-fold (result = (flagST)) for flag in (va-each flags...)
+                result | ((getattr enumT flag) as flagST)
+
+        bitcast result cls
+
 run-stage;
 
 do
-    using wgpu
-
     Instance := define-object "WGPUInstance" wgpu.Instance wgpu.InstanceDrop
     Adapter := define-object "WGPUAdapter" wgpu.Adapter
     BindGroup := define-object "WGPUBindGroup" wgpu.BindGroup wgpu.BindGroupDrop
@@ -102,4 +110,7 @@ do
         wgpu.QueueSubmit queue count cmd-buffers
         lose cmd-buffers
 
-    locals;
+    type ShaderStageFlags < integer : u32
+        let __typecall = (define-flags wgpu.ShaderStage)
+
+    .. (local-scope) wgpu

@@ -1,4 +1,5 @@
 using import .errors
+import .wgpu
 
 ..
     import .BindGroup
@@ -9,4 +10,5 @@ using import .errors
     import .GPUBuffer
     do
         let GPUError
+        ShaderStageFlags := wgpu.ShaderStageFlags
         local-scope;
