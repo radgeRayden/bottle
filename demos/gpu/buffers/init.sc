@@ -1,5 +1,6 @@
 using import Array
 using import Option
+using import String
 using import struct
 using import .common
 
@@ -24,15 +25,14 @@ struct RendererState
     bind-group     : BindGroup
 
 global render-state : (Option RendererState)
-QUAD-COUNT  := 120000:u32
-INDEX-COUNT := 6:u32
 
-global rng : random.RNG 0
+QUAD-COUNT  := 120000:u32
 fn gen-quads ()
     using import glm
     local quads : (Array Quad)
     'resize quads QUAD-COUNT
 
+    local rng : random.RNG 0
     unit-rand := () -> (random.normalize (rng))
     for quad in quads
         quad.rotation = (2 * pi:f64 * (unit-rand)) as f32
@@ -42,6 +42,7 @@ fn gen-quads ()
         quad.direction = (2 * pi:f64 * (unit-rand)) as f32
     quads
 
+INDEX-COUNT := 6:u32
 fn gen-indices ()
     local indices : (Array u32)
     'resize indices INDEX-COUNT
@@ -66,11 +67,11 @@ fn ()
                 vertex-stage =
                     VertexStage
                         shader = vert
-                        "main"
+                        entry-point = S"main"
                 fragment-stage =
                     FragmentStage
                         shader = frag
-                        "main"
+                        entry-point = S"main"
                         color-targets =
                             arrayof ColorTarget
                                 typeinit
