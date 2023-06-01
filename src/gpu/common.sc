@@ -50,11 +50,13 @@ fn get-preferred-surface-format ()
 
     selected-format
 
-inline wrap-nullable-object (cls object)
-    if (object == null)
-        raise GPUError.ObjectCreationFailed
-    else
-        imply object cls
+spice wrap-nullable-object (cls object)
+    spice-quote
+        if (object == null)
+            print "OBJECT CREATION FAILED:" [(tostring ('anchor object))]
+            raise GPUError.ObjectCreationFailed
+        else
+            imply object cls
 
 do
     let istate get-preferred-surface-format wrap-nullable-object
