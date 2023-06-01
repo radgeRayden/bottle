@@ -56,6 +56,8 @@ fn update-render-area ()
     istate.swapchain = (create-swapchain (window.get-drawable-size))
 
 fn init ()
+    cfg := from (import ..config) let istate-cfg
+
     istate.instance =
         wgpu.CreateInstance
             &local wgpu.InstanceDescriptor
@@ -66,7 +68,7 @@ fn init ()
     wgpu.InstanceRequestAdapter istate.instance
         &local wgpu.RequestAdapterOptions
             compatibleSurface = istate.surface
-            powerPreference = wgpu.PowerPreference.HighPerformance
+            powerPreference = cfg.gpu.power-preference
         fn (status result msg userdata)
             istate.adapter = result
             ;

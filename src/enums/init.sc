@@ -2,6 +2,7 @@ import wgpu
 
 do
     FrontFace := wgpu.FrontFace
+    PowerPreference := wgpu.PowerPreference
     PrimitiveTopology := wgpu.PrimitiveTopology
     ShaderStage   := wgpu.ShaderStage
     TextureFormat := wgpu.TextureFormat

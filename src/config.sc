@@ -2,6 +2,8 @@ using import struct
 using import Option
 using import String
 
+using import .enums
+
 struct BottleConfig
     window :
         struct WindowConfig
@@ -14,6 +16,9 @@ struct BottleConfig
         struct TimerConfig
             use-delta-accumulator? : bool
             fixed-timestep : f64 = (1 / 60)
+    gpu :
+        struct GPUConfig
+            power-preference = PowerPreference.HighPerformance
 
 global istate-cfg : BottleConfig
 
