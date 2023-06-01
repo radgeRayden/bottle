@@ -35,7 +35,7 @@ fn gen-quads ()
 
     unit-rand := () -> (random.normalize (rng))
     for quad in quads
-        quad.rotation = (10 * pi:f64 * (unit-rand)) as f32
+        quad.rotation = (2 * pi:f64 * (unit-rand)) as f32
         quad.size = (rng 5 50) as f32
         quad.color = vec4 (va-map unit-rand (va-range 4))
         quad.speed = (rng 5 250) as f32

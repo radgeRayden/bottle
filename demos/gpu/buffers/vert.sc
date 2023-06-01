@@ -26,10 +26,10 @@ fn vert ()
         # 0 - 1
         # 2 - 3
         arrayof vec2
-            vec2 0 0
-            vec2 1 0
-            vec2 0 1
-            vec2 1 1
+            vec2 -0.5 -0.5
+            vec2 0.5 -0.5
+            vec2 -0.5 0.5
+            vec2 0.5 0.5
 
     quad := (input-data.data @ gl_InstanceIndex)
     size := quad.size
@@ -37,7 +37,7 @@ fn vert ()
     dir := quad.direction
 
     orientation := quad.rotation * time
-    displacement := (vec2 (cos dir) (sin dir)) * quad.speed * time
+    displacement := (vec2 (cos (dir + orientation)) (sin (dir + orientation))) * quad.speed * time
 
     vertex := ((2Drotate (vertices @ gl_VertexIndex) orientation) * size) + displacement
     gl_Position = uniforms.mvp * (vec4 vertex 0.0 1.0)
