@@ -1,16 +1,21 @@
 import sdl
 import .config
 
+global first-time-measure : f64
 global last-time-measure : f64
 global delta-time : f64
 global fixed-timestep : f64
 
+fn get-time-raw ()
+    ((sdl.GetPerformanceCounter) as f64) / (sdl.GetPerformanceFrequency) as f64
+
 fn get-time ()
-    ((sdl.GetPerformanceCounter) as f64) / ((sdl.GetPerformanceFrequency) as f64)
+    (get-time-raw) - first-time-measure
 
 fn init ()
     cfg := config.istate-cfg
 
+    first-time-measure = (get-time-raw)
     last-time-measure = (get-time)
     fixed-timestep = cfg.timer.fixed-timestep
 
