@@ -25,6 +25,11 @@ struct GPUBuffer
     _capacity : usize
     _usage    : wgpu.BufferUsage
 
+    inline __imply (this other)
+        static-if (imply? other wgpu.Buffer)
+            inline (self)
+                imply self._handle other
+
 @@ memo
 inline gen-buffer-type (parent-type prefix backing-type usage-flags)
     type (.. prefix "<" (tostring backing-type) ">") < parent-type :: (storageof GPUBuffer)
@@ -78,10 +83,8 @@ inline gen-buffer-type (parent-type prefix backing-type usage-flags)
             ()
         # ------------------------------------------------------------------------------------
 
-        inline __imply (this other)
-            static-if (other == (storageof wgpu.Buffer))
-                inline (self)
-                    imply self._handle other
+        fn get-byte-size (self)
+            self._capacity * ElementSize
 
         unlet constructor
 
@@ -114,5 +117,5 @@ type UniformBuffer < GPUBuffer
 
 do
 
-    let StorageBuffer IndexBuffer UniformBuffer GenericBuffer
+    let StorageBuffer IndexBuffer UniformBuffer GenericBuffer GPUBuffer
     local-scope;

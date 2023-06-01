@@ -6,6 +6,7 @@ import .wgpu
 using import .common
 using import ..helpers
 using import .ShaderModule
+using import .BindGroup
 
 run-stage;
 
@@ -46,8 +47,6 @@ type FragmentStage <: wgpu.FragmentState
             inline (self)
                 bitcast self other
 
-
-type BindGroupLayout <:: wgpu.BindGroupLayout
 fn make-pipeline-layout (count layouts)
     layouts as:= pointer (storageof wgpu.BindGroupLayout)
     wgpu.DeviceCreatePipelineLayout istate.device
@@ -97,9 +96,11 @@ type RenderPipeline <:: wgpu.RenderPipeline
         cls ... := *...
         wrap-nullable-object cls (make-pipeline ...)
 
+    fn... get-bind-group-layout (self, index : u32)
+        wrap-nullable-object BindGroupLayout (wgpu.RenderPipelineGetBindGroupLayout (view self) index)
+
 do
-    let BindGroupLayout
-        ColorTarget
+    let ColorTarget
         PipelineLayout
         RenderPipeline
         FragmentStage

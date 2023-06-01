@@ -4,9 +4,10 @@ using import struct
 
 using import .common
 using import ..helpers
+using import .BindGroup
+using import .GPUBuffer
 from (import .Texture) let TextureView
 using import .RenderPipeline
-using import .GPUBuffer
 import .wgpu
 
 type ColorAttachment <: wgpu.RenderPassColorAttachment
@@ -85,7 +86,7 @@ struct RenderPass
 
         indexT := (typeof buffer) . BackingType
         offset := (sizeof indexT) * offset
-        size := (sizeof indexT) * count
+        size   := (sizeof indexT) * count
 
         let index-format =
             static-match indexT
@@ -97,6 +98,10 @@ struct RenderPass
                 wgpu.IndexFormat.Undefined
 
         wgpu.RenderPassEncoderSetIndexBuffer (view self) (view buffer) index-format offset size
+
+    fn... set-bind-group (self, slot : u32, bind-group : BindGroup)
+        # TODO: support dynamic offsets
+        wgpu.RenderPassEncoderSetBindGroup (view self) slot bind-group 0 null
 
     fn... draw (self, vertex-count : u32, instance-count = 1:u32, first-vertex = 0:u32, first-instance = 0:u32)
         self ... := *...
