@@ -12,23 +12,23 @@ let timer = (import .src.timer)
 let window = (import .src.window)
 
 vvv bind bottle
-do
-    using main
-    using syscallbacks
+..
+    main
+    syscallbacks
+    do
+        let
+            enums
+            font
+            gpu
+            input
+            keyboard
+            logger
+            mouse
+            timer
+            window
 
-    let
-        enums
-        font
-        gpu
-        input
-        keyboard
-        logger
-        mouse
-        timer
-        window
+        let quit! = sysevents.quit
 
-    let quit! = sysevents.quit
-
-    locals;
+        locals;
 
 bottle
