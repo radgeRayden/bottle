@@ -26,7 +26,7 @@ struct RendererState
 
 global render-state : (Option RendererState)
 
-QUAD-COUNT  := 120000:u32
+QUAD-COUNT  := 4194304:u32
 fn gen-quads ()
     using import glm
     local quads : (Array Quad)
@@ -36,7 +36,7 @@ fn gen-quads ()
     unit-rand := () -> (random.normalize (rng))
     for quad in quads
         quad.rotation = (2 * pi:f64 * (unit-rand)) as f32
-        quad.size = (rng 5 50) as f32
+        quad.size = (rng 1 6) as f32
         quad.color = vec4 (va-map unit-rand (va-range 4))
         quad.speed = (rng 5 250) as f32
         quad.direction = (2 * pi:f64 * (unit-rand)) as f32
@@ -97,6 +97,14 @@ fn ()
 
     else ()
 
+global time-offset : f64
+@@ 'on bottle.key-released
+fn (key)
+    if (key == KeyboardKey.Space)
+        time-offset = (bottle.timer.get-time)
+    elseif (key == KeyboardKey.Escape)
+        bottle.quit!;
+
 @@ 'on bottle.render
 fn (rp)
     using import glm
@@ -116,7 +124,7 @@ fn (rp)
             vec4 0.0 0.0 0.0 1.0
 
     ctx := 'force-unwrap render-state
-    time := (bottle.timer.get-time)
+    time := (bottle.timer.get-time) - time-offset
     'frame-write ctx.uniform-buffer (Uniforms (ortho (bottle.window.get-size)) (time as f32))
 
     'set-pipeline rp ctx.pipeline
