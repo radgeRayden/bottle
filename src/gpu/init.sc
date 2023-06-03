@@ -109,7 +109,7 @@ fn init ()
                             maxComputeWorkgroupsPerDimension = wgpu.WGPU_LIMIT_U32_UNDEFINED
         fn (status result msg userdata)
             if (status != wgpu.RequestDeviceStatus.Success)
-                print msg
+                print (String msg)
             istate.device = result
             ;
         null
