@@ -118,31 +118,11 @@ fn init ()
         fn (errtype message userdata)
             raising noreturn
             print (String message)
-            # TODO: rework functionality here to work AOT
-            # print
-            #     errtype as wgpu.ErrorType
-            #     "\n"
-            #     # FIXME: replace by something less stupid later; we don't want to use `string` anyway.
-            #     loop (result next = str"" (string message))
-            #         let match? start end =
-            #             try
-            #                 ('match? str"\\\\n" next) # for some reason newlines are escaped in shader error messages
-            #             else
-            #                 _ false 0 0
-            #         if match?
-            #             _
-            #                 .. result (lslice next start) "\n"
-            #                 rslice next end
-            #         else
-            #             break (result .. next)
             ;
         null
 
     istate.swapchain = (create-swapchain (window.get-drawable-size))
     istate.queue = (wgpu.DeviceGetQueue istate.device)
-
-    # binding-interface.make-dummy-resources istate
-    # binding-interface.make-default-pipeline-layouts istate
     ;
 
 fn set-clear-color (color)
