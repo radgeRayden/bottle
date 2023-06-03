@@ -63,6 +63,13 @@ fn minimized? ()
         (sdl.GetWindowFlags handle) & sdl.SDL_WINDOW_MINIMIZED
         bool
 
+fn set-title (title)
+    sdl.SetWindowTitle handle (title as rawstring)
+    ()
+
+fn get-title ()
+    String (sdl.GetWindowTitle handle)
+
 fn init ()
     if (operating-system == 'windows)
         sdl.SetHint sdl.SDL_HINT_WINDOWS_DPI_AWARENESS "permonitorv2"
@@ -105,6 +112,8 @@ do
         get-size
         get-drawable-size
         get-desktop-scaling-factor
+        set-title
+        get-title
         minimized?
         shutdown
     locals;
