@@ -1,5 +1,6 @@
 using import struct
 using import Option
+using import compiler.Printer
 
 bottle := __env.bottle
 
@@ -90,7 +91,7 @@ fn (render-pass)
     ;
 
 sugar-if main-module?
-    bottle.fun;
+    bottle.run;
 else
     fn main (argc argv)
         bottle.run;
