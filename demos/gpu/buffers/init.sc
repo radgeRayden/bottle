@@ -55,6 +55,8 @@ fn gen-indices ()
 
 @@ 'on bottle.load
 fn ()
+    print ((RendererBackendInfo) . RendererString)
+
     try
         vert := ShaderModule (import .vert) ShaderLanguage.SPIRV ShaderStage.Vertex
         frag := ShaderModule (import .frag) ShaderLanguage.SPIRV ShaderStage.Fragment

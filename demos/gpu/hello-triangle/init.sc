@@ -51,6 +51,8 @@ fn (cfg)
 
 @@ 'on bottle.load
 fn ()
+    print ((RendererBackendInfo) . RendererString)
+
     try # resource creation can fail, but in this simple case we don't need to handle it.
         vert := ShaderModule shaderf-vert ShaderLanguage.SPIRV ShaderStage.Vertex
         frag := ShaderModule shaderf-frag ShaderLanguage.SPIRV ShaderStage.Fragment
