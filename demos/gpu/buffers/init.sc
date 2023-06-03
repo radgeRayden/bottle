@@ -136,4 +136,8 @@ fn (rp)
     'draw-indexed rp INDEX-COUNT QUAD-COUNT
     ()
 
-bottle.run;
+sugar-if main-module?
+    bottle.run;
+else
+    fn main (argc argv)
+        bottle.run;

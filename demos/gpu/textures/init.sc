@@ -12,4 +12,8 @@ fn ()
         ;
     else ()
 
-bottle.run;
+sugar-if main-module?
+    bottle.run;
+else
+    fn main (argc argv)
+        bottle.run;

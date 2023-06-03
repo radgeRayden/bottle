@@ -54,9 +54,24 @@ fn run ()
     window.shutdown;
 
 sugar-if main-module?
+    using import String
+
     name argc argv := (script-launch-args)
-    demo := "hello-triangle"
-    require-from (module-dir .. "/..") (.. ".demos.gpu." demo) __env
+    let demo =
+        if (argc > 0)
+            String (argv @ 1)
+        else
+            S"gpu.hello-triangle"
+
+    let module =
+        try
+            require-from (module-dir .. "/..") (.. ".demos." demo) __env
+        else
+            error (string (.. "unknown demo:" demo))
+
+    f := (compile (typify (module as Closure) i32 (@ rawstring))) as (@ (function void i32 (@ rawstring)))
+    f argc argv
+    0
 else
     do
         let run load update fixed-update render configure
