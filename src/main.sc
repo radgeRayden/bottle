@@ -59,7 +59,7 @@ sugar-if main-module?
     name argc argv := (script-launch-args)
     let demo =
         if (argc > 0)
-            String (argv @ 1)
+            String (argv @ 0)
         else
             S"gpu.hello-triangle"
 
