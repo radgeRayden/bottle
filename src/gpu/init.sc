@@ -158,7 +158,7 @@ fn begin-frame ()
     if (swapchain-image == null)
         raise GPUError.OutdatedSwapchain
 
-    color-attachment := ColorAttachment (TextureView swapchain-image) istate.clear-color
+    color-attachment := ColorAttachment (imply swapchain-image TextureView) istate.clear-color
     RenderPass color-attachment
 
 fn present (render-pass)
