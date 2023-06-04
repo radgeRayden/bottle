@@ -1,6 +1,9 @@
-import sdl
-
 from (import .config) let istate-cfg
+cfg := `istate-cfg.window
+run-stage;
+
+using import String
+import sdl
 
 global handle : (mutable@ sdl.Window)
 
@@ -36,19 +39,38 @@ fn get-drawable-size ()
     sdl.GetWindowSizeInPixels handle &w &h
     _ w h
 
+fn get-desktop-size (display)
+    local mode : sdl.DisplayMode
+    sdl.GetDesktopDisplayMode display &mode
+    _ mode.w mode.h
+
+fn get-display-size (display)
+    local mode : sdl.DisplayMode
+    sdl.GetCurrentDisplayMode display &mode
+    _ mode.w mode.h
+
 fn get-desktop-scaling-factor ()
     let scaled = (get-size)
     let drawable = (get-drawable-size)
     drawable / scaled
+
+fn get-relative-size (display wratio hratio)
+    dw dh := get-desktop-size display
+    va-map i32 ((f32 dw) * wratio) ((f32 dh) * hratio)
 
 fn minimized? ()
     as
         (sdl.GetWindowFlags handle) & sdl.SDL_WINDOW_MINIMIZED
         bool
 
-fn init ()
-    cfg := istate-cfg.window
+fn set-title (title)
+    sdl.SetWindowTitle handle (title as rawstring)
+    ()
 
+fn get-title ()
+    String (sdl.GetWindowTitle handle)
+
+fn init ()
     if (operating-system == 'windows)
         sdl.SetHint sdl.SDL_HINT_WINDOWS_DPI_AWARENESS "permonitorv2"
         sdl.SetHint sdl.SDL_HINT_WINDOWS_DPI_SCALING "0"
@@ -57,15 +79,29 @@ fn init ()
     sdl.Init
         sdl.SDL_INIT_EVERYTHING
 
+    relative-width relative-height := (get-relative-size 0 cfg.relative-width cfg.relative-height)
+    let width =
+        try (deref ('unwrap cfg.width))
+        else relative-width
+    let height =
+        try (deref ('unwrap cfg.height))
+        else relative-height
+
     handle =
         sdl.CreateWindow
             cfg.title
             sdl.SDL_WINDOWPOS_UNDEFINED
             sdl.SDL_WINDOWPOS_UNDEFINED
-            cfg.width
-            cfg.height
+            width
+            height
             sdl.SDL_WINDOW_RESIZABLE
+
+    assert (handle != null) (.. "Error while creating window:" (String (sdl.GetError)))
     ;
+
+fn shutdown ()
+    sdl.DestroyWindow handle
+    sdl.Quit;
 
 do
     let
@@ -76,5 +112,8 @@ do
         get-size
         get-drawable-size
         get-desktop-scaling-factor
+        set-title
+        get-title
         minimized?
+        shutdown
     locals;

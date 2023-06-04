@@ -1,55 +1,15 @@
-using import struct
 using import String
-using import ..helpers
-using import ..logger
-using import .common
-using import .errors
-using import .render-pass
-
-import .binding-interface
-import ..window
+using import struct
 
 import sdl
-import wgpu
+import .wgpu
+import .types
 
-# MODULE FUNCTIONS START HERE
-# ================================================================================
-struct GPUBackendInfo
-    gpu : String
-    backend : String
+using import ..helpers
+using import .common
+using import .errors
 
-fn get-backend-info ()
-    local properties : wgpu.AdapterProperties
-    wgpu.AdapterGetProperties istate.adapter &properties
-
-    local info : GPUBackendInfo
-    let strlen = (extern 'strlen (function usize (@ char)))
-
-    if (properties.name != null)
-        info.gpu = (String properties.name (strlen properties.name))
-    info.backend =
-        do
-            switch properties.backendType
-            case wgpu.BackendType.Null
-                S"Null"
-            case wgpu.BackendType.WebGPU
-                S"WebGPU"
-            case wgpu.BackendType.D3D11
-                S"D3D11"
-            case wgpu.BackendType.D3D12
-                S"D3D12"
-            case wgpu.BackendType.Metal
-                S"Metal"
-            case wgpu.BackendType.Vulkan
-                S"Vulkan"
-            case wgpu.BackendType.OpenGL
-                S"OpenGL"
-            case wgpu.BackendType.OpenGLES
-                S"OpenGLES"
-            default
-                S"Unknown"
-
-    info
+import ..window
 
 fn create-surface ()
     static-match operating-system
@@ -96,6 +56,8 @@ fn update-render-area ()
     istate.swapchain = (create-swapchain (window.get-drawable-size))
 
 fn init ()
+    cfg := from (import ..config) let istate-cfg
+
     istate.instance =
         wgpu.CreateInstance
             &local wgpu.InstanceDescriptor
@@ -106,7 +68,7 @@ fn init ()
     wgpu.InstanceRequestAdapter istate.instance
         &local wgpu.RequestAdapterOptions
             compatibleSurface = istate.surface
-            powerPreference = wgpu.PowerPreference.HighPerformance
+            powerPreference = cfg.gpu.power-preference
         fn (status result msg userdata)
             istate.adapter = result
             ;
@@ -147,7 +109,7 @@ fn init ()
                             maxComputeWorkgroupsPerDimension = wgpu.WGPU_LIMIT_U32_UNDEFINED
         fn (status result msg userdata)
             if (status != wgpu.RequestDeviceStatus.Success)
-                print msg
+                print (String msg)
             istate.device = result
             ;
         null
@@ -155,38 +117,20 @@ fn init ()
     wgpu.DeviceSetUncapturedErrorCallback istate.device
         fn (errtype message userdata)
             raising noreturn
-            print message
-            # TODO: rework functionality here to work AOT
-            # print
-            #     errtype as wgpu.ErrorType
-            #     "\n"
-            #     # FIXME: replace by something less stupid later; we don't want to use `string` anyway.
-            #     loop (result next = str"" (string message))
-            #         let match? start end =
-            #             try
-            #                 ('match? str"\\\\n" next) # for some reason newlines are escaped in shader error messages
-            #             else
-            #                 _ false 0 0
-            #         if match?
-            #             _
-            #                 .. result (lslice next start) "\n"
-            #                 rslice next end
-            #         else
-            #             break (result .. next)
+            print (String message)
             ;
         null
 
     istate.swapchain = (create-swapchain (window.get-drawable-size))
     istate.queue = (wgpu.DeviceGetQueue istate.device)
-
-    binding-interface.make-dummy-resources istate
-    binding-interface.make-default-pipeline-layouts istate
     ;
 
 fn set-clear-color (color)
     istate.clear-color = color
 
 fn begin-frame ()
+    using types
+
     if (window.minimized?)
         raise GPUError.OutdatedSwapchain
 
@@ -194,43 +138,17 @@ fn begin-frame ()
     if (swapchain-image == null)
         raise GPUError.OutdatedSwapchain
 
-    let cmd-encoder =
-        wgpu.DeviceCreateCommandEncoder istate.device
-            (&local wgpu.CommandEncoderDescriptor)
-
-    let render-pass =
-        RenderPass cmd-encoder
-            arrayof wgpu.RenderPassColorAttachment
-                typeinit
-                    view = swapchain-image
-                    loadOp = wgpu.LoadOp.Clear
-                    storeOp = wgpu.StoreOp.Store
-                    clearValue = (typeinit (unpack istate.clear-color))
-
-    _ render-pass
+    color-attachment := ColorAttachment (imply swapchain-image TextureView) istate.clear-color
+    RenderPass color-attachment
 
 fn present (render-pass)
-    'finish render-pass
-
-    local cmd-buf =
-        wgpu.CommandEncoderFinish render-pass._cmd-encoder
-            (&local wgpu.CommandBufferDescriptor)
-
-    wgpu.QueueSubmit istate.queue 1 &cmd-buf
+    'submit ('finish render-pass)
     wgpu.SwapChainPresent istate.swapchain
     ;
 
 do
     let init update-render-area set-clear-color begin-frame present
-    let get-backend-info
-
-    vvv bind types
-    do
-        from (import .pipeline)    let GPUPipeline GPUShaderModule
-        from (import .render-pass) let RenderPass
-        from (import .buffer)      let GPUBuffer GPUStorageBuffer GPUIndexBuffer GPUUniformBuffer
-        from (import .texture)     let GPUTexture
-        # from (import .common)      let GPUResourceBinding
-        locals;
+    let types
+    let get-preferred-surface-format
 
     locals;

@@ -9,26 +9,28 @@ let mouse = (import .src.mouse)
 let syscallbacks = (import .src.sysevents.callbacks)
 let sysevents = (import .src.sysevents)
 let timer = (import .src.timer)
+let types = (import .src.types)
 let window = (import .src.window)
 
 vvv bind bottle
-do
-    using main
-    using syscallbacks
+..
+    main
+    syscallbacks
+    do
+        let
+            enums
+            font
+            gpu
+            input
+            keyboard
+            logger
+            mouse
+            timer
+            types
+            window
 
-    let
-        enums
-        font
-        gpu
-        input
-        keyboard
-        logger
-        mouse
-        timer
-        window
+        let quit! = sysevents.quit
 
-    let quit! = sysevents.quit
-
-    locals;
+        locals;
 
 bottle

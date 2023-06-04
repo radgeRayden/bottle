@@ -3,7 +3,7 @@ SUMMARY := "The fastest font renderer in the world, written in pure rust."
 
 archive :=
     download
-        "https://codeberg.org/spindlebink/fontdue-native/archive/{VERSION}.tar.gz"
+        "https://github.com/radgeRayden/fontdue-native/archive/{VERSION}.tar.gz"
 
 preinstall-dir :=
     then

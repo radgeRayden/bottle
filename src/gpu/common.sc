@@ -2,19 +2,20 @@ using import struct
 using import Map
 using import String
 using import glm
+using import .errors
 
 import wgpu
-from (import .binding-interface) let GPUResourceBinding
+# from (import .binding-interface) let GPUResourceBinding
 
-struct GfxDummyResources
-    buffer : GPUResourceBinding
-    uniform-buffer : GPUResourceBinding
-    sampler : GPUResourceBinding
-    texture-view : GPUResourceBinding
+# struct GfxDummyResources
+#     buffer : GPUResourceBinding
+#     uniform-buffer : GPUResourceBinding
+#     sampler : GPUResourceBinding
+#     texture-view : GPUResourceBinding
 
-struct GfxCachedLayouts
-    bind-group-layouts : (Map String wgpu.BindGroupLayout)
-    pipeline-layouts : (Map String wgpu.PipelineLayout)
+# struct GfxCachedLayouts
+#     bind-group-layouts : (Map String wgpu.BindGroupLayout)
+#     pipeline-layouts : (Map String wgpu.PipelineLayout)
 
 struct GfxState
     instance  : wgpu.Instance
@@ -24,8 +25,8 @@ struct GfxState
     swapchain : wgpu.SwapChain
     queue     : wgpu.Queue
 
-    dummy-resources : GfxDummyResources
-    cached-layouts  : GfxCachedLayouts
+    # dummy-resources : GfxDummyResources
+    # cached-layouts  : GfxCachedLayouts
 
     clear-color = (vec4 0.017 0.017 0.017 1.0)
 
@@ -49,6 +50,14 @@ fn get-preferred-surface-format ()
 
     selected-format
 
+spice wrap-nullable-object (cls object)
+    spice-quote
+        if (object == null)
+            print "OBJECT CREATION FAILED:" [(tostring ('anchor object))]
+            raise GPUError.ObjectCreationFailed
+        else
+            imply object cls
+
 do
-    let istate get-preferred-surface-format
+    let istate get-preferred-surface-format wrap-nullable-object
     locals;

@@ -9,7 +9,7 @@ import .timer
 fnchain load
 fnchain update
 fnchain fixed-update
-fnchain draw
+fnchain render
 fnchain configure
 
 fn run ()
@@ -42,13 +42,37 @@ fn run ()
             update dt
 
         try
-            let render-pass = (gpu.begin-frame)
+            render-pass := (gpu.begin-frame)
             # TODO: pass in dt remainder, after we adapt the timer module to be aware of it
-            draw render-pass
+            render render-pass
             gpu.present render-pass
-        else
-            ()
+        except (ex)
+            using gpu.types
+            if (ex == GPUError.ObjectCreationFailed)
+                assert false "unhandled GPU Object creation failure"
 
-do
-    let run load update fixed-update draw configure
-    locals;
+    window.shutdown;
+
+sugar-if main-module?
+    using import String
+
+    name argc argv := (script-launch-args)
+    let demo =
+        if (argc > 0)
+            String (argv @ 0)
+        else
+            S"gpu.hello-triangle"
+
+    let module =
+        try
+            require-from (module-dir .. "/..") (.. ".demos." demo) __env
+        else
+            error (string (.. "unknown demo:" demo))
+
+    f := (compile (typify (module as Closure) i32 (@ rawstring))) as (@ (function void i32 (@ rawstring)))
+    f argc argv
+    0
+else
+    do
+        let run load update fixed-update render configure
+        locals;
