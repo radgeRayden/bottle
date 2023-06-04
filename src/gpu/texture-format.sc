@@ -11,7 +11,7 @@ fn... get-texel-block-size (format : wgpu.TextureFormat, aspect : (param? wgpu.T
     pass Format.R8Snorm
     pass Format.R8Uint
     pass Format.R8Sint
-    do 1
+    do 1:u32
     pass Format.RG8Unorm
     pass Format.RG8Snorm
     pass Format.RG8Uint
@@ -21,7 +21,7 @@ fn... get-texel-block-size (format : wgpu.TextureFormat, aspect : (param? wgpu.T
     pass Format.R16Uint
     pass Format.R16Sint
     pass Format.R16Float
-    do 2
+    do 2:u32
     pass Format.RGBA8Unorm
     pass Format.RGBA8UnormSrgb
     pass Format.RGBA8Snorm
@@ -40,7 +40,7 @@ fn... get-texel-block-size (format : wgpu.TextureFormat, aspect : (param? wgpu.T
     pass Format.RGB9E5Ufloat
     pass Format.RGB10A2Unorm
     # pass Format.Rg11B10Float
-    do 4
+    do 4:u32
     # pass Format.RGBA16Unorm
     # pass Format.RGBA16Snorm
     pass Format.RGBA16Uint
@@ -49,14 +49,14 @@ fn... get-texel-block-size (format : wgpu.TextureFormat, aspect : (param? wgpu.T
     pass Format.RG32Uint
     pass Format.RG32Sint
     pass Format.RG32Float
-    do 8
+    do 8:u32
     pass Format.RGBA32Uint
     pass Format.RGBA32Sint
     pass Format.RGBA32Float
-    do 16
-    case Format.Stencil8 1
-    case Format.Depth16Unorm 2
-    case Format.Depth32Float 4
+    do 16:u32
+    case Format.Stencil8 1:u32
+    case Format.Depth16Unorm 2:u32
+    case Format.Depth32Float 4:u32
     case Format.Depth24Plus
         raise GPUError.InvalidOperation
     case Format.Depth24PlusStencil8
@@ -64,7 +64,7 @@ fn... get-texel-block-size (format : wgpu.TextureFormat, aspect : (param? wgpu.T
             raise GPUError.InvalidOperation
         else
             switch aspect
-            case Aspect.StencilOnly 1
+            case Aspect.StencilOnly 1:u32
             default
                 raise GPUError.InvalidOperation
     case Format.Depth32FloatStencil8
@@ -72,15 +72,15 @@ fn... get-texel-block-size (format : wgpu.TextureFormat, aspect : (param? wgpu.T
             raise GPUError.InvalidOperation
         else
             switch aspect
-            case Aspect.DepthOnly 4
-            case Aspect.StencilOnly 1
+            case Aspect.DepthOnly 4:u32
+            case Aspect.StencilOnly 1:u32
             default
                 raise GPUError.InvalidOperation
     pass Format.BC1RGBAUnorm
     pass Format.BC1RGBAUnormSrgb
     pass Format.BC4RUnorm
     pass Format.BC4RSnorm
-    do 8
+    do 8:u32
     pass Format.BC2RGBAUnorm
     pass Format.BC2RGBAUnormSrgb
     pass Format.BC3RGBAUnorm
@@ -91,23 +91,23 @@ fn... get-texel-block-size (format : wgpu.TextureFormat, aspect : (param? wgpu.T
     pass Format.BC6HRGBFloat
     pass Format.BC7RGBAUnorm
     pass Format.BC7RGBAUnormSrgb
-    do 16
+    do 16:u32
     pass Format.ETC2RGB8Unorm
     pass Format.ETC2RGB8UnormSrgb
     pass Format.ETC2RGB8A1Unorm
     pass Format.ETC2RGB8A1UnormSrgb
     pass Format.EACR11Unorm
     pass Format.EACR11Snorm
-    do 8
+    do 8:u32
     pass Format.ETC2RGBA8Unorm
     pass Format.ETC2RGBA8UnormSrgb
     pass Format.EACRG11Unorm
     pass Format.EACRG11Snorm
-    do 16
+    do 16:u32
     default
         # match all ASTC formats
         if (format >= Format.ASTC4x4Unorm and format <= Format.ASTC12x12UnormSrgb)
-            16
+            16:u32
         else
             raise GPUError.InvalidOperation
 

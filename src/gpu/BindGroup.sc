@@ -5,6 +5,8 @@ using import .common
 
 import .wgpu
 using import .GPUBuffer
+using import .Texture
+using import .Sampler
 
 type BindGroupLayout <:: wgpu.BindGroupLayout
 
@@ -20,6 +22,12 @@ type BindGroup <:: wgpu.BindGroup
                                 buffer = (imply (view entry) wgpu.Buffer)
                                 offset = 0
                                 size = ('get-byte-size entry) as u64
+                        case (entry : TextureView)
+                            _
+                                textureView = (imply (view entry) wgpu.TextureView)
+                        case (entry : Sampler)
+                            _
+                                sampler = entry
 
                         wgpu.BindGroupEntry (binding = idx)
                             match-entry entry

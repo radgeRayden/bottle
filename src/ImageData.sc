@@ -13,7 +13,8 @@ struct ImageData
     format : TextureFormat
 
     inline... __typecall (cls, width : u32, height : u32, slices = 1:u32, data : (param? (Array u8)) = none, format = TextureFormat.RGBA8UnormSrgb)
-        expected-size := width * height * slices * (get-texel-block-size format)
+        block-size := get-texel-block-size format
+        expected-size := width * height * slices * block-size
         let data =
             static-if (none? data)
                 local data = ((Array u8))
