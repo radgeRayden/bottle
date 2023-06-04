@@ -3,110 +3,110 @@ using import .errors
 using import ..helpers
 
 fn... get-texel-block-size (format : wgpu.TextureFormat, aspect : (param? wgpu.TextureAspect) = none)
-    using wgpu.TextureFormat
-    using wgpu.TextureAspect
+    Format := wgpu.TextureFormat
+    Aspect := wgpu.TextureAspect
 
     switch format
-    pass R8Unorm
-    pass R8Snorm
-    pass R8Uint
-    pass R8Sint
+    pass Format.R8Unorm
+    pass Format.R8Snorm
+    pass Format.R8Uint
+    pass Format.R8Sint
     do 1
-    pass RG8Unorm
-    pass RG8Snorm
-    pass RG8Uint
-    pass RG8Sint
-    pass R16Unorm
-    pass R16Snorm
-    pass R16Uint
-    pass R16Sint
-    pass R16Float
+    pass Format.RG8Unorm
+    pass Format.RG8Snorm
+    pass Format.RG8Uint
+    pass Format.RG8Sint
+    # pass Format.R16Unorm
+    # pass Format.R16Snorm
+    pass Format.R16Uint
+    pass Format.R16Sint
+    pass Format.R16Float
     do 2
-    pass RGBA8Unorm
-    pass RGBA8UnormSrgb
-    pass RGBA8Snorm
-    pass RGBA8Uint
-    pass RGBA8Sint
-    pass BGRA8Unorm
-    pass BGRA8UnormSrgb
-    pass RG16Unorm
-    pass RG16Snorm
-    pass RG16Uint
-    pass RG16Sint
-    pass RG16Float
-    pass R32Uint
-    pass R32Sint
-    pass R32Float
-    pass RGB9E5Ufloat
-    pass RGB10A2Unorm
-    pass Rg11B10Float
+    pass Format.RGBA8Unorm
+    pass Format.RGBA8UnormSrgb
+    pass Format.RGBA8Snorm
+    pass Format.RGBA8Uint
+    pass Format.RGBA8Sint
+    pass Format.BGRA8Unorm
+    pass Format.BGRA8UnormSrgb
+    # pass Format.RG16Unorm
+    # pass Format.RG16Snorm
+    pass Format.RG16Uint
+    pass Format.RG16Sint
+    pass Format.RG16Float
+    pass Format.R32Uint
+    pass Format.R32Sint
+    pass Format.R32Float
+    pass Format.RGB9E5Ufloat
+    pass Format.RGB10A2Unorm
+    # pass Format.Rg11B10Float
     do 4
-    pass RGBA16Unorm
-    pass RGBA16Snorm
-    pass RGBA16Uint
-    pass RGBA16Sint
-    pass RGBA16Float
-    pass RG32Uint
-    pass RG32Sint
-    pass RG32Float
+    # pass Format.RGBA16Unorm
+    # pass Format.RGBA16Snorm
+    pass Format.RGBA16Uint
+    pass Format.RGBA16Sint
+    pass Format.RGBA16Float
+    pass Format.RG32Uint
+    pass Format.RG32Sint
+    pass Format.RG32Float
     do 8
-    pass RGBA32Uint
-    pass RGBA32Sint
-    pass RGBA32Float
+    pass Format.RGBA32Uint
+    pass Format.RGBA32Sint
+    pass Format.RGBA32Float
     do 16
-    case Stencil8 1
-    case Depth16Unorm 2
-    case Depth32Float 4
-    case Depth24Plus
+    case Format.Stencil8 1
+    case Format.Depth16Unorm 2
+    case Format.Depth32Float 4
+    case Format.Depth24Plus
         raise GPUError.InvalidOperation
-    case Depth24PlusStencil8
+    case Format.Depth24PlusStencil8
         static-if (none? aspect)
             raise GPUError.InvalidOperation
         else
             switch aspect
-            case TextureAspect.StencilOnly 1
+            case Aspect.StencilOnly 1
             default
                 raise GPUError.InvalidOperation
-    case Depth32FloatStencil8
+    case Format.Depth32FloatStencil8
         static-if (none? aspect)
             raise GPUError.InvalidOperation
         else
             switch aspect
-            case TextureAspect.DepthOnly 4
-            case TextureAspect.StencilOnly 1
+            case Aspect.DepthOnly 4
+            case Aspect.StencilOnly 1
             default
                 raise GPUError.InvalidOperation
-    pass BC1RGBAUnorm
-    pass BC1RGBAUnormSrgb
-    pass BC4RUnorm
-    pass BC4RSnorm
+    pass Format.BC1RGBAUnorm
+    pass Format.BC1RGBAUnormSrgb
+    pass Format.BC4RUnorm
+    pass Format.BC4RSnorm
     do 8
-    pass BC2RGBAUnorm
-    pass BC2RGBAUnormSrgb
-    pass BC3RGBAUnorm
-    pass BC3RGBAUnormSrgb
-    pass BC5RGUnorm
-    pass BC5RGSnorm
-    pass BC6HRGBUfloat
-    pass BC6HRGBFloat
-    pass BC7RGBAUnorm
-    pass BC7RGBAUnormSrgb
+    pass Format.BC2RGBAUnorm
+    pass Format.BC2RGBAUnormSrgb
+    pass Format.BC3RGBAUnorm
+    pass Format.BC3RGBAUnormSrgb
+    pass Format.BC5RGUnorm
+    pass Format.BC5RGSnorm
+    pass Format.BC6HRGBUfloat
+    pass Format.BC6HRGBFloat
+    pass Format.BC7RGBAUnorm
+    pass Format.BC7RGBAUnormSrgb
     do 16
-    pass ETC2RGB8Unorm
-    pass ETC2RGB8UnormSrgb
-    pass ETC2RGB8A1Unorm
-    pass ETC2RGB8A1UnormSrgb
-    pass EACR11Unorm
-    pass EACR11Snorm
+    pass Format.ETC2RGB8Unorm
+    pass Format.ETC2RGB8UnormSrgb
+    pass Format.ETC2RGB8A1Unorm
+    pass Format.ETC2RGB8A1UnormSrgb
+    pass Format.EACR11Unorm
+    pass Format.EACR11Snorm
     do 8
-    pass ETC2RGBA8Unorm
-    pass ETC2RGBA8UnormSrgb
-    pass EACRG11Unorm
-    pass EACRG11Snorm
+    pass Format.ETC2RGBA8Unorm
+    pass Format.ETC2RGBA8UnormSrgb
+    pass Format.EACRG11Unorm
+    pass Format.EACRG11Snorm
     do 16
     default
         # match all ASTC formats
-        if (format >= ASTC4x4Unorm and format <= ASTC12x12UnormSrgb)
+        if (format >= Format.ASTC4x4Unorm and format <= Format.ASTC12x12UnormSrgb)
             16
         else
             raise GPUError.InvalidOperation
