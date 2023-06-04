@@ -24,7 +24,6 @@ inline array->ptr (value)
 inline param? (pT)
     typedef (.. "param?<" (tostring pT) ">")
         inline __typematch (cls T)
-            dump cls T
             static-if ((imply? T pT) or (T == Nothing))
                 true
             else false
