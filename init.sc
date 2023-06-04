@@ -9,6 +9,7 @@ let mouse = (import .src.mouse)
 let syscallbacks = (import .src.sysevents.callbacks)
 let sysevents = (import .src.sysevents)
 let timer = (import .src.timer)
+let types = (import .src.types)
 let window = (import .src.window)
 
 vvv bind bottle
@@ -25,6 +26,7 @@ vvv bind bottle
             logger
             mouse
             timer
+            types
             window
 
         let quit! = sysevents.quit

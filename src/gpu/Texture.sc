@@ -9,8 +9,6 @@ using import .errors
 using import .texture-format
 import .wgpu
 
-type TextureView <:: wgpu.TextureView
-
 type Texture <:: wgpu.Texture
     inline... __typecall (cls,
                           width : u32,
@@ -89,6 +87,11 @@ type Texture <:: wgpu.Texture
                 bytesPerRow = iwidth * block-size
                 rowsPerImage = iheight
             &local wgpu.Extent3D iwidth iheight islices
+
+type TextureView <:: wgpu.TextureView
+    inline... __typecall (cls, source-texture : Texture)
+        wrap-nullable-object cls
+            wgpu.TextureCreateView source-texture # TODO: allow configuration via descriptor
 
 do
     let TextureView Texture
