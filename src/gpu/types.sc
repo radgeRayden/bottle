@@ -9,6 +9,7 @@ import .wgpu
     import .RenderPipeline
     import .ShaderModule
     import .Texture
+    import .Sampler
     do
         let GPUError
         ShaderStageFlags := wgpu.ShaderStageFlags
