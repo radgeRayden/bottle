@@ -19,4 +19,16 @@ inline array->ptr (value)
         local v = value
         _ 1 &v
 
+
+@@ memo
+inline param? (pT)
+    typedef (.. "param?<" (tostring pT) ">")
+        inline __typematch (cls T)
+            dump cls T
+            static-if ((imply? T pT) or (T == Nothing))
+                true
+            else false
+        inline __rimply (cls T)
+            inline (self) self
+
 local-scope;
