@@ -21,7 +21,10 @@ type Texture <:: wgpu.Texture
                           mipmap-levels = 1:u32,
                           generate-mipmaps? = false)
 
-        usage := wgpu.TextureUsage.CopyDst | wgpu.TextureUsage.TextureBinding | (render-target? wgpu.TextureUsage.RenderAttachment 0)
+        usage :=
+            | wgpu.TextureUsage.CopyDst
+                wgpu.TextureUsage.TextureBinding
+                (render-target? wgpu.TextureUsage.RenderAttachment (bitcast 0 wgpu.TextureUsage))
 
         let format =
             static-if (none? format)
@@ -42,7 +45,7 @@ type Texture <:: wgpu.Texture
         self := wrap-nullable-object cls handle
 
         static-if (not (none? image-data))
-            'frame-write self image-data
+            'frame-write (view self) image-data
 
         self
 
@@ -58,11 +61,11 @@ type Texture <:: wgpu.Texture
     fn... frame-write (self, image-data : ImageData, x = 0:u32, y = 0:u32, z = 0:u32, mip-level = 0:u32, aspect = wgpu.TextureAspect.All)
         format := 'get-format self
         if (image-data.format != format)
-            raise GPUError.InvalidOperation S"Mismatched formats between ImageData and Texture"
+            raise GPUError.InvalidOperation #S"Mismatched formats between ImageData and Texture"
 
-        block-size := get-texel-block-size aspect format
+        block-size := get-texel-block-size format aspect
 
-        iwidth iheight islices := image-data.width image-data.height image-data.slices
+        iwidth iheight islices := image-data.width, image-data.height, image-data.slices
         twidth theight tslices := 'get-size self
         data-size          := iwidth * iheight * islices * block-size
         texture-size-bytes := twidth * theight * tslices * block-size
@@ -72,7 +75,7 @@ type Texture <:: wgpu.Texture
         assert (count == data-size) "malformed ImageData"
 
         if (data-size > (texture-size-bytes - buffer-offset))
-            raise GPUError.InvalidInput S"Writing image data at offset exceeds texture bounds"
+            raise GPUError.InvalidInput #S"Writing image data at offset exceeds texture bounds"
 
         wgpu.QueueWriteTexture istate.queue
             &local wgpu.ImageCopyTexture
@@ -91,7 +94,7 @@ type Texture <:: wgpu.Texture
 type TextureView <:: wgpu.TextureView
     inline... __typecall (cls, source-texture : Texture)
         wrap-nullable-object cls
-            wgpu.TextureCreateView source-texture # TODO: allow configuration via descriptor
+            wgpu.TextureCreateView source-texture null # TODO: allow configuration via descriptor
 
 do
     let TextureView Texture
