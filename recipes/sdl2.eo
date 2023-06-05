@@ -2,6 +2,8 @@
 VERSION := "SDL2"
 SUMMARY := "Simple DirectMedia Layer"
 
+update-url "https://raw.githubusercontent.com/ScopesCommunity/eo-packages/main/recipes/sdl2.eo"
+
 archive :=
     download
         "https://github.com/libsdl-org/SDL/archive/{VERSION}.tar.gz"

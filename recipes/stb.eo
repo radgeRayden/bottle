@@ -4,6 +4,8 @@
 VERSION := "master"
 SUMMARY := "stb single-file public domain libraries for C/C++"
 
+update-url "https://raw.githubusercontent.com/ScopesCommunity/eo-packages/main/recipes/stb.eo"
+
 amalgamated-source :=
     tempfile
         """"#define STB_HEXWAVE_IMPLEMENTATION
@@ -93,7 +95,7 @@ package stb
     platform windows-mingw
     version VERSION
 
-    libname := "libstb.dll"
+    libname := "stb.dll"
     alias "/lib/{libname}" (shared-library libname)
 
     alias "/include/stb_hexwave.h" "{source-path}/stb_hexwave.h"

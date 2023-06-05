@@ -1,6 +1,8 @@
 VERSION := "main"
 SUMMARY := "A portable, flexible file i/o abstraction."
 
+update-url "https://raw.githubusercontent.com/ScopesCommunity/eo-packages/main/recipes/physfs.eo"
+
 archive :=
     download
         "https://github.com/icculus/physfs/archive/{VERSION}.zip"
