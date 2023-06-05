@@ -4,7 +4,7 @@ import .sysevents
 import .window
 import .gpu
 import .config
-import .timer
+import .time
 
 fnchain load
 fnchain update
@@ -18,18 +18,18 @@ fn run ()
 
     window.init;
     gpu.init;
-    timer.init;
+    time.init;
     load;
 
-    USE_DT_ACCUMULATOR? := cfg.timer.use-delta-accumulator?
-    FIXED_TIMESTEP     := cfg.timer.fixed-timestep
+    USE_DT_ACCUMULATOR? := cfg.time.use-delta-accumulator?
+    FIXED_TIMESTEP     := cfg.time.fixed-timestep
     local dt-accumulator : f64
 
     while (not (sysevents.really-quit?))
         sysevents.dispatch;
 
-        timer.step;
-        dt := (timer.get-delta-time)
+        time.step;
+        dt := (time.get-delta-time)
 
         if USE_DT_ACCUMULATOR?
             dt-accumulator += dt
@@ -43,7 +43,7 @@ fn run ()
 
         try
             render-pass := (gpu.begin-frame)
-            # TODO: pass in dt remainder, after we adapt the timer module to be aware of it
+            # TODO: pass in dt remainder, after we adapt the time module to be aware of it
             render render-pass
             gpu.present render-pass
         except (ex)

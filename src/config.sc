@@ -12,8 +12,8 @@ struct BottleConfig
             height : (Option i32)
             relative-width  = 0.5
             relative-height = 0.5
-    timer :
-        struct TimerConfig
+    time :
+        struct TimeConfig
             use-delta-accumulator? : bool
             fixed-timestep : f64 = (1 / 60)
     gpu :

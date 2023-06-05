@@ -17,7 +17,7 @@ fn init ()
 
     first-time-measure = (get-time-raw)
     last-time-measure = (get-time)
-    fixed-timestep = cfg.timer.fixed-timestep
+    fixed-timestep = cfg.time.fixed-timestep
 
 fn get-delta-time ()
     deref delta-time
