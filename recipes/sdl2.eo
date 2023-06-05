@@ -23,6 +23,20 @@ preinstall-dir :=
         build-command "make install"
         install-tmp-dir
 
+fn patchelf (soname libpath)
+    then
+        bin :=
+            then
+                archive := (download "https://github.com/NixOS/patchelf/archive/0.18.0.tar.gz")
+                extracted := (commonpath (extract archive))
+                cmd := (shell extracted)
+                cmd "./bootstrap.sh"
+                cmd "./configure"
+                cmd "make"
+                "{extracted}/src/patchelf"
+        (shell ".") "{bin} --set-soname {soname} $(realpath {libpath})"
+        libpath
+
 bindings :=
     download "https://raw.githubusercontent.com/ScopesCommunity/eo-packages/main/bindings/sdl.sc"
 
@@ -30,7 +44,9 @@ package sdl2
     summary SUMMARY
     version VERSION
     platform linux unknown
-    alias "/lib/libSDL2.so" "{preinstall-dir}/lib/libSDL2.so"
+
+    libpath := (patchelf "libSDL2.so" "{preinstall-dir}/lib/libSDL2.so")
+    alias "/lib/libSDL2.so" libpath
     alias "/lib/scopes/packages/sdl.sc" bindings
     in "/include" "{preinstall-dir}/include/SDL2"
 
