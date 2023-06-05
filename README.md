@@ -18,6 +18,7 @@ chmod +x eo
 ```
 
 Currently Linux and Windows (MSYS2 MinGW) are supported. You may need to install the following programs prior to running the bootstrap recipe:
+- git
 - cmake
 - gcc
 - make
