@@ -6,6 +6,8 @@ using import String
 
 stbi := import stb.image
 bottle := __env.bottle
+import ...demo-common
+
 using bottle.gpu.types
 using bottle.types
 using bottle.enums
@@ -69,6 +71,7 @@ fn (render-pass)
     'set-pipeline rp ctx.pipeline
     'set-bind-group rp 0 ctx.bind-group
     'draw rp 6
+    demo-common.display-fps;
 
 sugar-if main-module?
     bottle.run;
