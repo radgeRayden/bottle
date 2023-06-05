@@ -20,6 +20,7 @@ libs... :=
             "SDL2"
             "stb"
             "wgpu_native"
+            "cimgui"
 
 
 patched-search-path := (cons (.. compiler-dir "/bin") __env.library-search-path)
