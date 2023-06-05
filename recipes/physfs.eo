@@ -1,0 +1,41 @@
+VERSION := "main"
+SUMMARY := "A portable, flexible file i/o abstraction."
+
+archive :=
+    download
+        "https://github.com/icculus/physfs/archive/{VERSION}.zip"
+
+preinstall-dir :=
+    then
+        build-path :=
+            commonpath
+                extract archive
+        cmd :=
+            shell
+                mkdir "{build-path}/build"
+        install-dir := (tempdir)
+        cmd "cmake .. -DCMAKE_INSTALL_PREFIX={install-dir}"
+        cmd "make -j {cpu-core-count}"
+        cmd "make install"
+        install-dir
+
+bindings :=
+    download "https://raw.githubusercontent.com/ScopesCommunity/eo-packages/main/bindings/physfs.sc"
+
+package physfs
+    summary SUMMARY
+    version VERSION
+    platform linux unknown
+
+    alias "lib/libphysfs.so" "{preinstall-dir}/lib/libphysfs.so"
+    alias "include/physfs.h" "{preinstall-dir}/include/physfs.h"
+    alias "/lib/scopes/packages/physfs.sc" bindings
+
+package physfs
+    summary SUMMARY
+    version VERSION
+    platform windows-mingw
+
+    alias "lib/physfs.dll" "{preinstall-dir}/lib/physfs.dll"
+    alias "include/physfs.h" "{preinstall-dir}/include/physfs.h"
+    alias "/lib/scopes/packages/physfs.sc" bindings
