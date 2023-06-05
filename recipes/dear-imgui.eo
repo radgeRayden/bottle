@@ -1,0 +1,49 @@
+VERSION := "docking_inter"
+SUMMARY := "Dear ImGui: Bloat-free Graphical User interface for C++ with minimal dependencies (cimgui)"
+
+fn imgui-git (platform wgpu-lib sdl-lib)
+    then
+        build-path :=
+            then
+                git-parent := (tempdir)
+                git-dir := "{git-parent}/cimgui"
+                (shell git-parent) "git clone --recursive https://github.com/cimgui/cimgui.git"
+                (shell git-dir) "git checkout {VERSION}"
+                git-dir
+
+        project-path := ((rshell ".") "scopes -e -c 'sc_write project-dir'")
+        cmd :=
+            shell build-path
+        imgui-wgpu := "{project-path}/src/imgui"
+        backend-dir := "{build-path}/imgui/backends"
+
+        cmd "cp {imgui-wgpu}/imgui_impl_wgpu.cpp {backend-dir}/"
+        cmd "cp {imgui-wgpu}/imgui_impl_wgpu.h {backend-dir}/"
+        cmd "cp {imgui-wgpu}/build_{platform}.sh ./"
+        cmd "mkdir lib"
+        cmd "cp {project-path}/lib/{wgpu-lib} ./lib"
+        cmd "cp {project-path}/lib/{sdl-lib} ./lib"
+        cmd "cp -r {project-path}/include/SDL2 ./include"
+        cmd "cp {project-path}/include/wgpu.h ./include"
+        cmd "cp {project-path}/include/webgpu.h ./include"
+
+        cmd "bash ./build_{platform}.sh"
+
+        build-path
+
+
+package dear-imgui
+    summary SUMMARY
+    version VERSION
+    platform windows-mingw
+    preinstall-dir := (imgui-git "windows" "wgpu_native.dll" "SDL2.dll")
+    alias "/lib/cimgui.dll" "{preinstall-dir}/cimgui.dll"
+    alias "/include/cimgui.h" "{preinstall-dir}/cimgui.h"
+
+package dear-imgui
+    summary SUMMARY
+    version VERSION
+    platform linux
+    preinstall-dir := (imgui-git "linux" "libwgpu_native.so" "libSDL2.so")
+    alias "/lib/libcimgui.so" "{preinstall-dir}/libcimgui.so"
+    alias "/include/cimgui.h" "{preinstall-dir}/cimgui.h"
