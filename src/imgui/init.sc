@@ -35,8 +35,8 @@ import ..window
 global reset : bool
 .. module
     do
-        # bool ImGui_ImplWGPU_Init(WGPUDevice device, int num_frames_in_flight, WGPUTextureFormat rt_format);
-        ImplWGPU_Init := extern 'ImGui_ImplWGPU_Init (function bool wgpu.Device i32 wgpu.TextureFormat)
+        # bool ImGui_ImplWGPU_Init(WGPUDevice device, int num_frames_in_flight, WGPUTextureFormat rt_format, WGPUTextureFormat depth_format = WGPUTextureFormat_Undefined);
+        ImplWGPU_Init := extern 'ImGui_ImplWGPU_Init (function bool wgpu.Device i32 wgpu.TextureFormat wgpu.TextureFormat)
         # void ImGui_ImplWGPU_Shutdown();
         ImplWGPU_Shutdown := extern 'ImGui_ImplWGPU_Shutdown (function void)
         # void ImGui_ImplWGPU_NewFrame();
@@ -67,7 +67,7 @@ global reset : bool
             assert
                 ImplSDL2_InitForVulkan (window.get-handle)
             assert
-                ImplWGPU_Init istate.device 3 (get-preferred-surface-format)
+                ImplWGPU_Init istate.device 3 (get-preferred-surface-format) wgpu.TextureFormat.Undefined
             ()
 
         fn begin-frame ()
