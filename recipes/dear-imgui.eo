@@ -36,6 +36,8 @@ package dear-imgui
     summary SUMMARY
     version VERSION
     platform windows-mingw
+    depends wgpu-native sdl2
+
     preinstall-dir := (imgui-git "windows" "wgpu_native.dll" "SDL2.dll")
     alias "/lib/cimgui.dll" "{preinstall-dir}/cimgui.dll"
     alias "/include/cimgui.h" "{preinstall-dir}/cimgui.h"
@@ -44,6 +46,8 @@ package dear-imgui
     summary SUMMARY
     version VERSION
     platform linux
+    depends wgpu-native sdl2
+
     preinstall-dir := (imgui-git "linux" "libwgpu_native.so" "libSDL2.so")
     alias "/lib/libcimgui.so" "{preinstall-dir}/libcimgui.so"
     alias "/include/cimgui.h" "{preinstall-dir}/cimgui.h"

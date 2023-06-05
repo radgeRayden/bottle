@@ -1,0 +1,5 @@
+package bootstrap
+    summary "Install Bottle dependencies"
+    version "main"
+    platform linux windows-mingw unknown
+    depends fontdue-native wgpu-native sdl2 physfs stb radl dear-imgui
