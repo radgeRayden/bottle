@@ -77,8 +77,9 @@ sugar-if main-module?
     let module =
         try
             require-from (module-dir .. "/..") (.. ".demos." demo) __env
-        else
-            error (string (.. "unknown demo:" demo))
+        except(ex)
+            'dump ex
+            error (.. "failed to load demo: " (demo as string))
 
     f := (compile (typify (module as Closure) i32 (@ rawstring))) as (@ (function void i32 (@ rawstring)))
     f argc argv

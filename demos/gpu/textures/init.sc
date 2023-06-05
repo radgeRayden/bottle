@@ -2,7 +2,7 @@ using import Array
 using import Option
 using import struct
 using import String
-using import compiler.Printer
+#using import compiler.Printer
 
 stbi := import stb.image
 bottle := __env.bottle

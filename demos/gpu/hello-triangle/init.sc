@@ -1,6 +1,6 @@
 using import struct
 using import Option
-using import compiler.Printer
+#using import compiler.Printer
 import ...demo-common
 
 bottle := __env.bottle

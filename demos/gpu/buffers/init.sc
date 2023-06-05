@@ -3,7 +3,7 @@ using import Option
 using import String
 using import struct
 using import .common
-using import compiler.Printer
+#using import compiler.Printer
 
 bottle := __env.bottle
 random := import radl.random

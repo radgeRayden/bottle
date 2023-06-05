@@ -11,7 +11,7 @@ fn imgui-git (platform wgpu-lib sdl-lib)
                 (shell git-dir) "git checkout {VERSION}"
                 git-dir
 
-        project-path := ((rshell ".") "scopes -e -c 'sc_write project-dir'")
+        project-path := ((rshell ".") "pwd")
         cmd :=
             shell build-path
         imgui-wgpu := "{project-path}/src/imgui"
