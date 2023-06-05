@@ -5,6 +5,7 @@ import .window
 import .gpu
 import .config
 import .time
+import .imgui
 
 fnchain load
 fnchain update
@@ -19,6 +20,7 @@ fn run ()
     window.init;
     gpu.init;
     time.init;
+    imgui.init;
     load;
 
     USE_DT_ACCUMULATOR? := cfg.time.use-delta-accumulator?
@@ -26,7 +28,7 @@ fn run ()
     local dt-accumulator : f64
 
     while (not (sysevents.really-quit?))
-        sysevents.dispatch;
+        sysevents.dispatch imgui.process-event
 
         time.step;
         dt := (time.get-delta-time)
@@ -43,14 +45,23 @@ fn run ()
 
         try
             render-pass := (gpu.begin-frame)
+            imgui.begin-frame;
             # TODO: pass in dt remainder, after we adapt the time module to be aware of it
             render render-pass
+            imgui.present render-pass
             gpu.present render-pass
+            imgui.end-frame;
         except (ex)
             using gpu.types
-            if (ex == GPUError.ObjectCreationFailed)
+            match ex
+            case GPUError.ObjectCreationFailed
                 assert false "unhandled GPU Object creation failure"
+            case GPUError.OutdatedSwapchain
+                imgui.wgpu-reset;
+                imgui.end-frame;
+            default ()
 
+    imgui.shutdown;
     window.shutdown;
 
 sugar-if main-module?

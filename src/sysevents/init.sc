@@ -22,11 +22,14 @@ fn quit ()
     sdl.PushEvent &ev
     ;
 
-fn dispatch ()
+inline dispatch (handler)
     from enums let KeyboardKey MouseButton ControllerButton ControllerAxis
 
     local event : sdl.Event
     while (sdl.PollEvent &event)
+        if (handler &event)
+            continue;
+
         switch event.type
         case sdl.SDL_QUIT
             let result = (callbacks.quit)
