@@ -23,8 +23,9 @@ header :=
 
 let imgui-extern = (filter-scope header.extern "^(ig|Im)")
 let imgui-typedef = (filter-scope header.typedef "^Im")
+let imgui-const = (filter-scope header.const "^(?=Im)")
 
-module := .. imgui-extern imgui-typedef
+module := .. imgui-extern imgui-typedef imgui-const
 run-stage;
 
 wgpu := import ..gpu.wgpu
