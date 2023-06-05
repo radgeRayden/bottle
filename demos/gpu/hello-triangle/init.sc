@@ -1,6 +1,7 @@
 using import struct
 using import Option
 using import compiler.Printer
+import ...demo-common
 
 bottle := __env.bottle
 
@@ -52,7 +53,7 @@ fn (cfg)
 
 @@ 'on bottle.load
 fn ()
-    print ((RendererBackendInfo) . RendererString)
+    # print (repr ((RendererBackendInfo) . RendererString))
 
     try # resource creation can fail, but in this simple case we don't need to handle it.
         vert := ShaderModule shaderf-vert ShaderLanguage.SPIRV ShaderStage.Vertex
@@ -88,6 +89,8 @@ fn (render-pass)
 
     'set-pipeline rp ctx.pipeline
     'draw rp 3
+
+    demo-common.display-fps;
     ;
 
 sugar-if main-module?

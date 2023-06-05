@@ -3,9 +3,11 @@ using import Option
 using import String
 using import struct
 using import .common
+using import compiler.Printer
 
 bottle := __env.bottle
 random := import radl.random
+import ...demo-common
 
 using bottle.gpu.types
 using bottle.enums
@@ -55,7 +57,7 @@ fn gen-indices ()
 
 @@ 'on bottle.load
 fn ()
-    print ((RendererBackendInfo) . RendererString)
+    # print ((RendererBackendInfo) . RendererString)
 
     try
         vert := ShaderModule (import .vert) ShaderLanguage.SPIRV ShaderStage.Vertex
@@ -69,7 +71,7 @@ fn ()
                 vertex-stage =
                     VertexStage
                         shader = vert
-                        entry-point = S"main"
+                        entry-point = "main"
                 fragment-stage =
                     FragmentStage
                         shader = frag
@@ -103,9 +105,7 @@ global time-offset : f64
 @@ 'on bottle.key-released
 fn (key)
     if (key == KeyboardKey.Space)
-        time-offset = (bottle.timer.get-time)
-    elseif (key == KeyboardKey.Escape)
-        bottle.quit!;
+        time-offset = (bottle.time.get-time)
 
 @@ 'on bottle.render
 fn (rp)
@@ -126,7 +126,7 @@ fn (rp)
             vec4 0.0 0.0 0.0 1.0
 
     ctx := 'force-unwrap render-state
-    time := (bottle.timer.get-time) - time-offset
+    time := (bottle.time.get-time) - time-offset
     'frame-write ctx.uniform-buffer (Uniforms (ortho (bottle.window.get-size)) (time as f32))
 
     'set-pipeline rp ctx.pipeline
@@ -134,6 +134,7 @@ fn (rp)
     'set-bind-group rp 0 ctx.bind-group
 
     'draw-indexed rp INDEX-COUNT QUAD-COUNT
+    demo-common.display-fps;
     ()
 
 sugar-if main-module?
