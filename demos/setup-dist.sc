@@ -15,6 +15,7 @@ libs... :=
                     error "unsupported OS"
             filename as string
         _
+            "physfs"
             "scopesrt"
             "fontdue_native"
             "SDL2"

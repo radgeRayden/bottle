@@ -1,11 +1,12 @@
 using import FunctionChain
 
-import .sysevents
-import .window
-import .gpu
 import .config
-import .time
+import .filesystem
+import .gpu
 import .imgui
+import .sysevents
+import .time
+import .window
 
 fnchain load
 fnchain update
@@ -17,6 +18,7 @@ fn run ()
     cfg := config.istate-cfg
     configure cfg
 
+    filesystem.init;
     window.init;
     gpu.init;
     time.init;
@@ -61,6 +63,7 @@ fn run ()
 
     imgui.shutdown;
     window.shutdown;
+    filesystem.shutdown;
 
 sugar-if main-module?
     using import String
@@ -74,12 +77,19 @@ sugar-if main-module?
 
     let module =
         try
-            require-from (module-dir .. "/..") (.. ".demos." demo) __env
+            C := (include "unistd.h") . extern
+
+            import-string := .. "..demos." demo
+            module := require-from module-dir import-string __env
+            # set cwd so filesystem.mount points to the correctly place
+            path := dots-to-slashes (import-string as string)
+            assert ((C.chdir (module-dir .. path)) == 0)
+            module
         except(ex)
             'dump ex
             error (.. "failed to load demo: " (demo as string))
 
-    f := (compile (typify (module as Closure) i32 (@ rawstring))) as (@ (function void i32 (@ rawstring)))
+    f := (compile (typify (module as Closure) i32 (@ rawstring))) as (@ (function i32 i32 (@ rawstring)))
     f argc argv
     0
 else
