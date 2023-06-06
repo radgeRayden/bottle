@@ -1,8 +1,4 @@
-# it has to work even before everything has been installed.
-let bottle =
-    try ((require-from module-dir ".init" __env) as Scope)
-    else (Scope)
-run-stage;
+bottle := require-from module-dir ".init" __env
 
 'bind-symbols __env
     bottle = bottle
