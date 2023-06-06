@@ -42,13 +42,11 @@ fn run ()
             update dt
         else
             update dt
-
         try
             render-pass := (gpu.begin-frame)
             imgui.begin-frame;
-            # TODO: pass in dt remainder, after we adapt the time module to be aware of it
             render render-pass
-            imgui.present render-pass
+            imgui.render render-pass
             gpu.present render-pass
             imgui.end-frame;
         except (ex)

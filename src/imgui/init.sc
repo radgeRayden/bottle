@@ -2,7 +2,7 @@ import sdl
 import ..window
 
 wgpu := import ..gpu.wgpu
-ig   := import .imgui
+ig   := import .bindings
 
 fn init ()
     using import ..gpu.common
@@ -47,7 +47,7 @@ fn process-event (event)
     do (deref io.WantCaptureKeyboard)
     default false #result
 
-fn present (render-pass)
+fn render (render-pass)
     ig.Render;
     ig.ImplWGPU_RenderDrawData (ig.GetDrawData) (view render-pass)
 
@@ -61,6 +61,6 @@ fn end-frame ()
 
 ..
     do
-        let init begin-frame wgpu-reset process-event present shutdown end-frame
+        let init begin-frame wgpu-reset process-event render shutdown end-frame
         local-scope;
     ig
