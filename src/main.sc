@@ -64,6 +64,7 @@ fn run ()
     imgui.shutdown;
     window.shutdown;
     filesystem.shutdown;
+    ()
 
 sugar-if main-module?
     using import String

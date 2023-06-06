@@ -1,9 +1,9 @@
 using import Array
 using import struct
-using import .enums
-using import .helpers
-using import .gpu.texture-format
-wgpu := import .gpu.wgpu
+using import ..enums
+using import ..helpers
+using import ..gpu.texture-format
+wgpu := import ..gpu.wgpu
 
 struct ImageData
     width : u32
@@ -12,13 +12,17 @@ struct ImageData
     data : (Array u8)
     format : TextureFormat
 
-    inline... __typecall (cls, width : u32, height : u32, slices = 1:u32, data : (param? (Array u8)) = none, format = TextureFormat.RGBA8UnormSrgb)
-        block-size := get-texel-block-size format
+    inline... __typecall (cls, width : u32, height : u32, slices : u32 = 1:u32, data : (param? (Array u8)) = none, format = TextureFormat.RGBA8UnormSrgb)
+        let block-size =
+            try (get-texel-block-size format)
+            else 4:u32 # I'm not sure this is a good idea.
+
         expected-size := width * height * slices * block-size
         let data =
             static-if (none? data)
                 local data = ((Array u8))
                 'resize data expected-size
+                data
             else
                 data
 

@@ -4,7 +4,7 @@ using import struct
 
 using import .common
 using import ..helpers
-using import ..ImageData
+using import ..asset.ImageData
 using import ..exceptions
 using import .texture-format
 import .wgpu

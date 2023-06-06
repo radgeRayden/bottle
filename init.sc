@@ -1,5 +1,7 @@
+let asset = (import .src.asset)
 let enums = (import .src.enums)
 let exceptions = (import .src.exceptions)
+let filesystem = (import .src.filesystem)
 let font = (import .src.font)
 let gpu = (import .src.gpu)
 let input = (import .src.input)
@@ -19,8 +21,10 @@ vvv bind bottle
     syscallbacks
     do
         let
+            asset
             enums
             exceptions
+            filesystem
             font
             gpu
             input
