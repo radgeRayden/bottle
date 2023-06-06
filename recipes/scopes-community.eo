@@ -1,0 +1,19 @@
+update-url "https://raw.githubusercontent.com/ScopesCommunity/eo-packages/main/scopes-community.eo"
+
+package scopes-community
+    summary "Meta package for the Scopes Community eo repository"
+    version "latest"
+
+fn pkg (name)
+    shortcut "{name}" "https://raw.githubusercontent.com/ScopesCommunity/eo-packages/main/recipes/{name}.eo"
+
+pkg "fontdue"
+pkg "glad"
+pkg "glfw"
+pkg "microui"
+pkg "physfs"
+pkg "sdl2"
+pkg "sljit"
+pkg "stb"
+pkg "volk"
+pkg "wgpu"
