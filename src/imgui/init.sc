@@ -68,6 +68,9 @@ global reset : bool
                 ImplSDL2_InitForVulkan (window.get-handle)
             assert
                 ImplWGPU_Init istate.device 3 (get-preferred-surface-format) wgpu.TextureFormat.Undefined
+
+            io := (ig.GetIO)
+            io.IniFilename = null
             ()
 
         fn begin-frame ()
