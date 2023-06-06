@@ -7,7 +7,7 @@ import .types
 
 using import ..helpers
 using import .common
-using import .errors
+using import ..exceptions
 
 import ..window
 

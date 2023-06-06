@@ -1,4 +1,5 @@
 let enums = (import .src.enums)
+let exceptions = (import .src.exceptions)
 let font = (import .src.font)
 let gpu = (import .src.gpu)
 let input = (import .src.input)
@@ -19,6 +20,7 @@ vvv bind bottle
     do
         let
             enums
+            exceptions
             font
             gpu
             input

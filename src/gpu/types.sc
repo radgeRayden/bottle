@@ -1,4 +1,3 @@
-using import .errors
 import .wgpu
 
 ..
@@ -11,6 +10,5 @@ import .wgpu
     import .Texture
     import .Sampler
     do
-        let GPUError
         ShaderStageFlags := wgpu.ShaderStageFlags
         local-scope;

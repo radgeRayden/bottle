@@ -2,7 +2,7 @@ using import struct
 using import Map
 using import String
 using import glm
-using import .errors
+using import ..exceptions
 
 import wgpu
 # from (import .binding-interface) let GPUResourceBinding

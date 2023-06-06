@@ -1,5 +1,5 @@
 import .wgpu
-using import .errors
+using import ..exceptions
 using import ..helpers
 
 fn... get-texel-block-size (format : wgpu.TextureFormat, aspect : (param? wgpu.TextureAspect) = none)

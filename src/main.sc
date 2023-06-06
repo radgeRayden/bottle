@@ -52,7 +52,7 @@ fn run ()
             gpu.present render-pass
             imgui.end-frame;
         except (ex)
-            using gpu.types
+            using import .exceptions
             match ex
             case GPUError.ObjectCreationFailed
                 assert false "unhandled GPU Object creation failure"

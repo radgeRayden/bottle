@@ -6,6 +6,10 @@ enum GPUError plain
     InvalidOperation
     InvalidInput
 
+enum FilesystemError plain
+    GenericError
+
 do
-    let GPUError
+    let FilesystemError
+        GPUError
     locals;
