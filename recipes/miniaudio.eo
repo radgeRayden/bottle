@@ -1,0 +1,42 @@
+VERSION := "master"
+SUMMARY := "Audio playback and capture library written in C, in a single source file."
+
+update-url "https://raw.githubusercontent.com/ScopesCommunity/eo-packages/main/recipes/miniaudio.eo"
+
+miniaudio-h := (download "https://raw.githubusercontent.com/mackron/miniaudio/master/miniaudio.h")
+miniaudio-c :=
+    tempfile
+        """"#define MINIAUDIO_IMPLEMENTATION
+            #include "miniaudio.h"
+
+build-dir := (tempdir)
+fn shared-library (libname)
+    then
+        cmd := (shell build-dir)
+        cmd "cp {miniaudio-h} ./miniaudio.h"
+        cmd "cp {miniaudio-c} ./miniaudio.c"
+        cmd "gcc -shared -fPIC -O2 -o {libname} -I. -x c miniaudio.c"
+        "{build-dir}/{libname}"
+
+bindings :=
+    download "https://raw.githubusercontent.com/ScopesCommunity/eo-packages/main/bindings/miniaudio.sc"
+
+package miniaudio
+    summary SUMMARY
+    platform linux unknown
+    version VERSION
+
+    libname := "libminiaudio.so"
+    alias "/lib/{libname}" (shared-library libname)
+    alias "/include/miniaudio.h" "{build-dir}/miniaudio.h"
+    alias "/lib/scopes/packages/miniaudio.sc" bindings
+
+package miniaudio
+    summary SUMMARY
+    platform windows-mingw
+    version VERSION
+
+    libname := "miniaudio.dll"
+    alias "/lib/{libname}" (shared-library libname)
+    alias "/include/miniaudio.h" "{build-dir}/miniaudio.h"
+    alias "/lib/scopes/packages/miniaudio.sc" bindings
