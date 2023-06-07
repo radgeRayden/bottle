@@ -1,6 +1,7 @@
-import wgpu
+wgpu := import ..gpu.wgpu
 
 do
+    FilterMode := wgpu.FilterMode
     FrontFace := wgpu.FrontFace
     PowerPreference := wgpu.PowerPreference
     PrimitiveTopology := wgpu.PrimitiveTopology

@@ -35,6 +35,9 @@ inline define-object (name super destructor)
                 inline (incoming)
                     bitcast incoming thisT
 
+        inline __hash (self)
+            hash (storagecast (view self))
+
 inline define-flags (enumT)
     inline __typecall (cls flags...)
         flagST := storageof wgpu.Flags
