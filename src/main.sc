@@ -82,7 +82,7 @@ sugar-if main-module?
 
             import-string := .. "..demos." demo
             module := require-from module-dir import-string __env
-            # set cwd so filesystem.mount points to the correctly place
+            # set cwd so filesystem.mount points to the correct place
             path := dots-to-slashes (import-string as string)
             assert ((C.chdir (module-dir .. path)) == 0)
             module
