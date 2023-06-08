@@ -128,6 +128,12 @@ fn init ()
 fn set-clear-color (color)
     istate.clear-color = color
 
+fn get-cmd-encoder ()
+    using types
+
+    cmd-encoder := 'force-unwrap istate.cmd-encoder
+    imply cmd-encoder CommandEncoder
+
 fn begin-frame ()
     using types
 
@@ -138,11 +144,20 @@ fn begin-frame ()
     if (swapchain-image == null)
         raise GPUError.OutdatedSwapchain
 
+    cmd-encoder := (wgpu.DeviceCreateCommandEncoder istate.device (&local wgpu.CommandEncoderDescriptor))
+
     color-attachment := ColorAttachment (imply swapchain-image TextureView) istate.clear-color
-    RenderPass color-attachment
+    render-pass := RenderPass cmd-encoder color-attachment
+
+    istate.cmd-encoder = cmd-encoder
+    render-pass
 
 fn present (render-pass)
-    'submit ('finish render-pass)
+    using types
+
+    'finish render-pass
+    cmd-encoder := imply ('force-unwrap ('swap istate.cmd-encoder none)) CommandEncoder
+    'submit ('finish cmd-encoder)
     wgpu.SwapChainPresent istate.swapchain
     ;
 

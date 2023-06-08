@@ -1,18 +1,20 @@
-using import struct
-using import Map
-using import String
 using import glm
+using import Map
+using import Option
+using import String
+using import struct
 using import ..exceptions
 
 import wgpu
 
 struct GfxState
-    instance  : wgpu.Instance
-    surface   : wgpu.Surface
-    adapter   : wgpu.Adapter
-    device    : wgpu.Device
-    swapchain : wgpu.SwapChain
-    queue     : wgpu.Queue
+    instance    : wgpu.Instance
+    surface     : wgpu.Surface
+    adapter     : wgpu.Adapter
+    device      : wgpu.Device
+    swapchain   : wgpu.SwapChain
+    queue       : wgpu.Queue
+    cmd-encoder : (Option wgpu.CommandEncoder)
 
     clear-color = (vec4 0.017 0.017 0.017 1.0)
 

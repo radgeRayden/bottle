@@ -2,6 +2,7 @@ import .wgpu
 
 ..
     import .BindGroup
+    import .CommandEncoder
     import .GPUBuffer
     import .RendererBackendInfo
     import .RenderPass
