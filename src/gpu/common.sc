@@ -5,17 +5,6 @@ using import glm
 using import ..exceptions
 
 import wgpu
-# from (import .binding-interface) let GPUResourceBinding
-
-# struct GfxDummyResources
-#     buffer : GPUResourceBinding
-#     uniform-buffer : GPUResourceBinding
-#     sampler : GPUResourceBinding
-#     texture-view : GPUResourceBinding
-
-# struct GfxCachedLayouts
-#     bind-group-layouts : (Map String wgpu.BindGroupLayout)
-#     pipeline-layouts : (Map String wgpu.PipelineLayout)
 
 struct GfxState
     instance  : wgpu.Instance
@@ -24,9 +13,6 @@ struct GfxState
     device    : wgpu.Device
     swapchain : wgpu.SwapChain
     queue     : wgpu.Queue
-
-    # dummy-resources : GfxDummyResources
-    # cached-layouts  : GfxCachedLayouts
 
     clear-color = (vec4 0.017 0.017 0.017 1.0)
 
