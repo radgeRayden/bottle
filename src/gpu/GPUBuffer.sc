@@ -2,6 +2,7 @@ using import Array
 using import property
 using import struct
 using import .common
+using import .CommandEncoder
 using import ..exceptions
 using import ..helpers
 import .wgpu
@@ -86,6 +87,13 @@ inline gen-buffer-type (parent-type prefix backing-type usage-flags)
 
         fn get-byte-size (self)
             self.Capacity * ElementSize
+
+        fn... clone (self, new-capacity : usize)
+            new-buffer := (typeof self) new-capacity (wgpu.BufferGetUsage (view self))
+            cmd-encoder := imply ('force-unwrap istate.cmd-encoder) CommandEncoder
+            wgpu.CommandEncoderCopyBufferToBuffer \
+                cmd-encoder self 0:u64 new-buffer 0:u64 ('get-byte-size self)
+            new-buffer
 
         inline __imply (this other)
             static-if (other == wgpu.Buffer)
