@@ -81,8 +81,9 @@ struct RenderPass
         wgpu.RenderPassEncoderSetPipeline (view self) (view pipeline)
 
     fn... set-index-buffer (self, buffer : IndexBuffer, offset = 0:usize, count...)
-        count := va-option count count... (buffer._capacity - offset)
-        assert (offset < buffer._capacity)
+        count := va-option count count... (buffer.Capacity - offset)
+        # TODO: error instead of assert
+        assert (offset < buffer.Capacity)
 
         indexT := (typeof buffer) . BackingType
         offset := (sizeof indexT) * offset

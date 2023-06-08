@@ -1,4 +1,5 @@
 using import Array
+using import property
 using import struct
 using import .common
 using import ..helpers
@@ -20,32 +21,27 @@ fn write-buffer (buf data-ptr offset data-size)
         data-ptr
         data-size
 
-struct GPUBuffer
-    _handle   : wgpu.Buffer
-    _capacity : usize
-    _usage    : wgpu.BufferUsage
-
-    inline __imply (this other)
-        static-if (imply? other wgpu.Buffer)
-            inline (self)
-                imply self._handle other
+typedef GPUBuffer <:: wgpu.Buffer
 
 @@ memo
 inline gen-buffer-type (parent-type prefix backing-type usage-flags)
-    type (.. prefix "<" (tostring backing-type) ">") < parent-type :: (storageof GPUBuffer)
+    type (.. prefix "<" (tostring backing-type) ">") <:: parent-type
         BackingType := backing-type
         ElementSize := (sizeof BackingType)
+
+        Capacity :=
+            property
+                inline "getter" (self)
+                    (wgpu.BufferGetSize (view self)) // ElementSize
 
         inline constructor (cls max-elements usage-flags)
             # TODO: ensure size obeys alignment rules
             size   := max-elements * (sizeof BackingType)
             handle := make-buffer size usage-flags
 
-            # use Struct directly to avoid hierarchy issues
-            Struct.__typecall cls
-                _handle = (wrap-nullable-object wgpu.Buffer handle)
-                _capacity = max-elements
-                _usage = usage-flags
+            bitcast
+                wrap-nullable-object wgpu.Buffer handle
+                cls
 
         # if usage flags aren't statically provided, it means they must be passed at runtime
         let __typecall =
@@ -60,11 +56,11 @@ inline gen-buffer-type (parent-type prefix backing-type usage-flags)
         fn... frame-write (self, data : (Array BackingType), offset : usize, count : usize)
             data-size     := ElementSize * count
             byte-offset   := ElementSize * offset
-            byte-capacity := ElementSize * self._capacity
+            byte-capacity := ElementSize * self.Capacity
             data-ptr      := (imply data pointer) as voidstar
 
             assert ((byte-offset + data-size) <= byte-capacity)
-            write-buffer self._handle data-ptr offset data-size
+            write-buffer (view self) data-ptr offset data-size
             ()
 
         case (self, data : (Array BackingType), offset : usize)
@@ -76,30 +72,35 @@ inline gen-buffer-type (parent-type prefix backing-type usage-flags)
         case (self, data : BackingType, offset = 0:usize)
             data-size     := ElementSize
             byte-offset   := ElementSize * offset
-            byte-capacity := ElementSize * self._capacity
+            byte-capacity := ElementSize * self.Capacity
 
             assert ((byte-offset + data-size) <= byte-capacity)
-            write-buffer self._handle (&local data) offset data-size
+            write-buffer (view self) (&local data) offset data-size
             ()
         # ------------------------------------------------------------------------------------
 
         fn get-byte-size (self)
-            self._capacity * ElementSize
+            self.Capacity * ElementSize
+
+        inline __imply (this other)
+            static-if (other == wgpu.Buffer)
+                inline (self)
+                    bitcast self other
 
         unlet constructor
 
-type GenericBuffer < GPUBuffer
+type GenericBuffer <:: GPUBuffer
     @@ memo
     inline __typecall (cls backing-type)
         gen-buffer-type cls "GenericBuffer" backing-type
 
-type StorageBuffer < GPUBuffer
+type StorageBuffer <:: GPUBuffer
     @@ memo
     inline __typecall (cls backing-type)
         gen-buffer-type cls "StorageBuffer" backing-type
             wgpu.BufferUsage.Storage | wgpu.BufferUsage.CopyDst | wgpu.BufferUsage.CopySrc
 
-type IndexBuffer < GPUBuffer
+type IndexBuffer <:: GPUBuffer
     @@ memo
     inline __typecall (cls backing-type)
         static-if (not ((backing-type == u16) or (backing-type == u32)))
@@ -109,7 +110,7 @@ type IndexBuffer < GPUBuffer
         gen-buffer-type cls "IndexBuffer" backing-type
             wgpu.BufferUsage.Index | wgpu.BufferUsage.CopyDst | wgpu.BufferUsage.CopySrc
 
-type UniformBuffer < GPUBuffer
+type UniformBuffer <:: GPUBuffer
     @@ memo
     inline __typecall (cls backing-type)
         gen-buffer-type cls "UniformBuffer" backing-type
