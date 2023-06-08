@@ -3,6 +3,7 @@ using import glm
 using import struct
 
 using import .common
+using import ..exceptions
 using import ..helpers
 using import .BindGroup
 using import .GPUBuffer
@@ -82,8 +83,8 @@ struct RenderPass
 
     fn... set-index-buffer (self, buffer : IndexBuffer, offset = 0:usize, count...)
         count := va-option count count... (buffer.Capacity - offset)
-        # TODO: error instead of assert
-        assert (offset < buffer.Capacity)
+        if (offset >= buffer.Capacity)
+            raise GPUError.InvalidInput
 
         indexT := (typeof buffer) . BackingType
         offset := (sizeof indexT) * offset

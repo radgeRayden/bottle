@@ -2,6 +2,7 @@ using import Array
 using import property
 using import struct
 using import .common
+using import ..exceptions
 using import ..helpers
 import .wgpu
 
@@ -59,7 +60,9 @@ inline gen-buffer-type (parent-type prefix backing-type usage-flags)
             byte-capacity := ElementSize * self.Capacity
             data-ptr      := (imply data pointer) as voidstar
 
-            assert ((byte-offset + data-size) <= byte-capacity)
+            if ((byte-offset + data-size) > byte-capacity)
+                raise GPUError.InvalidInput
+
             write-buffer (view self) data-ptr offset data-size
             ()
 
@@ -74,7 +77,9 @@ inline gen-buffer-type (parent-type prefix backing-type usage-flags)
             byte-offset   := ElementSize * offset
             byte-capacity := ElementSize * self.Capacity
 
-            assert ((byte-offset + data-size) <= byte-capacity)
+            if ((byte-offset + data-size) > byte-capacity)
+                raise GPUError.InvalidInput
+
             write-buffer (view self) (&local data) offset data-size
             ()
         # ------------------------------------------------------------------------------------
