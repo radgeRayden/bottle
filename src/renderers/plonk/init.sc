@@ -19,6 +19,7 @@ struct PlonkPermanentState
     render-target : TextureView
     sampler : Sampler
     clear-color : vec4 = (vec4 1.0 0.017 1.0 1)
+    target-binding : BindGroup
 
 struct PlonkFrameState
     render-pass : (Option RenderPass)
@@ -32,31 +33,34 @@ global context : (Option PlonkPermanentState)
 global frame-context : (Option PlonkFrameState)
 
 fn init (width height filtering)
-    vert := ShaderModule shaders.default-vert ShaderLanguage.SPIRV ShaderStage.Vertex
-    frag := ShaderModule shaders.default-frag ShaderLanguage.SPIRV ShaderStage.Fragment
+    vert := ShaderModule shaders.display-vert ShaderLanguage.SPIRV ShaderStage.Vertex
+    frag := ShaderModule shaders.display-frag ShaderLanguage.SPIRV ShaderStage.Fragment
+    sampler := (Sampler)
+    texture-view := TextureView (Texture (u32 width) (u32 height) TextureFormat.BGRA8UnormSrgb (render-target? = true))
+    pipeline :=
+        RenderPipeline
+            layout = (nullof PipelineLayout)
+            topology = PrimitiveTopology.TriangleList
+            winding = FrontFace.CCW
+            vertex-stage =
+                VertexStage
+                    shader = vert
+                    entry-point = S"main"
+            fragment-stage =
+                FragmentStage
+                    shader = frag
+                    entry-point = S"main"
+                    color-targets =
+                        arrayof ColorTarget
+                            typeinit
+                                format = TextureFormat.BGRA8UnormSrgb
 
     context =
         PlonkPermanentState
-            pipeline =
-                RenderPipeline
-                    layout = (nullof PipelineLayout)
-                    topology = PrimitiveTopology.TriangleList
-                    winding = FrontFace.CCW
-                    vertex-stage =
-                        VertexStage
-                            shader = vert
-                            entry-point = S"main"
-                    fragment-stage =
-                        FragmentStage
-                            shader = frag
-                            entry-point = S"main"
-                            color-targets =
-                                arrayof ColorTarget
-                                    typeinit
-                                        format = TextureFormat.BGRA8UnormSrgb
-            render-target =
-                TextureView (Texture (u32 width) (u32 height) TextureFormat.BGRA8UnormSrgb (render-target? = true))
-            sampler = (Sampler)
+            pipeline = pipeline
+            target-binding = (BindGroup ('get-bind-group-layout pipeline 0) (view sampler) (view texture-view))
+            render-target = texture-view
+            sampler = sampler
 
 fn begin-frame ()
     ctx := 'force-unwrap context
@@ -75,6 +79,9 @@ fn submit (render-pass)
     ctx := 'force-unwrap context
     frame-ctx := 'force-unwrap frame-context
     'finish ('force-unwrap ('swap frame-ctx.render-pass none))
+    'set-pipeline render-pass ctx.pipeline
+    'set-bind-group render-pass 0 ctx.target-binding
+    'draw render-pass 6
 
 do
     let init begin-frame sprite submit
