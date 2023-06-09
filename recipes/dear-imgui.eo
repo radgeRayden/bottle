@@ -9,6 +9,7 @@ fn imgui-git (platform wgpu-lib sdl-lib)
                 git-dir := "{git-parent}/cimgui"
                 (shell git-parent) "git clone --recursive https://github.com/cimgui/cimgui.git"
                 (shell git-dir) "git checkout {VERSION}"
+                (shell git-dir) "chmod -R a+w .git"
                 git-dir
 
         project-path := ((rshell ".") "pwd")

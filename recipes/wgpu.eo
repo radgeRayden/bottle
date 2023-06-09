@@ -16,6 +16,7 @@ git-release-dir :=
         cmd "git clone https://github.com/gfx-rs/wgpu-native/ --recurse-submodules ."
         cmd "git checkout {VERSION}"
         cmd "make package -j {cpu-core-count}"
+        cmd "chmod -R a+w .git"
         commonpath (extract "{build-path}/dist/wgpu--release.zip")
 
 # Pre-built binaries
