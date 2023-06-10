@@ -36,6 +36,7 @@ type Texture <:: wgpu.Texture
                 &local wgpu.TextureDescriptor
                     label = "Bottle Texture"
                     usage = usage
+
                     dimension = dimension
                     size = (wgpu.Extent3D width height slices)
                     format = format
@@ -48,6 +49,12 @@ type Texture <:: wgpu.Texture
             'frame-write (view self) image-data
 
         self
+    case (cls, image-data : ImageData)
+        this-function cls
+            copy image-data.width
+            copy image-data.height
+            copy image-data.format
+            image-data
 
     fn get-size (self)
         width := wgpu.TextureGetWidth self
