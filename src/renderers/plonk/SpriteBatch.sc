@@ -1,49 +1,60 @@
 using import Array
 using import glm
+using import Option
 using import struct
 
 using import ...gpu.types
 using import .common
 
-struct Quad plain
-    start : vec2
-    extent : vec2
-
 struct SpriteBatch
     attribute-buffer : (StorageBuffer VertexAttributes)
     index-buffer     : (IndexBuffer u32)
+    uniform-buffer   : (UniformBuffer Uniforms)
     vertex-data : (Array VertexAttributes)
     index-data  : (Array u32)
-    outdated-vertices? : bool
-    outdated-indices?  : bool
+    outdated-vertices? : bool = true
+    outdated-indices?  : bool = true
     vertex-offset : usize
     index-offset  : usize
 
+    pipeline : RenderPipeline
+    bind-group : (Option BindGroup)
+    cached-buffer-id : u64
+
     fn flush (self render-pass)
+        if (not (self.outdated-vertices? or self.outdated-indices?))
+            return;
+
         if self.outdated-vertices?
             attrbuf := self.attribute-buffer
             try
                 'frame-write attrbuf self.vertex-data self.vertex-offset
             else
                 # resize then try again
-                self.attribute-buffer = ('clone attrbuf (attrbuf.Capacity * 2))
-                return (this-function self)
+                self.attribute-buffer = ('clone attrbuf (attrbuf.Capacity * 2:usize))
+                return (this-function self render-pass)
+
+            if (self.cached-buffer-id != ('get-id attrbuf))
+                self.bind-group = BindGroup ('get-bind-group-layout self.pipeline 0) attrbuf self.uniform-buffer
+                self.cached-buffer-id = ('get-id attrbuf)
 
             self.outdated-vertices? = false
 
-        if self.oudated-indices?
+        if self.outdated-indices?
             idxbuf := self.index-buffer
             try
                 'frame-write idxbuf self.index-data self.index-offset
             else
                 # resize then try again
-                self.index-buffer = ('clone idxbuf (idxbuf.Capacity * 2))
-                return (this-function self)
+                self.index-buffer = ('clone idxbuf (idxbuf.Capacity * 2:usize))
+                return (this-function self render-pass)
 
             self.outdated-indices? = false
 
         index-count := (countof self.index-data)
         'set-index-buffer render-pass self.index-buffer
+        'set-pipeline render-pass self.pipeline
+        'set-bind-group render-pass 0 ('force-unwrap self.bind-group)
         'draw-indexed render-pass (index-count as u32) 1:u32 (u32 self.index-offset)
 
         self.vertex-offset += (countof self.vertex-data)
@@ -52,7 +63,8 @@ struct SpriteBatch
         'clear self.index-data
 
     fn... add-sprite (self : this-type, position, size, quad = (Quad (vec2 0 0) (vec2 1 1)), color = (vec4 1))
-        self.dirty? = true
+        self.outdated-vertices? = true
+        self.outdated-indices? = true
 
         local norm-vertices =
             # 0 - 3
@@ -95,9 +107,8 @@ struct SpriteBatch
         'append self.index-data (0:u16 + idx-offset)
         ;
 
-    fn finish (self)
-        'clear self.vertex-data
-        'clear self.index-data
+    fn finish (self render-pass)
+        'flush self render-pass
         self.vertex-offset = 0
         self.index-offset = 0
 

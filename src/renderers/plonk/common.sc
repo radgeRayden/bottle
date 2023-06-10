@@ -9,6 +9,10 @@ struct VertexAttributes plain
 struct Uniforms
     mvp : mat4
 
+struct Quad plain
+    start : vec2
+    extent : vec2
+
 do
-    let VertexAttributes Uniforms
+    let Quad VertexAttributes Uniforms
     local-scope;
