@@ -64,7 +64,7 @@ inline gen-buffer-type (parent-type prefix backing-type usage-flags)
             if ((byte-offset + data-size) > byte-capacity)
                 raise GPUError.InvalidInput
 
-            write-buffer (view self) data-ptr offset data-size
+            write-buffer (view self) data-ptr byte-offset data-size
             ()
 
         case (self, data : (Array BackingType), offset : usize)
@@ -81,7 +81,7 @@ inline gen-buffer-type (parent-type prefix backing-type usage-flags)
             if ((byte-offset + data-size) > byte-capacity)
                 raise GPUError.InvalidInput
 
-            write-buffer (view self) (&local data) offset data-size
+            write-buffer (view self) (&local data) byte-offset data-size
             ()
         # ------------------------------------------------------------------------------------
 
