@@ -16,6 +16,18 @@ type ColorTarget <: wgpu.ColorTargetState
             wgpu.ColorTargetState
                 format = format
                 writeMask = wgpu.ColorWriteMask.All
+                blend =
+                    &local wgpu.BlendState
+                        color =
+                            wgpu.BlendComponent
+                                operation = wgpu.BlendOperation.Add
+                                srcFactor = wgpu.BlendFactor.SrcAlpha
+                                dstFactor = wgpu.BlendFactor.OneMinusSrcAlpha
+                        alpha =
+                            wgpu.BlendComponent
+                                operation = wgpu.BlendOperation.Add
+                                srcFactor = wgpu.BlendFactor.One
+                                dstFactor = wgpu.BlendFactor.OneMinusSrcAlpha
             cls
 
 type VertexStage <: wgpu.VertexState
