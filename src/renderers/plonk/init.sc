@@ -8,6 +8,7 @@ wgpu := import ...gpu.wgpu
 using import ...enums
 using import .SpriteAtlas
 using import .SpriteBatch
+import ...asset
 import ...gpu
 import .shaders
 using import .common
@@ -21,11 +22,11 @@ struct PlonkPermanentState
     render-target : TextureView
     sampler : Sampler
     clear-color : vec4 = (vec4 1.0 0.017 1.0 1)
+    default-texture-binding : BindGroup
     target-binding : BindGroup
 
 struct PlonkFrameState
     render-pass : (Option RenderPass)
-
     # properties that can break batching
     last-texture    : u64
 
@@ -58,10 +59,35 @@ fn init (width height filtering)
 
     sprite-vert := ShaderModule shaders.sprite-vert ShaderLanguage.SPIRV ShaderStage.Vertex
     sprite-frag := ShaderModule shaders.sprite-frag ShaderLanguage.SPIRV ShaderStage.Fragment
+    sprite-pipeline :=
+        RenderPipeline
+            layout = (nullof PipelineLayout)
+            topology = PrimitiveTopology.TriangleList
+            winding = FrontFace.CCW
+            vertex-stage =
+                VertexStage
+                    shader = sprite-vert
+                    entry-point = S"main"
+            fragment-stage =
+                FragmentStage
+                    shader = sprite-frag
+                    entry-point = S"main"
+                    color-targets =
+                        arrayof ColorTarget
+                            typeinit
+                                format = TextureFormat.BGRA8UnormSrgb
+
+
+    local default-sprite-imdata : asset.ImageData 1 1
+    for byte in default-sprite-imdata.data
+        byte = 0xFF
+
+    default-sprite := TextureView (Texture default-sprite-imdata)
     context =
         PlonkPermanentState
             pipeline = pipeline
             target-binding = (BindGroup ('get-bind-group-layout pipeline 0) (view sampler) (view texture-view))
+            default-texture-binding = (BindGroup ('get-bind-group-layout sprite-pipeline 1) (view sampler) (view default-sprite))
             render-target = texture-view
             sampler = sampler
             batch =
@@ -69,23 +95,7 @@ fn init (width height filtering)
                     attribute-buffer = typeinit 4096
                     index-buffer = typeinit 8192
                     uniform-buffer = typeinit 1
-                    pipeline =
-                        RenderPipeline
-                            layout = (nullof PipelineLayout)
-                            topology = PrimitiveTopology.TriangleList
-                            winding = FrontFace.CCW
-                            vertex-stage =
-                                VertexStage
-                                    shader = sprite-vert
-                                    entry-point = S"main"
-                            fragment-stage =
-                                FragmentStage
-                                    shader = sprite-frag
-                                    entry-point = S"main"
-                                    color-targets =
-                                        arrayof ColorTarget
-                                            typeinit
-                                                format = TextureFormat.BGRA8UnormSrgb
+                    pipeline = sprite-pipeline
     settings =
         typeinit
             internal-resolution = (ivec2 width height)
@@ -120,7 +130,10 @@ fn sprite (atlas position size color)
 
     if (frame-ctx.last-texture != ('get-id atlas.texture-view))
         rp := ('force-unwrap frame-ctx.render-pass)
-        'flush ctx.batch rp
+
+        if (frame-ctx.last-texture != 0)
+            'flush ctx.batch rp
+
         if (not atlas.bind-group)
             atlas.bind-group = BindGroup ('get-bind-group-layout ctx.batch.pipeline 1) ctx.sampler atlas.texture-view
         'set-bind-group rp 1 ('force-unwrap atlas.bind-group)
@@ -132,8 +145,12 @@ fn submit (render-pass)
     ctx := 'force-unwrap context
     frame-ctx := 'force-unwrap frame-context
 
-    'finish ctx.batch ('force-unwrap frame-ctx.render-pass)
-    'finish ('force-unwrap ('swap frame-ctx.render-pass none))
+    frame-rp := ('force-unwrap ('swap frame-ctx.render-pass none))
+    if (frame-ctx.last-texture == 0)
+        'set-bind-group frame-rp 1 ctx.default-texture-binding
+
+    'finish ctx.batch frame-rp
+    'finish frame-rp
 
     'set-pipeline render-pass ctx.pipeline
     'set-bind-group render-pass 0 ctx.target-binding

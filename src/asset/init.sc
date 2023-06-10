@@ -19,5 +19,5 @@ fn load-image (filename)
     ImageData (w as u32) (h as u32) (slices = 1:u32) (data = data)
 
 do
-    let load-image
+    let load-image ImageData
     local-scope;
