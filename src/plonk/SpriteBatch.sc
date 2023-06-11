@@ -3,7 +3,7 @@ using import glm
 using import Option
 using import struct
 
-using import ...gpu.types
+using import ..gpu.types
 using import .common
 
 struct SpriteBatch

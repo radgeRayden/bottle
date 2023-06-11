@@ -10,7 +10,7 @@ let keyboard = (import .src.keyboard)
 let logger = (import .src.logger)
 let main = (import .src.main)
 let mouse = (import .src.mouse)
-let renderers = (import .src.renderers)
+let plonk = (import .src.plonk)
 let sysevents = (import .src.sysevents)
 let time = (import .src.time)
 let types = (import .src.types)
@@ -32,7 +32,7 @@ vvv bind bottle
             keyboard
             logger
             mouse
-            renderers
+            plonk
             time
             types
             window

@@ -3,17 +3,15 @@ using import Option
 using import String
 using import struct
 
-wgpu := import ...gpu.wgpu
-
 using import .common
-using import ...gpu.types
-using import ...enums
+using import ..gpu.types
+using import ..enums
 using import .SpriteAtlas
 using import .SpriteBatch
-import ...asset
-import ...gpu
-import ...math
-import ...window
+import ..asset
+import ..gpu
+import ..math
+import ..window
 import .shaders
 
 struct PlonkState

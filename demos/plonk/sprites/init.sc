@@ -4,7 +4,7 @@ using import struct
 import ...demo-common
 
 bottle := __env.bottle
-plonk  := bottle.renderers.plonk
+plonk  := bottle.plonk
 
 struct DrawState
     sprite : plonk.SpriteAtlas
