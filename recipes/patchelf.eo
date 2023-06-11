@@ -1,0 +1,21 @@
+VERSION := "0.18.0"
+SUMMARY := "A small utility to modify the dynamic linker and RPATH of ELF executables"
+
+update-url "https://raw.githubusercontent.com/ScopesCommunity/eo-packages/main/recipes/patchelf.eo"
+
+binary :=
+    then
+        archive := (download "https://github.com/NixOS/patchelf/archive/0.18.0.tar.gz")
+        extracted := (commonpath (extract archive))
+        cmd := (shell extracted)
+        cmd "./bootstrap.sh"
+        cmd "./configure"
+        cmd "make"
+        "{extracted}/src/patchelf"
+
+package patchelf
+    version VERSION
+    summary SUMMARY
+    platform linux unknown
+
+    alias "/bin/patchelf" binary

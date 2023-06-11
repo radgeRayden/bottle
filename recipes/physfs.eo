@@ -21,6 +21,11 @@ fn preinstall-dir (generator)
         cmd "make install"
         install-dir
 
+fn patchelf (soname libpath)
+    then
+        (shell ".") "./bin/patchelf --set-soname {soname} $(realpath {libpath})"
+        libpath
+
 bindings :=
     download "https://raw.githubusercontent.com/ScopesCommunity/eo-packages/main/bindings/physfs.sc"
 
@@ -28,9 +33,11 @@ package physfs
     summary SUMMARY
     version VERSION
     platform linux unknown
+    depends patchelf
 
     preinstall-dir := (preinstall-dir "Unix Makefiles")
-    alias "lib/libphysfs.so" "{preinstall-dir}/lib/libphysfs.so"
+    libpath := (patchelf "libphysfs.so" "{preinstall-dir}/lib/libphysfs.so")
+    alias "lib/libphysfs.so" libpath
     alias "include/physfs.h" "{preinstall-dir}/include/physfs.h"
     alias "/lib/scopes/packages/physfs.sc" bindings
 

@@ -27,16 +27,7 @@ preinstall-dir :=
 
 fn patchelf (soname libpath)
     then
-        bin :=
-            then
-                archive := (download "https://github.com/NixOS/patchelf/archive/0.18.0.tar.gz")
-                extracted := (commonpath (extract archive))
-                cmd := (shell extracted)
-                cmd "./bootstrap.sh"
-                cmd "./configure"
-                cmd "make"
-                "{extracted}/src/patchelf"
-        (shell ".") "{bin} --set-soname {soname} $(realpath {libpath})"
+        (shell ".") "./bin/patchelf --set-soname {soname} $(realpath {libpath})"
         libpath
 
 bindings :=
@@ -46,6 +37,7 @@ package sdl2
     summary SUMMARY
     version VERSION
     platform linux unknown
+    depends patchelf
 
     libpath := (patchelf "libSDL2.so" "{preinstall-dir}/lib/libSDL2.so")
     alias "/lib/libSDL2.so" libpath
