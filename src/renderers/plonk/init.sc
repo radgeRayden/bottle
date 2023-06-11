@@ -16,12 +16,8 @@ import ...math
 import ...window
 import .shaders
 
-struct PlonkSettings plain
-    internal-resolution : ivec2
-
 struct PlonkPermanentState
     batch : SpriteBatch
-    pipeline : RenderPipeline
     sampler : Sampler
     default-texture-binding : BindGroup
 
@@ -30,32 +26,11 @@ struct PlonkFrameState
     # properties that can break batching
     last-texture    : u64
 
-global settings : PlonkSettings
 global context : (Option PlonkPermanentState)
 global frame-context : (Option PlonkFrameState)
 
-fn init (width height filtering)
-    vert := ShaderModule shaders.display-vert ShaderLanguage.SPIRV ShaderStage.Vertex
-    frag := ShaderModule shaders.display-frag ShaderLanguage.SPIRV ShaderStage.Fragment
+fn init ()
     sampler := (Sampler)
-    pipeline :=
-        RenderPipeline
-            layout = (nullof PipelineLayout)
-            topology = PrimitiveTopology.TriangleList
-            winding = FrontFace.CCW
-            vertex-stage =
-                VertexStage
-                    shader = vert
-                    entry-point = S"main"
-            fragment-stage =
-                FragmentStage
-                    shader = frag
-                    entry-point = S"main"
-                    color-targets =
-                        arrayof ColorTarget
-                            typeinit
-                                format = TextureFormat.BGRA8UnormSrgb
-
     sprite-vert := ShaderModule shaders.sprite-vert ShaderLanguage.SPIRV ShaderStage.Vertex
     sprite-frag := ShaderModule shaders.sprite-frag ShaderLanguage.SPIRV ShaderStage.Fragment
     sprite-pipeline :=
@@ -76,7 +51,6 @@ fn init (width height filtering)
                             typeinit
                                 format = TextureFormat.BGRA8UnormSrgb
 
-
     local default-sprite-imdata : asset.ImageData 1 1
     for byte in default-sprite-imdata.data
         byte = 0xFF
@@ -84,7 +58,6 @@ fn init (width height filtering)
     default-sprite := TextureView (Texture default-sprite-imdata)
     context =
         PlonkPermanentState
-            pipeline = pipeline
             default-texture-binding = (BindGroup ('get-bind-group-layout sprite-pipeline 1) (view sampler) (view default-sprite))
             sampler = sampler
             batch =
@@ -93,9 +66,8 @@ fn init (width height filtering)
                     index-buffer = typeinit 8192
                     uniform-buffer = typeinit 1
                     pipeline = sprite-pipeline
-    settings =
-        typeinit
-            internal-resolution = (ivec2 width height)
+
+    ()
 
 fn begin-frame ()
     ctx := 'force-unwrap context

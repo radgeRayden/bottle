@@ -20,10 +20,7 @@ fn ()
     using bottle.enums
 
     try
-        plonk.init
-            width = 640
-            height = 480
-            filtering = FilterMode.Nearest
+        plonk.init;
 
         draw-state =
             DrawState
