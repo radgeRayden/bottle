@@ -8,6 +8,7 @@ plonk  := bottle.renderers.plonk
 
 struct DrawState
     sprite : plonk.SpriteAtlas
+    sprite-frame : i32
 
 global draw-state : (Option DrawState)
 
@@ -32,7 +33,7 @@ fn (dt)
     ctx := 'force-unwrap draw-state
 
     t := (bottle.time.get-time) * 11
-    'set-frame ctx.sprite (i32 (floor t))
+    ctx.sprite-frame = (i32 (floor t))
 
 @@ 'on bottle.render
 fn (render-pass)
@@ -41,7 +42,7 @@ fn (render-pass)
 
     using import itertools
     for x y in (dim 20 20)
-        plonk.sprite ctx.sprite (vec2 (x * 20) (y * 20)) (vec2 100 100) (vec4 1)
+        plonk.sprite ctx.sprite (vec2 (x * 20) (y * 20)) (vec2 100 100) ('get-quad ctx.sprite ctx.sprite-frame) (vec4 1)
 
     plonk.submit;
     demo-common.display-fps;

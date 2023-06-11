@@ -11,7 +11,6 @@ struct SpriteAtlas
     bind-group : (Option BindGroup)
     columns : i32
     rows : i32
-    frame : i32
 
     inline... __typecall (cls, image-data : ImageData, columns = 1, rows = 1)
         texture := Texture image-data
@@ -23,16 +22,14 @@ struct SpriteAtlas
             columns = columns
             rows = rows
 
-    fn set-frame (self frame)
-        frame-count := self.rows * self.columns
+    fn get-quad (self frame)
+        rows columns := self.rows, self.columns
+        frame-count := rows * columns
         idx := frame % frame-count
         let frame =
             if (idx < 0) (frame-count - idx)
             else idx
-        self.frame = frame
 
-    fn get-quad (self)
-        frame rows columns := self.frame, self.rows, self.columns
         x y := frame % columns, frame // columns
         w h := 1 / columns, 1 / rows
         Quad

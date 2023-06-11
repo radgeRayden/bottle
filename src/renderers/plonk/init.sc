@@ -84,7 +84,7 @@ fn begin-frame ()
 
     ctx.render-pass = rp
 
-fn sprite (atlas position size color)
+fn sprite (atlas position size quad color)
     ctx := 'force-unwrap context
 
     if (ctx.last-texture != ('get-id atlas.texture-view))
@@ -98,7 +98,7 @@ fn sprite (atlas position size color)
         'set-bind-group rp 1 ('force-unwrap atlas.bind-group)
         ctx.last-texture = ('get-id atlas.texture-view)
 
-    'add-sprite ctx.batch position size ('get-quad atlas) color
+    'add-sprite ctx.batch position size quad color
 
 fn submit ()
     ctx := 'force-unwrap context
