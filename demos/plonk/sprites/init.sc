@@ -30,7 +30,6 @@ fn ()
                 sprite = plonk.SpriteAtlas (bottle.asset.load-image "_Run.png") 10 1
     else ()
 
-
 @@ 'on bottle.update
 fn (dt)
     ctx := 'force-unwrap draw-state
@@ -42,8 +41,13 @@ fn (dt)
 fn (render-pass)
     ctx := 'force-unwrap draw-state
     plonk.begin-frame;
-    plonk.sprite ctx.sprite (vec2 10 10) (vec2 50 50) (vec4 1)
+
+    using import itertools
+    for x y in (dim 20 20)
+        plonk.sprite ctx.sprite (vec2 (x * 20) (y * 20)) (vec2 100 100) (vec4 1)
+
     plonk.submit render-pass
+    demo-common.display-fps;
 
 sugar-if main-module?
     bottle.run;

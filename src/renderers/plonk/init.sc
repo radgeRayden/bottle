@@ -3,15 +3,17 @@ using import Option
 using import String
 using import struct
 
-using import ...gpu.types
 wgpu := import ...gpu.wgpu
+
+using import .common
+using import ...gpu.types
 using import ...enums
 using import .SpriteAtlas
 using import .SpriteBatch
 import ...asset
 import ...gpu
+import ...math
 import .shaders
-using import .common
 
 struct PlonkSettings plain
     internal-resolution : ivec2
@@ -104,20 +106,12 @@ fn begin-frame ()
     ctx := 'force-unwrap context
     color-attachment := ColorAttachment ctx.render-target ctx.clear-color
 
-    inline ortho (width height)
-        # https://www.scratchapixel.com/lessons/3d-basic-rendering/perspective-and-orthographic-projection-matrix/orthographic-projection-matrix
-        # right, top
-        let r t = (width / 2) (height / 2)
-        # left, bottom
-        let l b = -r -t
-        # far, near
-        let f n = 100 -100
-        mat4
-            vec4 (2 / (r - l), 0.0, 0.0, -((r + l) / (r - l)))
-            vec4 (0.0, 2 / (t - b), 0.0, 0.0)
-            vec4 (-((t + b) / (t - b)), 0.0, -2 / (f - n), -((f + n) / (f - n)))
-            vec4 0.0 0.0 0.0 1.0
-    'frame-write ctx.batch.uniform-buffer (Uniforms (ortho (unpack settings.internal-resolution)))
+    w h := unpack settings.internal-resolution
+    mvp :=
+        *
+            math.orthographic-projection w h
+            math.translation-matrix (vec3 (-w / 2) (-h / 2) 0)
+    'frame-write ctx.batch.uniform-buffer (Uniforms mvp)
 
     cmd-encoder := (gpu.get-cmd-encoder)
     frame-context =
