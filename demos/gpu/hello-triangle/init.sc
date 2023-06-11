@@ -83,12 +83,13 @@ fn ()
     else ()
 
 @@ 'on bottle.render
-fn (render-pass)
-    rp  := render-pass
+fn ()
     ctx := 'force-unwrap render-state
 
+    rp := RenderPass (bottle.gpu.get-cmd-encoder) (ColorAttachment (bottle.gpu.get-swapchain-image) false)
     'set-pipeline rp ctx.pipeline
     'draw rp 3
+    'finish rp
 
     demo-common.display-fps;
     ;
@@ -98,3 +99,4 @@ sugar-if main-module?
 else
     fn main (argc argv)
         bottle.run;
+        0

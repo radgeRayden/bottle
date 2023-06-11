@@ -161,10 +161,9 @@ fn begin-frame ()
     istate.cmd-encoder = cmd-encoder
     render-pass
 
-fn present (render-pass)
+fn present ()
     using types
 
-    'finish render-pass
     cmd-encoder := imply ('force-unwrap ('swap istate.cmd-encoder none)) CommandEncoder
     'submit ('finish cmd-encoder)
     wgpu.SwapChainPresent istate.swapchain

@@ -1,26 +1,39 @@
 using import FunctionChain
 
+import .callbacks
 import .config
 import .filesystem
 import .gpu
 import .imgui
+import .plonk
 import .sysevents
 import .time
 import .window
-import .callbacks
+
+inline chain-callback (cb f...)
+    cb := getattr callbacks cb
+    'clear cb
+    va-map
+        inline (f)
+            'prepend cb f
+            ()
+        f...
+
+chain-callback 'load plonk.init imgui.init
+chain-callback 'begin-frame plonk.begin-frame imgui.begin-frame
+chain-callback 'end-frame plonk.submit imgui.render imgui.end-frame
 
 fn run ()
-    using callbacks
+    raising noreturn
 
     cfg := config.istate-cfg
-    configure cfg
+    callbacks.configure cfg
 
     filesystem.init;
     window.init;
     gpu.init;
     time.init;
-    imgui.init;
-    load;
+    callbacks.load;
 
     USE_DT_ACCUMULATOR? := cfg.time.use-delta-accumulator?
     FIXED_TIMESTEP     := cfg.time.fixed-timestep
@@ -36,18 +49,18 @@ fn run ()
             dt-accumulator += dt
 
             while (dt-accumulator > FIXED_TIMESTEP)
-                fixed-update FIXED_TIMESTEP
+                callbacks.fixed-update FIXED_TIMESTEP
                 dt-accumulator -= FIXED_TIMESTEP
-            update dt
+            callbacks.update dt
         else
-            update dt
+            callbacks.update dt
+
         try
-            render-pass := (gpu.begin-frame)
-            imgui.begin-frame;
-            render render-pass
-            imgui.render render-pass
-            gpu.present render-pass
-            imgui.end-frame;
+            gpu.begin-frame;
+            callbacks.begin-frame;
+            callbacks.render;
+            callbacks.end-frame;
+            gpu.present;
         except (ex)
             using import .exceptions
             match ex

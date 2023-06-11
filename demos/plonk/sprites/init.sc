@@ -21,8 +21,6 @@ fn ()
     using bottle.enums
 
     try
-        plonk.init;
-
         draw-state =
             DrawState
                 sprite = plonk.SpriteAtlas (bottle.asset.load-image "_Run.png") 10 1
@@ -36,15 +34,13 @@ fn (dt)
     ctx.sprite-frame = (i32 (floor t))
 
 @@ 'on bottle.render
-fn (render-pass)
+fn ()
     ctx := 'force-unwrap draw-state
-    plonk.begin-frame;
 
     using import itertools
     for x y in (dim 20 20)
         plonk.sprite ctx.sprite (vec2 (x * 20) (y * 20)) (vec2 100 100) ('get-quad ctx.sprite ctx.sprite-frame) (vec4 1)
 
-    plonk.submit;
     demo-common.display-fps;
 
 sugar-if main-module?

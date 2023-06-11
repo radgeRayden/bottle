@@ -1,4 +1,5 @@
 import sdl
+import ..gpu
 import ..window
 
 wgpu := import ..gpu.wgpu
@@ -47,9 +48,13 @@ fn process-event (event)
     do (deref io.WantCaptureKeyboard)
     default false #result
 
-fn render (render-pass)
+fn render ()
+    using gpu.types
+
     ig.Render;
-    ig.ImplWGPU_RenderDrawData (ig.GetDrawData) (view render-pass)
+    render-pass := RenderPass (gpu.get-cmd-encoder) (ColorAttachment (gpu.get-swapchain-image) false)
+    ig.ImplWGPU_RenderDrawData (ig.GetDrawData) render-pass
+    'finish render-pass
 
 fn shutdown ()
     ig.ImplSDL2_Shutdown;

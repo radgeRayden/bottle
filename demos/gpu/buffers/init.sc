@@ -108,7 +108,7 @@ fn (key)
         time-offset = (bottle.time.get-time)
 
 @@ 'on bottle.render
-fn (rp)
+fn ()
     using import glm
 
     inline ortho (width height)
@@ -126,6 +126,7 @@ fn (rp)
             vec4 0.0 0.0 0.0 1.0
 
     ctx := 'force-unwrap render-state
+    rp := RenderPass (bottle.gpu.get-cmd-encoder) (ColorAttachment (bottle.gpu.get-swapchain-image) false)
     time := (bottle.time.get-time) - time-offset
     'frame-write ctx.uniform-buffer (Uniforms (ortho (bottle.window.get-size)) (time as f32))
 
@@ -134,6 +135,7 @@ fn (rp)
     'set-bind-group rp 0 ctx.bind-group
 
     'draw-indexed rp INDEX-COUNT QUAD-COUNT
+    'finish rp
     demo-common.display-fps;
     ()
 
