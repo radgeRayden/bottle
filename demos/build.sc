@@ -30,7 +30,7 @@ fn build-demo (name)
             f"demo${name}"
 
     system f""""pushd ${module-dir}
-                gcc -o ${bin-dir}/${exe-name} ${obj-dir}/${obj-name} -L${bin-dir} ${libflags} -Wl,-rpath '-Wl,$ORIGIN'
+                gcc -o ${bin-dir}/${exe-name} ${obj-dir}/${obj-name} -lm -L${bin-dir} ${libflags} -Wl,-rpath '-Wl,$ORIGIN'
                 popd
 
 sugar-if main-module?
