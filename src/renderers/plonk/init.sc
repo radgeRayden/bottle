@@ -16,18 +16,15 @@ import ...math
 import ...window
 import .shaders
 
-struct PlonkPermanentState
+struct PlonkState
     batch : SpriteBatch
     sampler : Sampler
     default-texture-binding : BindGroup
-
-struct PlonkFrameState
     render-pass : (Option RenderPass)
     # properties that can break batching
     last-texture    : u64
 
-global context : (Option PlonkPermanentState)
-global frame-context : (Option PlonkFrameState)
+global context : (Option PlonkState)
 
 fn init ()
     sampler := (Sampler)
@@ -57,7 +54,7 @@ fn init ()
 
     default-sprite := TextureView (Texture default-sprite-imdata)
     context =
-        PlonkPermanentState
+        PlonkState
             default-texture-binding = (BindGroup ('get-bind-group-layout sprite-pipeline 1) (view sampler) (view default-sprite))
             sampler = sampler
             batch =
@@ -80,37 +77,35 @@ fn begin-frame ()
     'frame-write ctx.batch.uniform-buffer (Uniforms mvp)
 
     cmd-encoder := (gpu.get-cmd-encoder)
-    frame-context =
-        PlonkFrameState
-            render-pass = RenderPass cmd-encoder (ColorAttachment (gpu.get-swapchain-image) false)
+    swapchain-image := (gpu.get-swapchain-image)
+    ctx.last-texture = ('get-id swapchain-image)
+    rp := RenderPass cmd-encoder (ColorAttachment swapchain-image false)
+    'set-bind-group rp 1 ctx.default-texture-binding
+
+    ctx.render-pass = rp
 
 fn sprite (atlas position size color)
     ctx := 'force-unwrap context
-    frame-ctx := 'force-unwrap frame-context
 
-    if (frame-ctx.last-texture != ('get-id atlas.texture-view))
-        rp := ('force-unwrap frame-ctx.render-pass)
+    if (ctx.last-texture != ('get-id atlas.texture-view))
+        rp := ('force-unwrap ctx.render-pass)
 
-        if (frame-ctx.last-texture != 0)
+        if (ctx.last-texture != 0)
             'flush ctx.batch rp
 
         if (not atlas.bind-group)
             atlas.bind-group = BindGroup ('get-bind-group-layout ctx.batch.pipeline 1) ctx.sampler atlas.texture-view
         'set-bind-group rp 1 ('force-unwrap atlas.bind-group)
-        frame-ctx.last-texture = ('get-id atlas.texture-view)
+        ctx.last-texture = ('get-id atlas.texture-view)
 
     'add-sprite ctx.batch position size ('get-quad atlas) color
 
-fn submit (render-pass)
+fn submit ()
     ctx := 'force-unwrap context
-    frame-ctx := 'force-unwrap frame-context
 
-    frame-rp := ('force-unwrap ('swap frame-ctx.render-pass none))
-    if (frame-ctx.last-texture == 0)
-        'set-bind-group frame-rp 1 ctx.default-texture-binding
-
-    'finish ctx.batch frame-rp
-    'finish frame-rp
+    rp := ('force-unwrap ('swap ctx.render-pass none))
+    'finish ctx.batch rp
+    'finish rp
 
 do
     let init begin-frame sprite submit

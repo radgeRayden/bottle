@@ -43,7 +43,7 @@ fn (render-pass)
     for x y in (dim 20 20)
         plonk.sprite ctx.sprite (vec2 (x * 20) (y * 20)) (vec2 100 100) (vec4 1)
 
-    plonk.submit render-pass
+    plonk.submit;
     demo-common.display-fps;
 
 sugar-if main-module?

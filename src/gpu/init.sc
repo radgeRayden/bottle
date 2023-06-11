@@ -135,7 +135,8 @@ fn get-cmd-encoder ()
     imply cmd-encoder CommandEncoder
 
 fn get-swapchain-image ()
-    view ('force-unwrap istate.swapchain-image)
+    using types
+    imply (view ('force-unwrap istate.swapchain-image)) TextureView
 
 fn begin-frame ()
     using types
