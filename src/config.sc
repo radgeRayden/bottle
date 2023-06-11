@@ -12,6 +12,15 @@ struct BottleConfig
             height : (Option i32)
             relative-width  = 0.5
             relative-height = 0.5
+
+            # initialization options
+            fullscreen? = false
+            hidden? = false
+            borderless? = false
+            resizable? = true
+            minimized? = false
+            maximized? = false
+            always-on-top? = false
     time :
         struct TimeConfig
             use-delta-accumulator? : bool

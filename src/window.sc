@@ -87,6 +87,16 @@ fn init ()
         try (deref ('unwrap cfg.height))
         else relative-height
 
+    inline window-flags (flags...)
+        va-lfold 0:u32
+            inline (k next result)
+                setting := getattr cfg k
+                if setting
+                    result | next
+                else
+                    result
+            flags...
+
     handle =
         sdl.CreateWindow
             cfg.title
@@ -94,7 +104,15 @@ fn init ()
             sdl.SDL_WINDOWPOS_UNDEFINED
             width
             height
-            sdl.SDL_WINDOW_RESIZABLE
+            window-flags
+                fullscreen? = sdl.SDL_WINDOW_FULLSCREEN_DESKTOP
+                hidden? = sdl.SDL_WINDOW_HIDDEN
+                borderless? = sdl.SDL_WINDOW_BORDERLESS
+                resizable? = sdl.SDL_WINDOW_RESIZABLE
+                minimized? = sdl.SDL_WINDOW_MINIMIZED
+                maximized? = sdl.SDL_WINDOW_MAXIMIZED
+                always-on-top? = sdl.SDL_WINDOW_ALWAYS_ON_TOP
+
 
     assert (handle != null) (.. "Error while creating window:" (String (sdl.GetError)))
     ;
