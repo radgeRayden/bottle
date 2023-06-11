@@ -34,7 +34,7 @@ fn ()
 fn (dt)
     ctx := 'force-unwrap draw-state
 
-    t := (bottle.time.get-time) * 5
+    t := (bottle.time.get-time) * 11
     'set-frame ctx.sprite (i32 (floor t))
 
 @@ 'on bottle.render

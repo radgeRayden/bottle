@@ -15,6 +15,7 @@ struct GfxState
     swapchain   : wgpu.SwapChain
     queue       : wgpu.Queue
     cmd-encoder : (Option wgpu.CommandEncoder)
+    swapchain-image : (Option wgpu.TextureView)
 
     clear-color = (vec4 0.017 0.017 0.017 1.0)
 

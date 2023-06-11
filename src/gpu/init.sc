@@ -134,20 +134,28 @@ fn get-cmd-encoder ()
     cmd-encoder := 'force-unwrap istate.cmd-encoder
     imply cmd-encoder CommandEncoder
 
+fn get-swapchain-image ()
+    view ('force-unwrap istate.swapchain-image)
+
 fn begin-frame ()
     using types
 
     if (window.minimized?)
         raise GPUError.OutdatedSwapchain
 
-    let swapchain-image = (wgpu.SwapChainGetCurrentTextureView istate.swapchain)
+    swapchain-image := (wgpu.SwapChainGetCurrentTextureView istate.swapchain)
     if (swapchain-image == null)
         raise GPUError.OutdatedSwapchain
 
     cmd-encoder := (wgpu.DeviceCreateCommandEncoder istate.device (&local wgpu.CommandEncoderDescriptor))
 
-    color-attachment := ColorAttachment (imply swapchain-image TextureView) istate.clear-color
-    render-pass := RenderPass cmd-encoder color-attachment
+    # clear
+    'finish
+        RenderPass cmd-encoder (ColorAttachment (view swapchain-image) true istate.clear-color)
+
+    swapchain-image := imply swapchain-image TextureView
+    render-pass := RenderPass cmd-encoder (ColorAttachment (view swapchain-image) false istate.clear-color)
+    istate.swapchain-image = swapchain-image
 
     istate.cmd-encoder = cmd-encoder
     render-pass
@@ -159,11 +167,12 @@ fn present (render-pass)
     cmd-encoder := imply ('force-unwrap ('swap istate.cmd-encoder none)) CommandEncoder
     'submit ('finish cmd-encoder)
     wgpu.SwapChainPresent istate.swapchain
+    'swap istate.swapchain-image none
     ;
 
 do
     let init update-render-area set-clear-color begin-frame present
     let types
-    let get-preferred-surface-format get-cmd-encoder
+    let get-preferred-surface-format get-cmd-encoder get-swapchain-image
 
     locals;

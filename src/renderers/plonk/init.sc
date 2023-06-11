@@ -13,6 +13,7 @@ using import .SpriteBatch
 import ...asset
 import ...gpu
 import ...math
+import ...window
 import .shaders
 
 struct PlonkSettings plain
@@ -21,11 +22,8 @@ struct PlonkSettings plain
 struct PlonkPermanentState
     batch : SpriteBatch
     pipeline : RenderPipeline
-    render-target : TextureView
     sampler : Sampler
-    clear-color : vec4 = (vec4 1.0 0.017 1.0 1)
     default-texture-binding : BindGroup
-    target-binding : BindGroup
 
 struct PlonkFrameState
     render-pass : (Option RenderPass)
@@ -40,7 +38,6 @@ fn init (width height filtering)
     vert := ShaderModule shaders.display-vert ShaderLanguage.SPIRV ShaderStage.Vertex
     frag := ShaderModule shaders.display-frag ShaderLanguage.SPIRV ShaderStage.Fragment
     sampler := (Sampler)
-    texture-view := TextureView (Texture (u32 width) (u32 height) TextureFormat.BGRA8UnormSrgb (render-target? = true))
     pipeline :=
         RenderPipeline
             layout = (nullof PipelineLayout)
@@ -88,9 +85,7 @@ fn init (width height filtering)
     context =
         PlonkPermanentState
             pipeline = pipeline
-            target-binding = (BindGroup ('get-bind-group-layout pipeline 0) (view sampler) (view texture-view))
             default-texture-binding = (BindGroup ('get-bind-group-layout sprite-pipeline 1) (view sampler) (view default-sprite))
-            render-target = texture-view
             sampler = sampler
             batch =
                 SpriteBatch
@@ -104,9 +99,8 @@ fn init (width height filtering)
 
 fn begin-frame ()
     ctx := 'force-unwrap context
-    color-attachment := ColorAttachment ctx.render-target ctx.clear-color
 
-    w h := unpack settings.internal-resolution
+    w h := (window.get-size)
     mvp :=
         *
             math.orthographic-projection w h
@@ -116,7 +110,7 @@ fn begin-frame ()
     cmd-encoder := (gpu.get-cmd-encoder)
     frame-context =
         PlonkFrameState
-            render-pass = RenderPass cmd-encoder color-attachment
+            render-pass = RenderPass cmd-encoder (ColorAttachment (gpu.get-swapchain-image) false)
 
 fn sprite (atlas position size color)
     ctx := 'force-unwrap context
@@ -145,10 +139,6 @@ fn submit (render-pass)
 
     'finish ctx.batch frame-rp
     'finish frame-rp
-
-    'set-pipeline render-pass ctx.pipeline
-    'set-bind-group render-pass 0 ctx.target-binding
-    'draw render-pass 6
 
 do
     let init begin-frame sprite submit
