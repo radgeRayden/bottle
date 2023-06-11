@@ -1,4 +1,5 @@
 let asset = (import .src.asset)
+let callbacks = (import .src.callbacks)
 let enums = (import .src.enums)
 let exceptions = (import .src.exceptions)
 let filesystem = (import .src.filesystem)
@@ -10,7 +11,6 @@ let logger = (import .src.logger)
 let main = (import .src.main)
 let mouse = (import .src.mouse)
 let renderers = (import .src.renderers)
-let syscallbacks = (import .src.sysevents.callbacks)
 let sysevents = (import .src.sysevents)
 let time = (import .src.time)
 let types = (import .src.types)
@@ -19,7 +19,7 @@ let window = (import .src.window)
 vvv bind bottle
 ..
     main
-    syscallbacks
+    callbacks
     do
         let
             asset

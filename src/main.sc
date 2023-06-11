@@ -7,14 +7,11 @@ import .imgui
 import .sysevents
 import .time
 import .window
-
-fnchain load
-fnchain update
-fnchain fixed-update
-fnchain render
-fnchain configure
+import .callbacks
 
 fn run ()
+    using callbacks
+
     cfg := config.istate-cfg
     configure cfg
 
@@ -95,5 +92,6 @@ sugar-if main-module?
     0
 else
     do
-        let run load update fixed-update render configure
+        let run
+        using callbacks
         locals;
