@@ -4,6 +4,7 @@ plonk := bottle.plonk
 using import Array
 using import enum
 using import glm
+using import itertools
 using import Option
 using import struct
 import ..demo-common
@@ -74,16 +75,16 @@ fn spawn-snake ()
         game-state.playing-field @ (xy->idx (unpack segment)) = ObjectType.Snake
 
 fn spawn-fruit ()
-    loop (tries = 0)
-        try-position := ivec2 (rng 1 (TILES-W - 2)) (rng 1 (TILES-H - 2))
-        if (game-state.playing-field @ (xy->idx (unpack try-position)) == ObjectType.Empty)
-            game-state.fruit-position = try-position
-            game-state.playing-field @ (xy->idx (unpack game-state.fruit-position)) = ObjectType.Fruit
-            break true
+    local available-spots : (Array ivec2)
+    for x y in (dim TILES-W TILES-H)
+        thing := game-state.playing-field @ (xy->idx x y)
+        if (thing == ObjectType.Empty)
+            'append available-spots (ivec2 x y)
 
-        if (tries > 100)
-            break false # just so we don't hard lock the game, we can try again next frame.
-        tries + 1
+    if ((countof available-spots) > 0)
+        position := available-spots @ (rng (countof available-spots))
+        game-state.fruit-position = position
+        game-state.playing-field @ (xy->idx (unpack game-state.fruit-position)) = ObjectType.Fruit
 
 fn update-snake (dir)
     segments := game-state.snake-segments
@@ -169,7 +170,6 @@ fn ()
     inline draw-tile (x y tile)
         plonk.sprite ctx.atlas (vec2 (x * TILE-SIZE) (y * TILE-SIZE)) (vec2 TILE-SIZE) ('get-quad ctx.atlas tile)
 
-    using import itertools
     for x y in (dim TILES-W TILES-H)
         obj := (field @ (xy->idx x y))
         switch obj
