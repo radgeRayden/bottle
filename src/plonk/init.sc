@@ -84,7 +84,7 @@ fn begin-frame ()
 
     ctx.render-pass = rp
 
-fn sprite (atlas position size quad color)
+fn... sprite (atlas, position, size, quad, color = (vec4 1))
     ctx := 'force-unwrap context
 
     if (ctx.last-texture != ('get-id atlas.texture-view))
