@@ -12,6 +12,7 @@ let main = (import .src.main)
 let math = (import .src.math)
 let mouse = (import .src.mouse)
 let plonk = (import .src.plonk)
+let random = (import radl.random)
 let sysevents = (import .src.sysevents)
 let time = (import .src.time)
 let types = (import .src.types)
@@ -35,6 +36,7 @@ vvv bind bottle
             math
             mouse
             plonk
+            random
             time
             types
             window
