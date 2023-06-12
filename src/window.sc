@@ -1,5 +1,4 @@
-from (import .config) let istate-cfg
-cfg := `istate-cfg.window
+cfg := `(. (import .config) istate-cfg window)
 run-stage;
 
 using import String
@@ -112,7 +111,6 @@ fn init ()
                 minimized? = sdl.SDL_WINDOW_MINIMIZED
                 maximized? = sdl.SDL_WINDOW_MAXIMIZED
                 always-on-top? = sdl.SDL_WINDOW_ALWAYS_ON_TOP
-
 
     assert (handle != null) (.. "Error while creating window:" (String (sdl.GetError)))
     ;
