@@ -86,6 +86,21 @@ fn spawn-fruit ()
         game-state.fruit-position = position
         game-state.playing-field @ (xy->idx (unpack game-state.fruit-position)) = ObjectType.Fruit
 
+fn setup-game ()
+    game-state = (GameState)
+    field := game-state.playing-field
+    'resize field (TILES-W * TILES-H)
+
+    for i in (range TILES-W)
+        field @ (xy->idx i 0) = ObjectType.Wall
+        field @ (xy->idx i (TILES-H - 1)) = ObjectType.Wall
+    for i in (range TILES-H)
+        field @ (xy->idx 0 i) = ObjectType.Wall
+        field @ (xy->idx (TILES-W - 1) i) = ObjectType.Wall
+
+    spawn-snake;
+    spawn-fruit;
+
 fn update-snake (dir)
     segments := game-state.snake-segments
 
@@ -117,6 +132,7 @@ fn update-snake (dir)
         spawn-fruit;
     elseif (thing-at == ObjectType.Snake or thing-at == ObjectType.Wall)
         print "game-over"
+        setup-game;
 
 @@ 'on bottle.load
 fn ()
@@ -126,31 +142,25 @@ fn ()
                 atlas = plonk.SpriteAtlas (bottle.asset.load-image "snake.png") 6 1
     else ()
 
-    field := game-state.playing-field
-    'resize field (TILES-W * TILES-H)
-
-    for i in (range TILES-W)
-        field @ (xy->idx i 0) = ObjectType.Wall
-        field @ (xy->idx i (TILES-H - 1)) = ObjectType.Wall
-    for i in (range TILES-H)
-        field @ (xy->idx 0 i) = ObjectType.Wall
-        field @ (xy->idx (TILES-W - 1) i) = ObjectType.Wall
-
-    spawn-snake;
-    spawn-fruit;
+    setup-game;
 
 @@ 'on bottle.key-pressed
 fn (key)
+    current-dir := game-state.snake-direction
     using bottle.enums
     switch key
     case KeyboardKey.Up
-        game-state.snake-direction = Direction.Up
+        if (current-dir != Direction.Down)
+            game-state.snake-direction = Direction.Up
     case KeyboardKey.Right
-        game-state.snake-direction = Direction.Right
+        if (current-dir != Direction.Left)
+            game-state.snake-direction = Direction.Right
     case KeyboardKey.Down
-        game-state.snake-direction = Direction.Down
+        if (current-dir != Direction.Up)
+            game-state.snake-direction = Direction.Down
     case KeyboardKey.Left
-        game-state.snake-direction = Direction.Left
+        if (current-dir != Direction.Right)
+            game-state.snake-direction = Direction.Left
     default ()
 
 @@ 'on bottle.update
