@@ -21,7 +21,7 @@ inline chain-callback (cb f...)
 
 chain-callback 'load plonk.init imgui.init
 chain-callback 'begin-frame plonk.begin-frame imgui.begin-frame
-chain-callback 'end-frame plonk.submit imgui.render imgui.end-frame
+chain-callback 'end-frame imgui.end-frame imgui.render plonk.submit
 
 fn run ()
     raising noreturn
