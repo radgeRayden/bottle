@@ -7,7 +7,7 @@ archive :=
     download
         "https://github.com/icculus/physfs/archive/{VERSION}.zip"
 
-fn preinstall-dir (generator)
+fn preinstall-dir (generator make)
     then
         build-path :=
             commonpath
@@ -17,8 +17,8 @@ fn preinstall-dir (generator)
                 mkdir "{build-path}/build"
         install-dir := (tempdir)
         cmd "cmake .. -G \"{generator}\" -DCMAKE_INSTALL_PREFIX={install-dir}"
-        cmd "make -j {cpu-core-count}"
-        cmd "make install"
+        cmd "{make} -j {cpu-core-count}"
+        cmd "{make} install"
         install-dir
 
 fn patchelf (soname libpath)
@@ -35,7 +35,7 @@ package physfs
     platform linux unknown
     depends patchelf
 
-    preinstall-dir := (preinstall-dir "Unix Makefiles")
+    preinstall-dir := (preinstall-dir "Unix Makefiles" "make")
     libpath := (patchelf "libphysfs.so" "{preinstall-dir}/lib/libphysfs.so")
     alias "lib/libphysfs.so" libpath
     alias "include/physfs.h" "{preinstall-dir}/include/physfs.h"
@@ -46,7 +46,7 @@ package physfs
     version VERSION
     platform windows-mingw
 
-    preinstall-dir := (preinstall-dir "MinGW Makefiles")
+    preinstall-dir := (preinstall-dir "MinGW Makefiles" "mingw32-make")
     alias "lib/physfs.dll" "{preinstall-dir}/bin/libphysfs.dll"
     alias "include/physfs.h" "{preinstall-dir}/include/physfs.h"
     alias "/lib/scopes/packages/physfs.sc" bindings
