@@ -76,33 +76,7 @@ fn run ()
     filesystem.shutdown;
     ()
 
-sugar-if main-module?
-    using import String
-
-    cfg := config.istate-cfg
-    name argc argv := (script-launch-args)
-    let demo =
-        if (argc > 0)
-            String (argv @ 0)
-        else
-            S"gpu.hello-triangle"
-
-    import-string := .. "..demos." demo
-    path := dots-to-slashes (import-string as string)
-    cfg.filesystem.root = module-dir .. "/" .. (rslice (String path) 1)
-
-    let module =
-        try
-            require-from module-dir import-string __env
-        except(ex)
-            'dump ex
-            error (.. "failed to load demo: " (demo as string))
-
-    f := (compile (typify (module as Closure) i32 (@ rawstring))) as (@ (function i32 i32 (@ rawstring)))
-    f argc argv
-    0
-else
-    do
-        let run
-        using callbacks
-        locals;
+do
+    let run
+    using callbacks
+    locals;
