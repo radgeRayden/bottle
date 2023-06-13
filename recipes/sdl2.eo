@@ -8,7 +8,7 @@ archive :=
     download
         "https://github.com/libsdl-org/SDL/archive/{VERSION}.tar.gz"
 
-preinstall-dir :=
+fn preinstall-dir (make)
     then
         build-path :=
             commonpath
@@ -21,8 +21,8 @@ preinstall-dir :=
                     CXXFLAGS = "-fPIC"
         install-tmp-dir := (tempdir)
         build-command "sh ../configure --prefix {install-tmp-dir}"
-        build-command "make -j {cpu-core-count}"
-        build-command "make install"
+        build-command "{make} -j {cpu-core-count}"
+        build-command "{make} install"
         install-tmp-dir
 
 fn patchelf (soname libpath)
@@ -40,6 +40,7 @@ package sdl2
     depends patchelf
 
     libpath := (patchelf "libSDL2.so" "{preinstall-dir}/lib/libSDL2.so")
+    preinstall-dir := (preinstall-dir "make")
     alias "/lib/libSDL2.so" libpath
     alias "/lib/scopes/packages/sdl.sc" bindings
     in "/include" "{preinstall-dir}/include/SDL2"
@@ -48,6 +49,8 @@ package sdl2
     summary SUMMARY
     version VERSION
     platform windows-mingw
+
+    preinstall-dir := (preinstall-dir "mingw32-make")
     alias "/lib/SDL2.dll" "{preinstall-dir}/bin/SDL2.dll"
     alias "/lib/scopes/packages/sdl.sc" bindings
     in "/include" "{preinstall-dir}/include/SDL2"
