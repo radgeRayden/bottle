@@ -1,8 +1,15 @@
+cfg := `(. (import ..config) istate-cfg filesystem)
+run-stage;
+
 using import String
 using import Array
 import physfs
 
 using import ..exceptions
+
+fn get-error ()
+    err := (physfs.getLastErrorCode)
+    .. "Filesystem error: " (String (physfs.getErrorByCode err))
 
 fn... check-error (result, failure-code = 0)
     let code =
@@ -11,14 +18,13 @@ fn... check-error (result, failure-code = 0)
         else result
 
     if (code == (failure-code as (typeof code)))
-        err := (physfs.getLastErrorCode)
-        print "Filesystem error:" (String (physfs.getErrorByCode err))
+        print (get-error)
         raise FilesystemError.GenericError
     result
 
 fn init ()
-    assert (physfs.init null)
-    assert (physfs.mount "." "/" true)
+    assert (physfs.init null) (get-error)
+    assert (physfs.mount cfg.root "/" true) (get-error)
 
 fn mount (dir mount-point)
     check-error

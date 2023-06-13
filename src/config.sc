@@ -25,6 +25,9 @@ struct BottleConfig
         struct TimeConfig
             use-delta-accumulator? : bool
             fixed-timestep : f64 = (1 / 60)
+    filesystem :
+        struct FilesystemConfig
+            root = S"."
     gpu :
         struct GPUConfig
             power-preference = PowerPreference.HighPerformance

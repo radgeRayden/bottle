@@ -79,6 +79,7 @@ fn run ()
 sugar-if main-module?
     using import String
 
+    cfg := config.istate-cfg
     name argc argv := (script-launch-args)
     let demo =
         if (argc > 0)
@@ -86,16 +87,13 @@ sugar-if main-module?
         else
             S"gpu.hello-triangle"
 
+    import-string := .. "..demos." demo
+    path := dots-to-slashes (import-string as string)
+    cfg.filesystem.root = module-dir .. "/" .. (rslice (String path) 1)
+
     let module =
         try
-            C := (include "unistd.h") . extern
-
-            import-string := .. "..demos." demo
-            module := require-from module-dir import-string __env
-            # set cwd so filesystem.mount points to the correct place
-            path := dots-to-slashes (import-string as string)
-            assert ((C.chdir (module-dir .. path)) == 0)
-            module
+            require-from module-dir import-string __env
         except(ex)
             'dump ex
             error (.. "failed to load demo: " (demo as string))
