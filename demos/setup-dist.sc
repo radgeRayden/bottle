@@ -31,15 +31,24 @@ libpaths... :=
             find-library libname patched-search-path
         libs...
 
-bin-dir := f"${module-dir}/dist/bin"
-obj-dir := f"${module-dir}/dist/obj"
+local module-dir : String = module-dir
+for c in module-dir
+    if (c == char"\\")
+        c = char"/"
 
-system f"mkdir -p ${bin-dir}"
-system f"mkdir -p ${obj-dir}"
+bin-dir := f"./dist/bin"
+obj-dir := f"./dist/obj"
+
+fn cmd (command)
+    system (report command)
+
+cmd f"mkdir \"${module-dir}/dist\""
+cmd f"mkdir \"${bin-dir}\""
+cmd f"mkdir \"${obj-dir}\""
 
 va-map
     inline copy-lib (path)
-        system f"cp ${path} ${bin-dir}/"
+        cmd f"cp \"${path}\" \"${bin-dir}\"/"
     libpaths...
 
 libpaths... :=
@@ -49,8 +58,8 @@ libpaths... :=
         libs...
 
 libflags :=
-    static-fold (libs = S"") for lib in (va-each libpaths...)
-        f"${libs} -l:$(basename ${lib}) "
+    static-fold (libs = S"") for lib in (va-each libs...)
+        f"${libs} -l:${lib} "
 
 fn setup-dist ()
 sugar-if main-module?
@@ -58,5 +67,5 @@ sugar-if main-module?
 else
     do
         let libpaths...
-        let bin-dir obj-dir libflags
+        let bin-dir obj-dir libflags cmd module-dir
         local-scope;

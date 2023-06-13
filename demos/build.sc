@@ -4,6 +4,7 @@ using import radl.strfmt
 
 bottle := __env.bottle
 using import .setup-dist
+local module-dir : string = module-dir as string
 
 run-stage;
 
@@ -11,6 +12,13 @@ fn build-demo (name)
     module :=
         require-from module-dir name
             'bind __env 'bottle bottle
+
+    local name : String = name as String
+    for c in name
+        if (c == char".")
+            c = char"_"
+
+    name as:= string
 
     main := (typify (module as Closure) i32 (@ rawstring))
     obj-name := .. "obj" name ".o"
@@ -29,9 +37,7 @@ fn build-demo (name)
         default
             f"demo${name}"
 
-    system f""""pushd ${module-dir}
-                gcc -o ${bin-dir}/${exe-name} ${obj-dir}/${obj-name} -lm -L${bin-dir} ${libflags} -Wl,-rpath '-Wl,$ORIGIN'
-                popd
+    cmd f""""gcc -o ${bin-dir}/${exe-name} ${obj-dir}/${obj-name} -lm -L${bin-dir} ${libflags} -Wl,-rpath '-Wl,$ORIGIN'
 
 sugar-if main-module?
     name argc argv := (script-launch-args)
