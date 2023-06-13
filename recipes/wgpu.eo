@@ -7,7 +7,7 @@ update-url "https://raw.githubusercontent.com/ScopesCommunity/eo-packages/main/r
 LIBNAME := "wgpu_native"
 
 # Build from source
-git-release-dir :=
+fn git-release-dir (make)
     then
         build-path := (tempdir)
         cmd :=
@@ -15,8 +15,7 @@ git-release-dir :=
 
         cmd "git clone https://github.com/gfx-rs/wgpu-native/ --recurse-submodules ."
         cmd "git checkout {VERSION}"
-        cmd "make package -j {cpu-core-count}"
-        cmd "chmod -R a+w .git"
+        cmd "{make} package -j {cpu-core-count}"
         commonpath (extract "{build-path}/dist/wgpu--release.zip")
 
 # Pre-built binaries
@@ -34,9 +33,10 @@ package wgpu-native
     version VERSION
     summary SUMMARY
 
-    alias "/include/webgpu.h" "{git-release-dir}/webgpu.h"
-    alias "/include/wgpu.h" "{git-release-dir}/wgpu.h"
-    alias "/lib/lib{LIBNAME}.so" "{git-release-dir}/lib{LIBNAME}.so"
+    preinstall-dir := (git-release-dir "make")
+    alias "/include/webgpu.h" "{preinstall-dir}/webgpu.h"
+    alias "/include/wgpu.h" "{preinstall-dir}/wgpu.h"
+    alias "/lib/lib{LIBNAME}.so" "{preinstall-dir}/lib{LIBNAME}.so"
     alias "/lib/scopes/packages/wgpu.sc" bindings
 
 package wgpu-native
@@ -44,9 +44,10 @@ package wgpu-native
     version VERSION
     summary SUMMARY
 
-    alias "/include/webgpu.h" "{git-release-dir}/webgpu.h"
-    alias "/include/wgpu.h" "{git-release-dir}/wgpu.h"
-    alias "/lib/{LIBNAME}.dll" "{git-release-dir}/{LIBNAME}.dll"
+    preinstall-dir := (git-release-dir "mingw32-make")
+    alias "/include/webgpu.h" "{preinstall-dir}/webgpu.h"
+    alias "/include/wgpu.h" "{preinstall-dir}/wgpu.h"
+    alias "/lib/{LIBNAME}.dll" "{preinstall-dir}/{LIBNAME}.dll"
     alias "/lib/scopes/packages/wgpu.sc" bindings
 
 package wgpu-native-release
