@@ -25,10 +25,15 @@ Currently Linux and Windows (MSYS2 MinGW) are supported. You may need to install
 - rustc
 - python3
 
+On MinGW you can run the following command:
+``` sh
+pacman -S git mingw-w64-x86_64-python mingw-w64-x86_64-gcc zip unzip mingw-w64-x86_64-7zip mingw-w64-x86_64-make mingw-w64-x86_64-rust mingw-w64-x86_64-clang
+```
+The exact package names for linux will depend on your distribution.
+
 If it seems like you have all dependencies and it still fails to install, please open an issue.
 
 After bootstrapping, you can then start a new project:
-
 ``` sh
 mkdir my_project
 cd my_project
