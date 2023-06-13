@@ -15,13 +15,13 @@ inline chain-callback (cb f...)
     'clear cb
     va-map
         inline (f)
-            'prepend cb f
+            'append cb f
             ()
         f...
 
-chain-callback 'load plonk.init imgui.init
-chain-callback 'begin-frame plonk.begin-frame imgui.begin-frame
-chain-callback 'end-frame imgui.end-frame imgui.render plonk.submit
+chain-callback 'load imgui.init plonk.init
+chain-callback 'begin-frame imgui.begin-frame plonk.begin-frame
+chain-callback 'end-frame plonk.submit imgui.end-frame imgui.render
 
 fn run ()
     raising noreturn
