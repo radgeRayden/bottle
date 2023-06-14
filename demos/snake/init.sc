@@ -12,6 +12,7 @@ import ..demo-common
 TILE-SIZE := 64
 SCREEN-WIDTH SCREEN-HEIGHT := 800, 600
 TILES-W TILES-H := SCREEN-WIDTH // TILE-SIZE, SCREEN-HEIGHT // TILE-SIZE
+DEBUG-MODE? := false
 
 enum SpriteIndices plain
     SnakeHead
@@ -36,16 +37,22 @@ enum Direction plain
     Down
     Left
 
+struct SnakeSegment plain
+    position : ivec2
+    direction : Direction
+    corner? : bool
+
 struct DrawState
     atlas : plonk.SpriteAtlas
 
 struct GameState
     score : i32
     movement-timer : f64
-    snake-speed : i32 = 2
+    snake-speed : i32 = 5
     snake-length : i32 = 3
-    snake-segments : (Array ivec2)
-    snake-direction : Direction = Direction.Left
+    snake-segments : (Array SnakeSegment)
+    snake-direction = Direction.Left
+    next-snake-direction = Direction.Left
     fruit-position : ivec2
     playing-field : (Array ObjectType)
 
@@ -70,9 +77,9 @@ fn (cfg)
 
 fn spawn-snake ()
     for x in (range game-state.snake-length)
-        segment := ivec2 ((TILES-W // 2) + x) (TILES-H // 2)
+        segment := SnakeSegment (ivec2 ((TILES-W // 2) + x) (TILES-H // 2)) Direction.Left false
         'append game-state.snake-segments segment
-        game-state.playing-field @ (xy->idx (unpack segment)) = ObjectType.Snake
+        game-state.playing-field @ (xy->idx (unpack segment.position)) = ObjectType.Snake
 
 fn spawn-fruit ()
     local available-spots : (Array ivec2)
@@ -101,36 +108,45 @@ fn setup-game ()
     spawn-snake;
     spawn-fruit;
 
-fn update-snake (dir)
+fn update-snake ()
     segments := game-state.snake-segments
+    dir next-dir := game-state.snake-direction, game-state.next-snake-direction
 
     tail := deref ('last segments)
-    game-state.playing-field @ (xy->idx (unpack tail)) = ObjectType.Empty
+    game-state.playing-field @ (xy->idx (unpack tail.position)) = ObjectType.Empty
     for i segment in (zip (rrange (countof segments)) ('reverse segments))
         if (i == 0)
-            switch dir
+            switch next-dir
             case Direction.Up
-                segment += ivec2 0 1
+                segment.position += ivec2 0 1
             case Direction.Right
-                segment += ivec2 1 0
+                segment.position += ivec2 1 0
             case Direction.Down
-                segment += ivec2 0 -1
+                segment.position += ivec2 0 -1
             case Direction.Left
-                segment += ivec2 -1 0
+                segment.position += ivec2 -1 0
             default ()
-        else
-            segment = (segments @ (i - 1))
 
-    thing-at := deref (game-state.playing-field @ (xy->idx (unpack (segments @ 0))))
+            segment.direction = next-dir
+        else
+            prev-segment := segments @ (i - 1)
+            segment = prev-segment
+
+    if (dir != next-dir)
+        (segments @ 1) . corner? = true
+        (segments @ 1) . direction = next-dir
+    dir = next-dir
+
+    thing-at := deref (game-state.playing-field @ (xy->idx (unpack ((segments @ 0) . position))))
     for segment in segments
-        game-state.playing-field @ (xy->idx (unpack segment)) = ObjectType.Snake
+        game-state.playing-field @ (xy->idx (unpack segment.position)) = ObjectType.Snake
 
     if (thing-at == ObjectType.Fruit)
         game-state.score += 1
         'append segments tail
-        game-state.playing-field @ (xy->idx (unpack tail)) = ObjectType.Snake
         spawn-fruit;
     elseif (thing-at == ObjectType.Snake or thing-at == ObjectType.Wall)
+        game-state.playing-field @ (xy->idx (unpack tail.position)) = ObjectType.Snake
         print "game-over"
         setup-game;
 
@@ -144,6 +160,7 @@ fn ()
 
     setup-game;
 
+global debug-flip? : bool
 @@ 'on bottle.key-pressed
 fn (key)
     current-dir := game-state.snake-direction
@@ -151,16 +168,23 @@ fn (key)
     switch key
     case KeyboardKey.Up
         if (current-dir != Direction.Down)
-            game-state.snake-direction = Direction.Up
+            game-state.next-snake-direction = Direction.Up
     case KeyboardKey.Right
         if (current-dir != Direction.Left)
-            game-state.snake-direction = Direction.Right
+            game-state.next-snake-direction = Direction.Right
     case KeyboardKey.Down
         if (current-dir != Direction.Up)
-            game-state.snake-direction = Direction.Down
+            game-state.next-snake-direction = Direction.Down
     case KeyboardKey.Left
         if (current-dir != Direction.Right)
-            game-state.snake-direction = Direction.Left
+            game-state.next-snake-direction = Direction.Left
+    case KeyboardKey.Space
+        if DEBUG-MODE?
+            update-snake;
+    case KeyboardKey.x
+        if DEBUG-MODE?
+            debug-flip? = not debug-flip?
+            print "debug-flip" debug-flip?
     default ()
 
 @@ 'on bottle.update
@@ -170,33 +194,69 @@ fn (dt)
 
     if (game-state.movement-timer >= turn-duration)
         game-state.movement-timer -= turn-duration
-        update-snake game-state.snake-direction
+        if (not DEBUG-MODE?)
+            update-snake;
 
 @@ 'on bottle.render
 fn ()
     ctx := 'force-unwrap draw-context
     field := game-state.playing-field
 
-    inline draw-tile (x y tile)
-        plonk.sprite ctx.atlas (vec2 (x * TILE-SIZE) (y * TILE-SIZE)) (vec2 TILE-SIZE) ('get-quad ctx.atlas tile)
+    inline draw-tile (position tile rotation flip...)
+        fliph? flipv? := (va-option fliph? flip... false), (va-option flipv? flip... false)
+        x y := unpack position
+        plonk.sprite ctx.atlas (vec2 (x * TILE-SIZE) (y * TILE-SIZE)) (vec2 TILE-SIZE) (rotation as f32) ('get-quad ctx.atlas tile)
+            fliph? = fliph?
+            flipv? = flipv?
 
     for x y in (dim TILES-W TILES-H)
         obj := (field @ (xy->idx x y))
+        position := ivec2 x y
+
         switch obj
         case ObjectType.Wall
-            draw-tile x y SpriteIndices.Wall
+            draw-tile position SpriteIndices.Wall 0
         case ObjectType.Fruit
-            draw-tile x y SpriteIndices.Fruit
+            draw-tile position SpriteIndices.Fruit 0
         default ()
 
     segments := game-state.snake-segments
     for i segment in (enumerate segments)
+        let rotation =
+            switch segment.direction
+            case Direction.Left
+                0:f32
+            case Direction.Down
+                pi:f32 / 2
+            case Direction.Right
+                pi:f32
+            case Direction.Up
+                -pi:f32 / 2
+            default (unreachable)
+
         if (i == 0)
-            draw-tile segment.x segment.y SpriteIndices.SnakeHead
+            draw-tile segment.position SpriteIndices.SnakeHead rotation
         elseif (i == ((countof segments) - 1))
-            draw-tile segment.x segment.y SpriteIndices.SnakeTail
+            draw-tile segment.position SpriteIndices.SnakeTail rotation
         else
-            draw-tile segment.x segment.y SpriteIndices.SnakeBody
+            tile := segment.corner? SpriteIndices.SnakeCorner SpriteIndices.SnakeBody
+            let fliph? flipv? =
+                if ((not debug-flip?) and segment.corner?)
+                    next-segment := segments @ (i + 1)
+                    dir next-dir := segment.direction, next-segment.direction
+                    if (dir == Direction.Up and next-dir == Direction.Left)
+                        _ false true
+                    elseif (dir == Direction.Right and next-dir == Direction.Up)
+                        _ false true
+                    elseif (dir == Direction.Down and next-dir == Direction.Right)
+                        _ false true
+                    elseif (dir == Direction.Left and next-dir == Direction.Down)
+                        _ false true
+                    else
+                        _ false false
+                else (_ false false)
+
+            draw-tile segment.position tile rotation (fliph? = fliph?) (flipv? = flipv?)
 
     demo-common.display-fps;
 
