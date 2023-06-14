@@ -22,7 +22,7 @@ struct SpriteAtlas
             columns = columns
             rows = rows
 
-    fn... get-quad (self, frame, fliph? = false, flipv? = false)
+    fn... get-quad (self, frame)
         rows columns := self.rows, self.columns
         frame-count := rows * columns
         idx := frame % frame-count
@@ -33,13 +33,6 @@ struct SpriteAtlas
         x y := frame % columns, frame // columns
         w h := 1 / columns, 1 / rows
         x y := (f32 x) * w, (f32 y) * h
-
-        let x w =
-            if fliph? (_ (x + w) -w)
-            else (_ x w)
-        let y h =
-            if flipv? (_ (y + h) -h)
-            else (_ y h)
 
         Quad
             start = vec2 x y

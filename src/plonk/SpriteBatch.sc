@@ -3,6 +3,7 @@ using import glm
 using import Option
 using import struct
 
+import ..math
 using import ..gpu.types
 using import .common
 
@@ -62,48 +63,66 @@ struct SpriteBatch
         'clear self.vertex-data
         'clear self.index-data
 
-    fn... add-sprite (self : this-type, position, size, quad = (Quad (vec2 0 0) (vec2 1 1)), color = (vec4 1))
+    fn... add-sprite (self : this-type, position, size, rotation : f32, quad = (Quad (vec2 0 0) (vec2 1 1)),
+                      fliph? = false, flipv? = false, color = (vec4 1))
+
         self.outdated-vertices? = true
         self.outdated-indices? = true
 
         local norm-vertices =
-            # 0 - 3
+            # 0 - 1
             # | \ |
-            # 1 - 2
+            # 2 - 3
             arrayof vec2
                 vec2 0 1 # top left
+                vec2 1 1 # top right
                 vec2 0 0 # bottom left
                 vec2 1 0 # bottom right
-                vec2 1 1 # top right
 
         local texcoords =
             arrayof vec2
                 vec2 0 0 # top left
+                vec2 1 0 # top right
                 vec2 0 1 # bottom left
                 vec2 1 1 # bottom right
-                vec2 1 0 # top right
 
-        inline make-vertex (i)
+        inline make-vertex (vertex-index uv-index)
+            vertex :=
+                +
+                    math.rotate2D
+                        (norm-vertices @ vertex-index) - (vec2 0.5)
+                        rotation
+                    vec2 0.5
+
             VertexAttributes
-                position = (position + ((norm-vertices @ i) * size))
-                texcoords = (quad.start + ((texcoords @ i) * quad.extent))
+                position = (position + (vertex * size))
+                texcoords = (quad.start + ((texcoords @ uv-index) * quad.extent))
                 color = color
 
         let idx-offset = ((countof self.vertex-data) as u16)
+
+        inline get-idx (input)
+            input as:= u8
+            # fliph makes index switch from odd to even (toggle bit 0)
+            # flipv swaps 0,1 <-> 2,3 (toggle bit 1)
+            output := bxor input (u8 fliph?)
+            output := bxor output ((u8 flipv?) << 1)
+            _ input output
+
         'append self.vertex-data
-            make-vertex 0
+            make-vertex (get-idx 0)
         'append self.vertex-data
-            make-vertex 1
+            make-vertex (get-idx 1)
         'append self.vertex-data
-            make-vertex 2
+            make-vertex (get-idx 2)
         'append self.vertex-data
-            make-vertex 3
+            make-vertex (get-idx 3)
 
         'append self.index-data (0:u16 + idx-offset)
-        'append self.index-data (1:u16 + idx-offset)
-        'append self.index-data (2:u16 + idx-offset)
         'append self.index-data (2:u16 + idx-offset)
         'append self.index-data (3:u16 + idx-offset)
+        'append self.index-data (3:u16 + idx-offset)
+        'append self.index-data (1:u16 + idx-offset)
         'append self.index-data (0:u16 + idx-offset)
         ;
 

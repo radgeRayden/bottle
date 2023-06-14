@@ -29,4 +29,11 @@ do
             vec4 0     0   v.z  0
             vec4 0     0    0   1
 
+
+    inline... rotate2D (v : vec2, angle : f32)
+        let rcos rsin = (cos angle) (sin angle)
+        vec2
+            (rcos * v.x) - (rsin * v.y)
+            (rsin * v.x) + (rcos * v.y)
+
     local-scope;
