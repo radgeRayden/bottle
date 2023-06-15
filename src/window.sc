@@ -79,9 +79,11 @@ fn init ()
         sdl.SetHint sdl.SDL_HINT_WINDOWS_DPI_AWARENESS "permonitorv2"
         sdl.SetHint sdl.SDL_HINT_WINDOWS_DPI_SCALING "0"
 
-    # FIXME: maybe SDL initialization shouldn't be in the window module as we might want to make it optional in the future.
-    sdl.Init
-        sdl.SDL_INIT_EVERYTHING
+    status :=
+        sdl.Init
+            sdl.SDL_INIT_EVERYTHING
+    if (status < 0)
+        print "SDL initialization failed:" (String (sdl.GetError))
 
     relative-width relative-height := (get-relative-size 0 cfg.relative-width cfg.relative-height)
     let width =
