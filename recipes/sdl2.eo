@@ -39,8 +39,8 @@ package sdl2
     platform linux unknown
     depends patchelf
 
-    libpath := (patchelf "libSDL2.so" "{preinstall-dir}/lib/libSDL2.so")
     preinstall-dir := (preinstall-dir "make")
+    libpath := (patchelf "libSDL2.so" "{preinstall-dir}/lib/libSDL2.so")
     alias "/lib/libSDL2.so" libpath
     alias "/lib/scopes/packages/sdl.sc" bindings
     in "/include" "{preinstall-dir}/include/SDL2"
