@@ -138,14 +138,19 @@ fn update-snake ()
     dir = next-dir
 
     thing-at := deref (game-state.playing-field @ (xy->idx (unpack ((segments @ 0) . position))))
+
+    ate-fruit? := thing-at == ObjectType.Fruit
+    if ate-fruit?
+        game-state.score += 1
+        'append segments tail
+
     for segment in segments
         game-state.playing-field @ (xy->idx (unpack segment.position)) = ObjectType.Snake
 
-    if (thing-at == ObjectType.Fruit)
-        game-state.score += 1
-        'append segments tail
+    if ate-fruit?
         spawn-fruit;
-    elseif (thing-at == ObjectType.Snake or thing-at == ObjectType.Wall)
+
+    if (thing-at == ObjectType.Snake or thing-at == ObjectType.Wall)
         game-state.playing-field @ (xy->idx (unpack tail.position)) = ObjectType.Snake
         print "game-over"
         setup-game;
@@ -184,7 +189,7 @@ fn (key)
     case KeyboardKey.x
         if DEBUG-MODE?
             debug-flip? = not debug-flip?
-            print "debug-flip" debug-flip?
+            # print "debug-flip" debug-flip?
     default ()
 
 @@ 'on bottle.update
