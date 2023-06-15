@@ -81,7 +81,8 @@ fn init ()
 
     status :=
         sdl.Init
-            sdl.SDL_INIT_EVERYTHING
+            | sdl.SDL_INIT_VIDEO sdl.SDL_INIT_TIMER sdl.SDL_INIT_GAMECONTROLLER
+
     if (status < 0)
         print "SDL initialization failed:" (String (sdl.GetError))
 
