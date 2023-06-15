@@ -40,7 +40,12 @@ fn get-drawable-size ()
 
 fn get-desktop-size (display)
     local mode : sdl.DisplayMode
-    sdl.GetDesktopDisplayMode display &mode
+    result := sdl.GetDesktopDisplayMode display &mode
+
+    if (result != 0)
+        print (.. "Failed to get desktop size: " (String (sdl.GetError)))
+        return 1366 768
+
     _ mode.w mode.h
 
 fn get-display-size (display)
