@@ -130,3 +130,4 @@ sugar-if main-module?
 else
     fn main (argc argv)
         bottle.run;
+        0
