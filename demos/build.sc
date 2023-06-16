@@ -29,6 +29,7 @@ fn build-demo (name)
         do
             main := main
             local-scope;
+        # 'dump-module
 
     let exe-name =
         static-match operating-system
@@ -37,7 +38,7 @@ fn build-demo (name)
         default
             f"demo${name}"
 
-    cmd f""""gcc -o ${bin-dir}/${exe-name} ${obj-dir}/${obj-name} -lm -L${bin-dir} ${libflags} -Wl,-rpath '-Wl,$ORIGIN'
+    cmd f""""gcc -o ${bin-dir}/${exe-name} ${obj-dir}/${obj-name} -I../include ../src/scopesrt.c -lm -L${bin-dir} ${libflags} -Wl,-rpath '-Wl,$ORIGIN'
 
 sugar-if main-module?
     name argc argv := (script-launch-args)

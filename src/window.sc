@@ -1,6 +1,7 @@
 cfg := `(. (import .config) istate-cfg window)
 run-stage;
 
+using import compiler.Printer
 using import String
 import sdl
 
@@ -43,7 +44,8 @@ fn get-desktop-size (display)
     result := sdl.GetDesktopDisplayMode display &mode
 
     if (result != 0)
-        print (.. "Failed to get desktop size: " (String (sdl.GetError)))
+        msg := (sdl.GetError)
+        print "Failed to get desktop size:" msg
         return 1366 768
 
     _ mode.w mode.h
@@ -84,7 +86,8 @@ fn init ()
             | sdl.SDL_INIT_VIDEO sdl.SDL_INIT_TIMER sdl.SDL_INIT_GAMECONTROLLER
 
     if (status < 0)
-        print "SDL initialization failed:" (String (sdl.GetError))
+        msg := (sdl.GetError)
+        print "SDL initialization failed:" msg
 
     relative-width relative-height := (get-relative-size 0 cfg.relative-width cfg.relative-height)
     let width =
@@ -120,7 +123,11 @@ fn init ()
                 maximized? = sdl.SDL_WINDOW_MAXIMIZED
                 always-on-top? = sdl.SDL_WINDOW_ALWAYS_ON_TOP
 
-    assert (handle != null) (.. "Error while creating window:" (String (sdl.GetError)))
+    if (handle == null)
+        # TODO: unify error handling
+        from (import C.string) let strlen
+        msg := (sdl.GetError)
+        assert false (.. "Error while creating window:" (String msg (strlen msg)))
     ;
 
 fn shutdown ()

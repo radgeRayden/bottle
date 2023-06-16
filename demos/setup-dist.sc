@@ -16,7 +16,7 @@ libs... :=
             filename as string
         _
             "physfs"
-            "scopesrt"
+            # "scopesrt"
             "fontdue_native"
             "miniaudio"
             "SDL2"
@@ -40,7 +40,7 @@ bin-dir := f"./dist/bin"
 obj-dir := f"./dist/obj"
 
 fn cmd (command)
-    system (report command)
+    system command
 
 cmd f"mkdir \"${module-dir}/dist\""
 cmd f"mkdir \"${bin-dir}\""

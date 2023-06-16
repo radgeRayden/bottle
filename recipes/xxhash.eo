@@ -1,0 +1,32 @@
+VERSION := "v0.8.1"
+SUMMARY := "Extremely fast non-cryptographic hash algorithm"
+
+src-dir :=
+    commonpath
+        extract
+            download
+                "https://github.com/Cyan4973/xxHash/archive/{VERSION}.tar.gz"
+
+fn shared-lib (libname)
+    then
+        cmd := (shell "{src-dir}")
+        cmd "gcc -shared -fPIC -O2 -o {libname} -I{src-dir} -x c {src-dir}/xxhash.c"
+        "{libname}"
+
+package xxhash
+    platform linux unknown
+    summary SUMMARY
+    version VERSION
+
+    libname := (shared-lib "libxxhash.so")
+    alias "include/xxhash.h" "{src-dir}/xxhash.h"
+    alias "lib/{libname}" "{src-dir}/{libname}"
+
+package xxhash
+    platform windows-mingw
+    summary SUMMARY
+    version VERSION
+
+    libname := (shared-lib "xxhash.dll")
+    alias "include/xxhash.h" "{src-dir}/xxhash.h"
+    alias "lib/{libname}" "{src-dir}/{libname}"

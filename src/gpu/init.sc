@@ -1,3 +1,4 @@
+using import compiler.Printer
 using import String
 using import struct
 
@@ -109,15 +110,15 @@ fn init ()
                             maxComputeWorkgroupsPerDimension = wgpu.WGPU_LIMIT_U32_UNDEFINED
         fn (status result msg userdata)
             if (status != wgpu.RequestDeviceStatus.Success)
-                print (String msg)
+                print msg
             istate.device = result
             ;
         null
 
     wgpu.DeviceSetUncapturedErrorCallback istate.device
-        fn (errtype message userdata)
+        fn (errtype msg userdata)
             raising noreturn
-            print (String message)
+            print msg
             ;
         null
 

@@ -1,4 +1,5 @@
-#!/usr/bin/env sh
+#!/usr/bin/env bash
+set -euxo pipefail
 
 scopes -e ./build.sc ".gpu.hello-triangle"
 scopes -e ./build.sc ".gpu.buffers"
