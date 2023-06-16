@@ -1,11 +1,13 @@
 bottle := __env.bottle
 plonk := bottle.plonk
+audio := bottle.audio
 
 using import Array
 using import enum
 using import glm
 using import itertools
 using import Option
+using import String
 using import struct
 import ..demo-common
 
@@ -42,7 +44,7 @@ struct SnakeSegment plain
     direction : Direction
     corner? : bool
 
-struct DrawState
+struct GameResources
     atlas : plonk.SpriteAtlas
 
 struct GameState
@@ -64,16 +66,21 @@ inline xy->idx (x y)
     assert (x >= 0 and x < TILES-W and y >= 0 and y < TILES-H)
     y * TILES-W + x
 
-global draw-context : (Option DrawState)
+global resources : (Option GameResources)
 global game-state : GameState
 global rng : bottle.random.RNG 0
 
+global root-dir : String
 @@ 'on bottle.configure
 fn (cfg)
     cfg.window.title = "snake"
     cfg.window.width = SCREEN-WIDTH
     cfg.window.height = SCREEN-HEIGHT
     cfg.window.resizable? = false
+    root-dir = copy cfg.filesystem.root
+
+fn play-sfx (name)
+    audio.play-one-shot (.. root-dir "/" name ".wav")
 
 fn spawn-snake ()
     for x in (range game-state.snake-length)
@@ -148,18 +155,19 @@ fn update-snake ()
         game-state.playing-field @ (xy->idx (unpack segment.position)) = ObjectType.Snake
 
     if ate-fruit?
+        play-sfx "bubble1"
         spawn-fruit;
 
     if (thing-at == ObjectType.Snake or thing-at == ObjectType.Wall)
         game-state.playing-field @ (xy->idx (unpack tail.position)) = ObjectType.Snake
-        print "game-over"
+        play-sfx "game_over"
         setup-game;
 
 @@ 'on bottle.load
 fn ()
     try
-        draw-context =
-            DrawState
+        resources =
+            GameResources
                 atlas = plonk.SpriteAtlas (bottle.asset.load-image "snake.png") 6 1
     else ()
 
@@ -204,7 +212,7 @@ fn (dt)
 
 @@ 'on bottle.render
 fn ()
-    ctx := 'force-unwrap draw-context
+    ctx := 'force-unwrap resources
     field := game-state.playing-field
 
     inline draw-tile (position tile rotation flip...)

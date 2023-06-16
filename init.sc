@@ -1,3 +1,4 @@
+let audio = (import .src.audio)
 let asset = (import .src.asset)
 let callbacks = (import .src.callbacks)
 let enums = (import .src.enums)
@@ -24,6 +25,7 @@ vvv bind bottle
     callbacks
     do
         let
+            audio
             asset
             enums
             exceptions

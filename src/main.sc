@@ -1,5 +1,6 @@
 using import FunctionChain
 
+import .audio
 import .callbacks
 import .config
 import .filesystem
@@ -33,6 +34,7 @@ fn run ()
     window.init;
     gpu.init;
     time.init;
+    audio.init;
     callbacks.load;
 
     USE_DT_ACCUMULATOR? := cfg.time.use-delta-accumulator?
@@ -74,6 +76,7 @@ fn run ()
     imgui.shutdown;
     window.shutdown;
     filesystem.shutdown;
+    audio.shutdown;
     ()
 
 do
