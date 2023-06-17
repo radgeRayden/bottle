@@ -62,8 +62,7 @@ fn ()
     'set-bind-group rp 0 ctx.bind-group
     'draw rp 6
     'finish rp
-
-    demo-common.display-fps;
+    ()
 
 sugar-if main-module?
     bottle.run;

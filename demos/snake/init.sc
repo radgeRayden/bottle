@@ -270,8 +270,7 @@ fn ()
                 else (_ false false)
 
             draw-tile segment.position tile rotation (fliph? = fliph?) (flipv? = flipv?)
-
-    demo-common.display-fps;
+    ()
 
 sugar-if main-module?
     bottle.run;

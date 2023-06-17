@@ -40,8 +40,7 @@ fn ()
     using import itertools
     for x y in (dim 20 20)
         plonk.sprite ctx.sprite (vec2 (x * 20) (y * 20)) (vec2 100 100) 0:f32 ('get-quad ctx.sprite ctx.sprite-frame)
-
-    demo-common.display-fps;
+    ()
 
 sugar-if main-module?
     bottle.run;

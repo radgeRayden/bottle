@@ -122,7 +122,6 @@ fn ()
 
     'draw-indexed rp INDEX-COUNT QUAD-COUNT
     'finish rp
-    demo-common.display-fps;
     ()
 
 sugar-if main-module?

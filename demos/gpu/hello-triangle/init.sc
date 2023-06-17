@@ -90,9 +90,7 @@ fn ()
     'set-pipeline rp ctx.pipeline
     'draw rp 3
     'finish rp
-
-    demo-common.display-fps;
-    ;
+    ()
 
 sugar-if main-module?
     bottle.run;
