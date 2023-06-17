@@ -99,7 +99,9 @@ struct SpriteBatch
                 texcoords = (quad.start + ((texcoords @ uv-index) * quad.extent))
                 color = color
 
-        let idx-offset = ((countof self.vertex-data) as u16)
+        # position in the batched vertex buffer + current vertex in this batch
+        vtx-offset := self.vertex-offset + (countof self.vertex-data)
+        vtx-offset as:= u32
 
         inline get-idx (input)
             input as:= u8
@@ -118,12 +120,12 @@ struct SpriteBatch
         'append self.vertex-data
             make-vertex (get-idx 3)
 
-        'append self.index-data (0:u16 + idx-offset)
-        'append self.index-data (2:u16 + idx-offset)
-        'append self.index-data (3:u16 + idx-offset)
-        'append self.index-data (3:u16 + idx-offset)
-        'append self.index-data (1:u16 + idx-offset)
-        'append self.index-data (0:u16 + idx-offset)
+        'append self.index-data (0:u32 + vtx-offset)
+        'append self.index-data (2:u32 + vtx-offset)
+        'append self.index-data (3:u32 + vtx-offset)
+        'append self.index-data (3:u32 + vtx-offset)
+        'append self.index-data (1:u32 + vtx-offset)
+        'append self.index-data (0:u32 + vtx-offset)
         ;
 
     fn finish (self render-pass)
