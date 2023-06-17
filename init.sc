@@ -30,9 +30,11 @@ VERSION :=
             static-if (operating-system == 'windows) (_ _popen _pclose)
             else (_ popen pclose)
 
-        version := getenv "BOTTLE_VERSION"
-        if (version != null)
-            merge get-version (String version)
+        try
+            using import radl.IO
+            version-file := FileStream (module-dir .. "/BOTTLE_VERSION") FileMode.Read
+            merge get-version ('read-all-string version-file)
+        else ()
 
         inline try-commands (def cmd...)
             let devnull =

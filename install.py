@@ -18,3 +18,5 @@ shutil.copyfile(f"{bottle_src}/LICENSE", f"{bottle_dst}/LICENSE")
 shutil.copyfile(f"{bottle_src}/README.md", f"{bottle_dst}/README.md")
 
 open("__env.sc", 'a').close()
+open(f"{bottle_dst}/BOTTLE_VERSION", "a").close()
+os.system(f"cd {bottle_src}; bash -c 'echo -n $(scopes -e -c \"sc_write (__env.bottle.get-version)\") > {bottle_dst}/BOTTLE_VERSION'")
