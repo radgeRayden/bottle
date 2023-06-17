@@ -21,9 +21,14 @@ let window = (import .src.window)
 
 VERSION :=
     label get-version
+        _popen _pclose popen pclose := # hack for windows-mingw
         using import C.stdlib
         using import C.stdio
         using import String
+
+        let popen pclose =
+            static-if (operating-system == 'windows) (_ _popen _pclose)
+            else (_ popen pclose)
 
         version := getenv "BOTTLE_VERSION"
         if (version != null)
