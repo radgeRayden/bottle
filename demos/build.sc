@@ -37,8 +37,9 @@ fn build-demo (name)
             f"demo${name}"
 
     inline cmd (cmd)
-    libflags := string (getenv "LDFLAGS")
+    libflags := (getenv "LDFLAGS")
     assert (libflags != null)
+    libflags := string libflags
 
     cmd := f"gcc -o ${bin-dir}/${exe-name} ${obj-dir}/${obj-name} -I../include ../src/scopesrt.c -lm -L${bin-dir} ${libflags} -Wl,-rpath '-Wl,$ORIGIN'"
     print "+" cmd
