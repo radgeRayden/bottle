@@ -12,7 +12,7 @@ struct ImageData
     data : (Array u8)
     format : TextureFormat
 
-    inline... __typecall (cls, width : u32, height : u32, slices : u32 = 1:u32, data : (param? (Array u8)) = none, format = TextureFormat.RGBA8UnormSrgb)
+    inline... __typecall (cls, width : u32, height : u32, slices : u32 = 1:u32, data : (param? (Array u8)) = none, format : TextureFormat = TextureFormat.RGBA8UnormSrgb)
         let block-size =
             try (get-texel-block-size format)
             else 4:u32 # I'm not sure this is a good idea.
