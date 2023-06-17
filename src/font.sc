@@ -79,10 +79,19 @@ struct Font
             atlas-height : u32
 
         fn pack-glyph (char-buf dst-buf idx metrics userdata)
+            row-size := userdata.glyph-width * 4
+            offset := userdata.atlas-height * row-size
+
             userdata.atlas-height += userdata.glyph-height
-            'append-each dst-buf char-buf
-            offset := userdata.atlas-height * userdata.glyph-width
-            'resize dst-buf offset
+            'resize dst-buf (userdata.atlas-height * row-size)
+
+            using import itertools
+            for x y in (dim metrics.width metrics.height)
+                offset := offset + (y * row-size) + (x * 4)
+                dst-buf @ (offset + 0) = char-buf @ ((y * metrics.width) + x)
+                dst-buf @ (offset + 1) = char-buf @ ((y * metrics.width) + x)
+                dst-buf @ (offset + 2) = char-buf @ ((y * metrics.width) + x)
+                dst-buf @ (offset + 3) = char-buf @ ((y * metrics.width) + x)
 
         local atlas-data : (Array u8)
         local userdata : PackedFontAtlasUserData
@@ -91,7 +100,7 @@ struct Font
             self.char-width
 
         'rasterize-glyph-range self first-glyph last-glyph atlas-data pack-glyph userdata
-        ImageData userdata.atlas-width userdata.atlas-height 1 (data = atlas-data) (format = TextureFormat.R8Unorm)
+        ImageData userdata.atlas-width userdata.atlas-height 1 (data = atlas-data) (format = TextureFormat.RGBA8Unorm)
 
     inline __drop (self)
         fontdue.font_free self.font
