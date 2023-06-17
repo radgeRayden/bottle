@@ -15,8 +15,9 @@ scopes -e ./build.sc ".snake"
 
 cp ./gpu/textures/linus.jpg ./dist/bin
 cp ./plonk/sprites/_Run.png ./dist/bin
-cp ./snake/snake.png ./dist/bin/
+cp ./snake/*.png ./dist/bin/
 cp ./snake/*.wav ./dist/bin/
+cp ./snake/*.ttf ./dist/bin/
 mv ./dist/bin ./bottle-demos
 
 if [ "$(expr substr $(uname -s) 1 10)" == "MINGW64_NT" ]; then
