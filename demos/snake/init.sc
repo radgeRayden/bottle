@@ -116,6 +116,7 @@ fn setup-game ()
     spawn-fruit;
 
 fn update-snake ()
+    game-state.movement-timer = 0
     segments := game-state.snake-segments
     dir next-dir := game-state.snake-direction, game-state.next-snake-direction
     switch next-dir
@@ -196,12 +197,16 @@ fn (key)
     switch key
     case KeyboardKey.Up
         next-dir = Direction.Up
+        update-snake;
     case KeyboardKey.Right
         next-dir = Direction.Right
+        update-snake;
     case KeyboardKey.Down
         next-dir = Direction.Down
+        update-snake;
     case KeyboardKey.Left
         next-dir = Direction.Left
+        update-snake;
     case KeyboardKey.Space
         if debug-mode?
             update-snake;
