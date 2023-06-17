@@ -14,7 +14,6 @@ import ..demo-common
 TILE-SIZE := 64
 SCREEN-WIDTH SCREEN-HEIGHT := 800, 600
 TILES-W TILES-H := SCREEN-WIDTH // TILE-SIZE, SCREEN-HEIGHT // TILE-SIZE
-DEBUG-MODE? := false
 
 enum SpriteIndices plain
     SnakeHead
@@ -119,6 +118,16 @@ fn setup-game ()
 fn update-snake ()
     segments := game-state.snake-segments
     dir next-dir := game-state.snake-direction, game-state.next-snake-direction
+    switch next-dir
+    case Direction.Up
+        if (dir == Direction.Down) (next-dir = dir)
+    case Direction.Right
+        if (dir == Direction.Left) (next-dir = dir)
+    case Direction.Left
+        if (dir == Direction.Right) (next-dir = dir)
+    case Direction.Down
+        if (dir == Direction.Up) (next-dir = dir)
+    default ()
 
     tail := deref ('last segments)
     game-state.playing-field @ (xy->idx (unpack tail.position)) = ObjectType.Empty
@@ -178,31 +187,29 @@ fn ()
 
     setup-game;
 
+global debug-mode? : bool
 global debug-flip? : bool
 @@ 'on bottle.key-pressed
 fn (key)
-    current-dir := game-state.snake-direction
+    next-dir := game-state.next-snake-direction
     using bottle.enums
     switch key
     case KeyboardKey.Up
-        if (current-dir != Direction.Down)
-            game-state.next-snake-direction = Direction.Up
+        next-dir = Direction.Up
     case KeyboardKey.Right
-        if (current-dir != Direction.Left)
-            game-state.next-snake-direction = Direction.Right
+        next-dir = Direction.Right
     case KeyboardKey.Down
-        if (current-dir != Direction.Up)
-            game-state.next-snake-direction = Direction.Down
+        next-dir = Direction.Down
     case KeyboardKey.Left
-        if (current-dir != Direction.Right)
-            game-state.next-snake-direction = Direction.Left
+        next-dir = Direction.Left
     case KeyboardKey.Space
-        if DEBUG-MODE?
+        if debug-mode?
             update-snake;
     case KeyboardKey.x
-        if DEBUG-MODE?
+        if debug-mode?
             debug-flip? = not debug-flip?
-            # print "debug-flip" debug-flip?
+    case KeyboardKey.d
+        debug-mode? = not debug-mode?
     default ()
 
 @@ 'on bottle.update
@@ -212,7 +219,7 @@ fn (dt)
 
     if (game-state.movement-timer >= turn-duration)
         game-state.movement-timer -= turn-duration
-        if (not DEBUG-MODE?)
+        if (not debug-mode?)
             update-snake;
 
 @@ 'on bottle.render
