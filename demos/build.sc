@@ -37,12 +37,12 @@ fn build-demo (name)
             f"demo${name}"
 
     inline cmd (cmd)
-        print "+" cmd
-        system cmd
-
     libflags := string (getenv "LDFLAGS")
     assert (libflags != null)
-    cmd f""""gcc -o ${bin-dir}/${exe-name} ${obj-dir}/${obj-name} -I../include ../src/scopesrt.c -lm -L${bin-dir} ${libflags} -Wl,-rpath '-Wl,$ORIGIN'
+
+    cmd := f"gcc -o ${bin-dir}/${exe-name} ${obj-dir}/${obj-name} -I../include ../src/scopesrt.c -lm -L${bin-dir} ${libflags} -Wl,-rpath '-Wl,$ORIGIN'"
+    print "+" cmd
+    system cmd
 
 sugar-if main-module?
     name argc argv := (script-launch-args)

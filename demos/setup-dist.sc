@@ -1,6 +1,7 @@
 using import String
 using import C.stdlib
 using import radl.strfmt
+using import compiler.Printer
 
 libs... :=
     va-map
@@ -33,7 +34,9 @@ libpaths... :=
 
 va-map
     inline copy-lib (path)
-        system f"cp \"${path}\" ./dist/bin"
+        cmd := f"cp \"${path}\" ./dist/bin"
+        print2 "+" cmd
+        system cmd
     libpaths...
 
 libflags :=
