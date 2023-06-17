@@ -12,5 +12,6 @@ cp ./plonk/sprites/_Run.png ./dist/bin
 cp ./snake/snake.png ./dist/bin/
 cp ./snake/*.wav ./dist/bin/
 mv ./dist/bin ./bottle-demos
+rm -f ./bottle-demos/physfs.dll
 zip bottle-demos.zip ./bottle-demos/*
 rm -r dist bottle-demos
