@@ -47,8 +47,8 @@ VERSION :=
             def
 
         try-commands S"unknown"
-            "git describe --exact-match --tags"
-            "echo git-$(git rev-parse --short HEAD)"
+            "git describe --exact-match --tags HEAD"
+            "echo git-$(git rev-parse --short HEAD)-$(git rev-parse --abbrev-ref HEAD)"
 VERSION as:= string
 run-stage;
 
