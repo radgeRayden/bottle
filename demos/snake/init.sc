@@ -192,21 +192,22 @@ global debug-mode? : bool
 global debug-flip? : bool
 @@ 'on bottle.key-pressed
 fn (key)
-    next-dir := game-state.next-snake-direction
+    cur-dir next-dir := game-state.snake-direction, game-state.next-snake-direction
+    inline update-dir (dir)
+        if (dir != next-dir)
+            next-dir = dir
+            update-snake;
+
     using bottle.enums
     switch key
     case KeyboardKey.Up
-        next-dir = Direction.Up
-        update-snake;
+        update-dir Direction.Up
     case KeyboardKey.Right
-        next-dir = Direction.Right
-        update-snake;
+        update-dir Direction.Right
     case KeyboardKey.Down
-        next-dir = Direction.Down
-        update-snake;
+        update-dir Direction.Down
     case KeyboardKey.Left
-        next-dir = Direction.Left
-        update-snake;
+        update-dir Direction.Left
     case KeyboardKey.Space
         if debug-mode?
             update-snake;
@@ -219,11 +220,18 @@ fn (key)
 
 @@ 'on bottle.update
 fn (dt)
+    using bottle.enums
+
     game-state.movement-timer += dt
-    turn-duration := 1 / game-state.snake-speed
+    let speed =
+        if ((not debug-mode?) and (bottle.keyboard.down? KeyboardKey.Space))
+            game-state.snake-speed * 3
+        else
+            deref game-state.snake-speed
+
+    turn-duration := 1 / speed
 
     if (game-state.movement-timer >= turn-duration)
-        game-state.movement-timer -= turn-duration
         if (not debug-mode?)
             update-snake;
 
