@@ -40,7 +40,7 @@ VERSION :=
                 else str"/dev/null"
             va-map
                 inline "#hidden" (cmd)
-                    handle := popen (cmd .. " 2> " .. devnull) "r"
+                    handle := popen (.. "bash -c '" cmd "' 2> " devnull) "r"
                     local result : String
                     while (not ((feof handle) as bool))
                         local c : i8
