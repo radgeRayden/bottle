@@ -2,7 +2,6 @@ using import Array
 using import Option
 using import struct
 using import String
-#using import compiler.Printer
 
 bottle := __env.bottle
 import ...demo-common
@@ -19,8 +18,6 @@ global render-state : (Option RendererState)
 
 @@ 'on bottle.load
 fn ()
-    # print ((RendererBackendInfo) . RendererString)
-
     try
         vert := ShaderModule (import .vert) ShaderLanguage.SPIRV ShaderStage.Vertex
         frag := ShaderModule (import .frag) ShaderLanguage.SPIRV ShaderStage.Fragment

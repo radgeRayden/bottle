@@ -12,6 +12,9 @@ using import ..exceptions
 
 import ..window
 
+fn get-info ()
+    types.RendererBackendInfo;
+
 fn create-surface ()
     static-match operating-system
     case 'linux
@@ -174,6 +177,6 @@ fn present ()
 do
     let init update-render-area set-clear-color begin-frame present
     let types
-    let get-preferred-surface-format get-cmd-encoder get-swapchain-image
+    let get-info get-preferred-surface-format get-cmd-encoder get-swapchain-image
 
     locals;

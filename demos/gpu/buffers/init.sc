@@ -3,7 +3,6 @@ using import Option
 using import String
 using import struct
 using import .common
-#using import compiler.Printer
 
 bottle := __env.bottle
 random := import radl.random
@@ -57,8 +56,6 @@ fn gen-indices ()
 
 @@ 'on bottle.load
 fn ()
-    # print ((RendererBackendInfo) . RendererString)
-
     try
         vert := ShaderModule (import .vert) ShaderLanguage.SPIRV ShaderStage.Vertex
         frag := ShaderModule (import .frag) ShaderLanguage.SPIRV ShaderStage.Fragment

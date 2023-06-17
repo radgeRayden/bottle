@@ -1,5 +1,11 @@
 bottle := __env.bottle
 
+@@ 'on bottle.load
+fn ()
+    renderer-info := (bottle.gpu.get-info)
+    print "bottle version:" (bottle.get-version)
+    print renderer-info.RendererString
+
 @@ 'on bottle.key-released
 fn (key)
     using bottle.enums
