@@ -1,10 +1,14 @@
 bottle := __env.bottle
+import C.stdio
+using import String
 
 @@ 'on bottle.load
 fn ()
     renderer-info := (bottle.gpu.get-info)
-    print "bottle version:" (bottle.get-version)
-    print renderer-info.RendererString
+    # FIXME: using this while compiler.Printer is broken for String
+    C.stdio.printf "bottle version: %s\n" ((bottle.get-version) as rawstring)
+    C.stdio.printf "%s\n" ((copy (imply renderer-info.RendererString String)) as rawstring)
+    ()
 
 @@ 'on bottle.key-released
 fn (key)
@@ -25,6 +29,7 @@ fn display-fps ()
     fps := i32 (1 / (bottle.time.get-delta-time))
     ig.Text "FPS: %d" fps
     ig.End;
+    ()
 
 do
     local-scope;

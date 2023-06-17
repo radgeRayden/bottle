@@ -1,3 +1,4 @@
+import C.string
 using import String
 using import struct
 using import property
@@ -21,7 +22,7 @@ struct WGPUVersion
             revision = (value & 0xFF) as u8
 
     inline __repr (self)
-        .. (va-map tostring 'v self.major '. self.minor '. self.patch '. self.revision)
+        f"v${self.major}.${self.minor}.${self.patch}.${self.revision}"
 
 struct RendererBackendInfo
     version : WGPUVersion
@@ -45,12 +46,15 @@ struct RendererBackendInfo
         local p : wgpu.AdapterProperties
         wgpu.AdapterGetProperties istate.adapter &p
 
+        inline make-String (rstr)
+            String rstr (C.string.strlen rstr)
+
         super-type.__typecall cls
             version = typeinit (wgpu.GetVersion)
-            vendor = String p.vendorName
-            architecture = String p.architecture
-            device = String p.name
-            driver = String p.driverDescription
+            vendor = make-String p.vendorName
+            architecture = make-String p.architecture
+            device = make-String p.name
+            driver = make-String p.driverDescription
             adapter = p.adapterType
             low-level-api = p.backendType
 
