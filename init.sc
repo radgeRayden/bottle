@@ -35,9 +35,12 @@ VERSION :=
             merge get-version (String version)
 
         inline try-commands (def cmd...)
+            let devnull =
+                static-if (operating-system == 'windows) str"NUL"
+                else str"/dev/null"
             va-map
                 inline "#hidden" (cmd)
-                    handle := popen (cmd .. " 2> /dev/null") "r"
+                    handle := popen (cmd .. " 2> " .. devnull) "r"
                     local result : String
                     while (not ((feof handle) as bool))
                         local c : i8
