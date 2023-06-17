@@ -173,7 +173,7 @@ fn ()
         resources =
             GameResources
                 atlas = plonk.SpriteAtlas (bottle.asset.load-image "snake.png") 6 1
-                font-atlas = plonk.SpriteAtlas ('pack-atlas font char" " char"~") 1 (char"~" - char" ")
+                font-atlas = plonk.SpriteAtlas ('pack-atlas font char" " char"~") 1 95
     else ()
 
     setup-game;
@@ -276,8 +276,9 @@ fn ()
 
             draw-tile segment.position tile rotation (fliph? = fliph?) (flipv? = flipv?)
 
-    for c in S"score:"
-        plonk.sprite ctx.font-atlas (vec2 0 0) (vec2 6 13) 0:f32 ('get-quad ctx.font-atlas (c - char" "))
+    using import radl.strfmt
+    for i c in (enumerate f"score: ${game-state.score}")
+        plonk.sprite ctx.font-atlas (vec2 (i * 15) 0) (vec2 15 31) 0:f32 ('get-quad ctx.font-atlas (c - char" "))
     ()
 
 sugar-if main-module?
