@@ -51,9 +51,6 @@ va-map
         cmd f"cp \"${path}\" \"${bin-dir}\"/"
     libpaths...
 
-static-if (operating-system == 'windows)
-    cmd f"cp \"${bin-dir}/physfs.dll\" \"${bin-dir}/libphysfs.dll\""
-
 libpaths... :=
     va-map
         inline get-libpath (libname)
