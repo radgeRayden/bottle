@@ -1,6 +1,12 @@
 #!/usr/bin/env bash
 set -euxo pipefail
 
+rm -rf ./dist ./bottle-demos
+mkdir ./dist
+mkdir ./dist/bin
+mkdir ./dist/obj
+
+export LDFLAGS="$(scopes -e ./setup-dist.sc)"
 scopes -e ./build.sc ".gpu.hello-triangle"
 scopes -e ./build.sc ".gpu.buffers"
 scopes -e ./build.sc ".gpu.textures"

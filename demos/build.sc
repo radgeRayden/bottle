@@ -3,10 +3,8 @@ using import C.stdlib
 using import radl.strfmt
 
 bottle := __env.bottle
-using import .setup-dist
-local module-dir : string = module-dir as string
-
-run-stage;
+obj-dir := "./dist/obj"
+bin-dir := "./dist/bin"
 
 fn build-demo (name)
     module :=
@@ -38,6 +36,12 @@ fn build-demo (name)
         default
             f"demo${name}"
 
+    inline cmd (cmd)
+        print "+" cmd
+        system cmd
+
+    libflags := string (getenv "LDFLAGS")
+    assert (libflags != null)
     cmd f""""gcc -o ${bin-dir}/${exe-name} ${obj-dir}/${obj-name} -I../include ../src/scopesrt.c -lm -L${bin-dir} ${libflags} -Wl,-rpath '-Wl,$ORIGIN'
 
 sugar-if main-module?
