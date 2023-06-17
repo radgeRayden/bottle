@@ -3,6 +3,8 @@ using import Array
 using import UTF-8
 
 import fontdue
+using import .asset.ImageData
+using import .enums
 
 let ceil =
     (extern 'llvm.ceil.f32 (function f32 f32))
@@ -68,6 +70,28 @@ struct Font
 
     inline rasterize-all-glyphs (self buffer packf userdata)
         # ...
+
+    fn pack-atlas (self first-glyph last-glyph)
+        struct PackedFontAtlasUserData plain
+            glyph-width : u32
+            glyph-height : u32
+            atlas-width : u32
+            atlas-height : u32
+
+        fn pack-glyph (char-buf dst-buf idx metrics userdata)
+            userdata.atlas-height += userdata.glyph-height
+            'append-each dst-buf char-buf
+            offset := userdata.atlas-height * userdata.glyph-width
+            'resize dst-buf offset
+
+        local atlas-data : (Array u8)
+        local userdata : PackedFontAtlasUserData
+            self.char-width
+            u32 (ceil self.line-metrics.new_line_size)
+            self.char-width
+
+        'rasterize-glyph-range self first-glyph last-glyph atlas-data pack-glyph userdata
+        ImageData userdata.atlas-width userdata.atlas-height 1 (data = atlas-data) (format = TextureFormat.R8Unorm)
 
     inline __drop (self)
         fontdue.font_free self.font

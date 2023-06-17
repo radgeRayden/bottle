@@ -46,6 +46,7 @@ struct SnakeSegment plain
 
 struct GameResources
     atlas : plonk.SpriteAtlas
+    font-atlas : plonk.SpriteAtlas
 
 struct GameState
     score : i32
@@ -166,9 +167,13 @@ fn update-snake ()
 @@ 'on bottle.load
 fn ()
     try
+        font-data := bottle.filesystem.load-file "monogram.ttf"
+        font := bottle.font.Font font-data 39
+
         resources =
             GameResources
                 atlas = plonk.SpriteAtlas (bottle.asset.load-image "snake.png") 6 1
+                font-atlas = plonk.SpriteAtlas ('pack-atlas font char" " char"~") 1 (char"~" - char" ")
     else ()
 
     setup-game;
@@ -270,6 +275,9 @@ fn ()
                 else (_ false false)
 
             draw-tile segment.position tile rotation (fliph? = fliph?) (flipv? = flipv?)
+
+    for c in S"score:"
+        plonk.sprite ctx.font-atlas (vec2 0 0) (vec2 6 13) 0:f32 ('get-quad ctx.font-atlas (c - char" "))
     ()
 
 sugar-if main-module?
