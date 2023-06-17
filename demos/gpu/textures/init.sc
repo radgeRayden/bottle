@@ -16,6 +16,10 @@ struct RendererState
 
 global render-state : (Option RendererState)
 
+@@ 'on bottle.configure
+fn (cfg)
+    cfg.window.title = "low level texture setup"
+
 @@ 'on bottle.load
 fn ()
     try
