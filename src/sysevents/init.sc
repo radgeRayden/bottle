@@ -37,10 +37,12 @@ inline dispatch (handler)
                 (none? result) or (imply result bool)
 
         case sdl.SDL_KEYDOWN
-            callbacks.key-pressed (event.key.keysym.sym as KeyboardKey)
+            if (not event.key.repeat)
+                callbacks.key-pressed (event.key.keysym.sym as KeyboardKey)
 
         case sdl.SDL_KEYUP
-            callbacks.key-released (event.key.keysym.sym as KeyboardKey)
+            if (not event.key.repeat)
+                callbacks.key-released (event.key.keysym.sym as KeyboardKey)
 
         case sdl.SDL_MOUSEMOTION
             edata := event.motion
