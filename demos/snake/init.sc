@@ -11,8 +11,8 @@ using import String
 using import struct
 import ..demo-common
 
-TILE-SIZE := 64
-SCREEN-WIDTH SCREEN-HEIGHT := 800, 600
+TILE-SIZE := 32
+SCREEN-WIDTH SCREEN-HEIGHT := 800, 608
 TILES-W TILES-H := SCREEN-WIDTH // TILE-SIZE, SCREEN-HEIGHT // TILE-SIZE
 
 enum SpriteIndices plain
@@ -50,7 +50,7 @@ struct GameResources
 struct GameState
     score : i32
     movement-timer : f64
-    snake-speed : i32 = 5
+    snake-speed : i32 = 7
     snake-length : i32 = 3
     snake-segments : (Array SnakeSegment)
     snake-direction = Direction.Left
