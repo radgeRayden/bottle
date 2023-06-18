@@ -27,7 +27,7 @@ VERSION :=
             merge get-version ('read-all-string version-file)
         else ()
 
-        using import radl.gitversion
+        using import radl.version-string
         git-version;
 
 VERSION as:= string
