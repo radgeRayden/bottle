@@ -36,7 +36,7 @@ After bootstrapping, you can then start a new project:
 ``` sh
 mkdir my_project
 cd my_project
-python3 ../bottle/install.py
+../bottle/install
 ```
 
 Happy coding!
