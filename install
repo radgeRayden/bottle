@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+
+set -euxo pipefail
+
+BOTTLE_SRC=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+BOTTLE_DST=./lib/scopes/packages/bottle
+cp -rf $BOTTLE_SRC/lib ./
+cp -rf $BOTTLE_SRC/include ./
+
+rm -rf $BOTTLE_DST
+mkdir -p $BOTTLE_DST
+cp -rf $BOTTLE_SRC/src $BOTTLE_DST/src
+cp -f $BOTTLE_SRC/init.sc $BOTTLE_DST/init.sc
+mkdir -p ./licenses
+cp -f $BOTTLE_SRC/LICENSE ./licenses/bottle.txt
+touch ./__env.sc
+
+BOTTLE_DST=$(realpath $BOTTLE_DST)
+pushd $BOTTLE_SRC
+echo -n $(scopes -e -c "sc_write (__env.bottle.get-version)") > $BOTTLE_DST/BOTTLE_VERSION
+popd
