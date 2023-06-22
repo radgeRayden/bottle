@@ -1,8 +1,11 @@
 from doit.tools import LongRunning
 
+def cmd(cmd):
+    return f"bash -c \"{cmd}\""
+
 def task_eo():
     return {
-        'actions': ["wget -O eo https://hg.sr.ht/~duangle/majoreo/raw/eo?rev=tip", "chmod +x eo"],
+        'actions': [cmd("wget -O eo https://hg.sr.ht/~duangle/majoreo/raw/eo?rev=tip"), cmd("chmod +x eo")],
         'targets': ["eo"],
         'uptodate': [True]
     }
@@ -10,20 +13,20 @@ def task_eo():
 bootstrap = ".eo/installed/bootstrap"
 def task_bootstrap():
     return {
-        'actions': ["./eo install -y bootstrap"],
+        'actions': [cmd("./eo install -y bootstrap")],
         'file_dep': ["eo"],
         'targets': [bootstrap]
     }
 
 def task_force_bootstrap():
     return {
-        'actions': ["rm -r .eo lib include", "./eo init", "./eo install -y bootstrap"],
+        'actions': [cmd("rm -r .eo lib include"), cmd("./eo init"), cmd("./eo install -y bootstrap")],
         'uptodate': [False],
         'file_dep': ["eo"],
     }
 
 def demo_cmd(name):
-    return f"scopes -e run.sc {name}"
+    return cmd(f"scopes -e run.sc {name}")
 
 def task_demo_snake():
     return {
