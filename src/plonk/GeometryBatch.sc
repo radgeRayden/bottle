@@ -7,7 +7,7 @@ import ..math
 using import ..gpu.types
 using import .common
 
-struct SpriteBatch
+struct GeometryBatch
     attribute-buffer : (StorageBuffer VertexAttributes)
     index-buffer     : (IndexBuffer u32)
     uniform-buffer   : (UniformBuffer Uniforms)
@@ -63,7 +63,7 @@ struct SpriteBatch
         'clear self.vertex-data
         'clear self.index-data
 
-    fn... add-sprite (self : this-type, position, size, rotation : f32, quad = (Quad (vec2 0 0) (vec2 1 1)),
+    fn... add-quad (self : this-type, position, size, rotation : f32, quad = (Quad (vec2 0 0) (vec2 1 1)),
                       fliph? = false, flipv? = false, color = (vec4 1))
 
         self.outdated-vertices? = true
@@ -134,5 +134,5 @@ struct SpriteBatch
         self.index-offset = 0
 
 do
-    let SpriteBatch
+    let GeometryBatch
     local-scope;

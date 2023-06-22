@@ -7,7 +7,7 @@ using import .common
 using import ..gpu.types
 using import ..enums
 using import .SpriteAtlas
-using import .SpriteBatch
+using import .GeometryBatch
 import ..asset
 import ..callbacks
 import ..gpu
@@ -16,7 +16,7 @@ import ..window
 import .shaders
 
 struct PlonkState
-    batch : SpriteBatch
+    batch : GeometryBatch
     sampler : Sampler
     default-texture-binding : BindGroup
     render-pass : (Option RenderPass)
@@ -58,7 +58,7 @@ fn init ()
                 default-texture-binding = (BindGroup ('get-bind-group-layout sprite-pipeline 1) (view sampler) (view default-sprite))
                 sampler = sampler
                 batch =
-                    SpriteBatch
+                    GeometryBatch
                         attribute-buffer = typeinit 4096
                         index-buffer = typeinit 8192
                         uniform-buffer = typeinit 1
@@ -98,7 +98,7 @@ fn... sprite (atlas : SpriteAtlas, ...)
         'set-bind-group rp 1 ('force-unwrap atlas.bind-group)
         ctx.last-texture = ('get-id atlas.texture-view)
 
-    'add-sprite ctx.batch ...
+    'add-quad ctx.batch ...
 
 fn submit ()
     ctx := 'force-unwrap context
