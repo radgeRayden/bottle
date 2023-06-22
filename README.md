@@ -4,7 +4,13 @@ Basic goals (for a first version):
 - Good enough for sprite based games
 - can be combined with game code in a standalone executable (+ supporting shared libraries)
 
-Examples can be found in the `demos` folder.
+Examples can be found in the `demos` folder. To run a demo, execute in the root bottle directory (for example): 
+
+``` sh
+scopes -e run.sc snake
+# for demos in subdirectories, you use dots instead of slashes:
+scopes -e run.sc gpu.buffers
+```
 
 ### Building
 Currently Linux and Windows (MSYS2 MinGW) are supported. If it seems like you have all dependencies and it still fails to install, please open an issue.
