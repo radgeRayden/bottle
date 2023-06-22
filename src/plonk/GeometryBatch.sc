@@ -63,7 +63,7 @@ struct GeometryBatch
         'clear self.vertex-data
         'clear self.index-data
 
-    fn... add-quad (self : this-type, position, size, rotation : f32, quad = (Quad (vec2 0 0) (vec2 1 1)),
+    fn... add-quad (self : this-type, position, size, rotation : f32 = 0:f32, quad = (Quad (vec2 0 0) (vec2 1 1)),
                       fliph? = false, flipv? = false, color = (vec4 1))
 
         self.outdated-vertices? = true
