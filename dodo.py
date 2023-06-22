@@ -14,7 +14,7 @@ bootstrap = ".eo/installed/bootstrap"
 def task_bootstrap():
     return {
         'verbosity': 2,
-        'actions': [cmd("./eo init"), cmd("./eo install -y bootstrap")],
+        'actions': [cmd("./eo init; true"), cmd("./eo install -y bootstrap")],
         'file_dep': ["eo"],
         'targets': [bootstrap]
     }
@@ -30,9 +30,21 @@ def task_force_bootstrap():
 def demo_cmd(name):
     return cmd(f"scopes -e run.sc {name}")
 
-def task_demo_snake():
+demos = ["snake", "plonk.sprites", "gpu.hello-triangle", "gpu.buffers", "gpu.textures"]
+def task_demos ():
+    for name in demos:
+        yield {
+            'basename': f"demo.{name}",
+            'actions': [LongRunning(demo_cmd(name))],
+            'file_dep': [bootstrap],
+            'uptodate': [False]
+        }
+
+def task_build_demos():
     return {
-        'actions': [LongRunning(demo_cmd("snake"))],
+        'verbosity': 2,
+        'actions': [cmd("./demos/build.sh")],
+        'targets': ["demos/bottle-demos.zip"],
         'file_dep': [bootstrap],
         'uptodate': [False]
     }
