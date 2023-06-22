@@ -13,7 +13,7 @@ def task_eo():
 bootstrap = ".eo/installed/bootstrap"
 def task_bootstrap():
     return {
-        'actions': [cmd("./eo install -y bootstrap")],
+        'actions': [cmd("./eo init"), cmd("./eo install -y bootstrap")],
         'file_dep': ["eo"],
         'targets': [bootstrap]
     }
