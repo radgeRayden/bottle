@@ -20,8 +20,9 @@ struct PlonkState
     sampler : Sampler
     default-texture-binding : BindGroup
     render-pass : (Option RenderPass)
-    # properties that can break batching
+
     last-texture    : u64
+    default-texture : u64
 
 global context : (Option PlonkState)
 
@@ -84,20 +85,28 @@ fn begin-frame ()
 
     ctx.render-pass = rp
 
-fn... sprite (atlas : SpriteAtlas, ...)
-    ctx := 'force-unwrap context
-
-    if (ctx.last-texture != ('get-id atlas.texture-view))
+fn set-texture (ctx bind-group id)
+    if (ctx.last-texture != id)
         rp := ('force-unwrap ctx.render-pass)
 
         if (ctx.last-texture != 0)
             'flush ctx.batch rp
 
-        if (not atlas.bind-group)
-            atlas.bind-group = BindGroup ('get-bind-group-layout ctx.batch.pipeline 1) ctx.sampler atlas.texture-view
-        'set-bind-group rp 1 ('force-unwrap atlas.bind-group)
-        ctx.last-texture = ('get-id atlas.texture-view)
+        'set-bind-group rp 1 bind-group
+        ctx.last-texture = id
 
+fn... sprite (atlas : SpriteAtlas, ...)
+    ctx := 'force-unwrap context
+
+    if (not atlas.bind-group)
+        atlas.bind-group = BindGroup ('get-bind-group-layout ctx.batch.pipeline 1) ctx.sampler atlas.texture-view
+
+    set-texture ctx ('force-unwrap atlas.bind-group) ('get-id atlas.texture-view)
+    'add-quad ctx.batch ...
+
+fn rectangle (...)
+    ctx := 'force-unwrap context
+    set-texture ctx ctx.default-texture-binding ctx.default-texture
     'add-quad ctx.batch ...
 
 fn submit ()
@@ -108,6 +117,6 @@ fn submit ()
     'finish rp
 
 do
-    let init begin-frame sprite submit
+    let init begin-frame sprite rectangle submit
     let SpriteAtlas
     local-scope;
