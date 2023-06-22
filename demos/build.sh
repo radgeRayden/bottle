@@ -1,6 +1,9 @@
 #!/usr/bin/env bash
 set -euxo pipefail
 
+SCRIPT_SRC=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+cd $SCRIPT_SRC
+
 rm -rf ./dist ./bottle-demos
 mkdir ./dist
 mkdir ./dist/bin

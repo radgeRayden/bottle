@@ -1,5 +1,7 @@
 from doit.tools import LongRunning
 
+DOIT_CONFIG = {'default_tasks': ['build_demos']}
+
 def cmd(cmd):
     return f"bash -c \"{cmd}\""
 
