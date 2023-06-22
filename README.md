@@ -1,4 +1,4 @@
-Every game programmer eventually has the urge to create their own game engine. This is mine. It's written in Scopes, an experimental programming language. Learn more about it here: http://scopes.rocks/
+Every game programmer eventually has the urge to create their own game engine. This is mine. It's written in [Scopes](http://scopes.rocks/), an experimental programming language. Note you need a working install of Scopes in your path to use this framework.
 
 Basic goals (for a first version):
 - Good enough for sprite based games
