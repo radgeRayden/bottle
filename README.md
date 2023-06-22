@@ -9,7 +9,7 @@ Examples can be found in the `demos` folder.
 ### Building
 Currently Linux and Windows (MSYS2 MinGW) are supported. If it seems like you have all dependencies and it still fails to install, please open an issue.
 
-##### Linux
+#### Linux
 
 The exact package names for linux will depend on your distribution. 
 You may need to install the following packages prior to running the bootstrap recipe:
@@ -26,12 +26,12 @@ You may need to install the following packages prior to running the bootstrap re
 
 Here are examples for a couple common distributions; you can then translate to your favorite package manager / distribution.
 
-*Arch Linux*:
+Arch Linux:
 ```sh
 pacman -S wget git base-devel rust python3 zip unzip sdl2 cmake clang
 ```
 
-##### Windows (MinGW)
+#### Windows (MinGW)
 
 Install all needed dependencies inside a MSYS2 shell:
 ``` sh
