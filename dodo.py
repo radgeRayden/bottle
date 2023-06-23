@@ -1,9 +1,13 @@
+import platform
 from doit.tools import LongRunning
 
 DOIT_CONFIG = {'default_tasks': ['build_demos']}
 
 def cmd(cmd):
-    return f"bash -c \"{cmd}\""
+    if platform.system() == "Linux":
+        return f"bash -c \"{cmd} | ansi2txt\" || {cmd}"
+    else:
+        return f"bash -c \"{cmd}\""
 
 def task_eo():
     return {
