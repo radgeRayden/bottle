@@ -128,16 +128,15 @@ struct GeometryBatch
         'append self.index-data (0:u32 + vtx-offset)
         ;
 
-    fn... add-circle (self, center, radius, color : vec4 = (vec4 1))
+    fn... add-polygon (self, center, segments, radius, color : vec4 = (vec4 1))
         self.outdated-vertices? = true
         self.outdated-indices? = true
 
         radius as:= f32
-        segments := math.ceil (pi / (acos (1.0 - 0.5 / (max radius 0.5))))
-        segments := max 5:u32 (u32 segments)
-
         vtx-offset := self.vertex-offset + (countof self.vertex-data)
         vtx-offset as:= u32
+
+        segments := (max (u32 segments) 3:u32)
 
         'append self.vertex-data
             VertexAttributes (position = center) (color = color)
@@ -150,6 +149,17 @@ struct GeometryBatch
             'append self.index-data vtx-offset # center
             'append self.index-data (vtx-offset + i)
             'append self.index-data (vtx-offset + i + 1)
+        ()
+
+    fn... add-circle (self, center, radius, color : vec4 = (vec4 1))
+        self.outdated-vertices? = true
+        self.outdated-indices? = true
+
+        radius as:= f32
+        segments := math.ceil (pi / (acos (1.0 - 0.5 / (max radius 0.5))))
+        segments := max 5:u32 (u32 segments)
+
+        'add-polygon self center segments radius color
         ()
 
     fn finish (self render-pass)
