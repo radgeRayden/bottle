@@ -32,7 +32,7 @@ def task_force_bootstrap():
 def demo_cmd(name):
     return cmd(f"scopes -e run.sc {name}")
 
-demos = ["snake", "plonk.sprites", "gpu.hello-triangle", "gpu.buffers", "gpu.textures"]
+demos = ["snake", "plonk.sprites", "plonk.shapes", "gpu.hello-triangle", "gpu.buffers", "gpu.textures"]
 def task_demos ():
     for name in demos:
         yield {
