@@ -133,8 +133,7 @@ struct GeometryBatch
         self.outdated-indices? = true
 
         radius as:= f32
-        # https://stackoverflow.com/a/59568826
-        segments := floor (pi / (acos (1.0 - 0.5 / (max radius 0.5))))
+        segments := math.ceil (pi / (acos (1.0 - 0.5 / (max radius 0.5))))
         segments := max 5:u32 (u32 segments)
 
         vtx-offset := self.vertex-offset + (countof self.vertex-data)

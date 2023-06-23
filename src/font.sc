@@ -5,9 +5,7 @@ using import UTF-8
 import fontdue
 using import .asset.ImageData
 using import .enums
-
-let ceil =
-    (extern 'llvm.ceil.f32 (function f32 f32))
+using import .math
 
 struct Font
     font : fontdue.Font

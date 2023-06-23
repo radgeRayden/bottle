@@ -1,6 +1,9 @@
 using import glm
 
 do
+    let ceil =
+        (extern 'llvm.ceil.f32 (function f32 f32))
+
     inline orthographic-projection (width height)
         # https://www.scratchapixel.com/lessons/3d-basic-rendering/perspective-and-orthographic-projection-matrix/orthographic-projection-matrix
         # right, top
