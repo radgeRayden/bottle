@@ -128,6 +128,27 @@ struct GeometryBatch
         'append self.index-data (0:u32 + vtx-offset)
         ;
 
+    fn... add-circle (self, center, radius, color : vec4 = (vec4 1))
+        self.outdated-vertices? = true
+        self.outdated-indices? = true
+        segments := 50:u32
+
+        vtx-offset := self.vertex-offset + (countof self.vertex-data)
+        vtx-offset as:= u32
+
+        'append self.vertex-data
+            VertexAttributes (position = center) (color = color)
+        for i in (range (segments + 1))
+            'append self.vertex-data
+                VertexAttributes
+                    position = center + ((math.rotate2D (vec2 1 0) ((f32 i) * (2 * pi / segments))) * (f32 radius))
+                    color = color
+        for i in (range (segments + 1))
+            'append self.index-data vtx-offset # center
+            'append self.index-data (vtx-offset + i)
+            'append self.index-data (vtx-offset + i + 1)
+        ()
+
     fn finish (self render-pass)
         'flush self render-pass
         self.vertex-offset = 0

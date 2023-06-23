@@ -109,6 +109,11 @@ fn rectangle (...)
     set-texture ctx ctx.default-texture-binding ctx.default-texture
     'add-quad ctx.batch ...
 
+fn circle (...)
+    ctx := 'force-unwrap context
+    set-texture ctx ctx.default-texture-binding ctx.default-texture
+    'add-circle ctx.batch ...
+
 fn submit ()
     ctx := 'force-unwrap context
 
@@ -117,6 +122,6 @@ fn submit ()
     'finish rp
 
 do
-    let init begin-frame sprite rectangle submit
+    let init begin-frame sprite rectangle circle submit
     let SpriteAtlas
     local-scope;
