@@ -63,8 +63,8 @@ struct GeometryBatch
         'clear self.vertex-data
         'clear self.index-data
 
-    fn... add-quad (self : this-type, position, size, rotation : f32 = 0:f32, quad = (Quad (vec2 0 0) (vec2 1 1)),
-                      fliph? = false, flipv? = false, color = (vec4 1))
+    fn... add-quad (self : this-type, position : vec2, size : vec2, rotation : f32 = 0:f32, quad : Quad = (Quad (vec2 0 0) (vec2 1 1)),
+                      fliph? : bool = false, flipv? : bool = false, color : vec4 = (vec4 1))
 
         self.outdated-vertices? = true
         self.outdated-indices? = true
@@ -128,7 +128,7 @@ struct GeometryBatch
         'append self.index-data (0:u32 + vtx-offset)
         ;
 
-    fn... add-polygon (self, center, segments, radius, color : vec4 = (vec4 1))
+    fn... add-polygon (self, center, segments, radius, rotation : f32 = 0:f32, color : vec4 = (vec4 1))
         self.outdated-vertices? = true
         self.outdated-indices? = true
 
@@ -141,9 +141,10 @@ struct GeometryBatch
         'append self.vertex-data
             VertexAttributes (position = center) (color = color)
         for i in (range (segments + 1))
+            angle := (f32 i) * (2 * pi / (f32 segments)) + (pi / 2) + rotation
             'append self.vertex-data
                 VertexAttributes
-                    position = center + ((math.rotate2D (vec2 1 0) ((f32 i) * (2 * pi / (f32 segments)))) * radius)
+                    position = center + ((math.rotate2D (vec2 1 0) angle) * radius)
                     color = color
         for i in (range (segments + 1))
             'append self.index-data vtx-offset # center
@@ -159,7 +160,7 @@ struct GeometryBatch
         segments := math.ceil (pi / (acos (1.0 - 0.5 / (max radius 0.5))))
         segments := max 5:u32 (u32 segments)
 
-        'add-polygon self center segments radius color
+        'add-polygon self center segments radius 0:f32 color
         ()
 
     fn finish (self render-pass)

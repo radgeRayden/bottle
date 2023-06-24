@@ -104,10 +104,10 @@ fn... sprite (atlas : SpriteAtlas, ...)
     set-texture ctx ('force-unwrap atlas.bind-group) ('get-id atlas.texture-view)
     'add-quad ctx.batch ...
 
-fn rectangle (...)
+fn... rectangle (position, size, rotation, color)
     ctx := 'force-unwrap context
     set-texture ctx ctx.default-texture-binding ctx.default-texture
-    'add-quad ctx.batch ...
+    'add-quad ctx.batch position size rotation (color = color)
 
 fn circle (...)
     ctx := 'force-unwrap context
