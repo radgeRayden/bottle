@@ -30,7 +30,6 @@ bindings :=
 
 package wgpu-native
     platform linux unknown
-    version VERSION
     summary SUMMARY
 
     preinstall-dir := (git-release-dir "make")
@@ -41,7 +40,6 @@ package wgpu-native
 
 package wgpu-native
     platform windows-mingw
-    version VERSION
     summary SUMMARY
 
     preinstall-dir := (git-release-dir "mingw32-make")
