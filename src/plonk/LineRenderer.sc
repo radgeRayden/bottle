@@ -22,7 +22,7 @@ struct LineRenderer
 
     inline __typecall (cls)
         vert := ShaderModule shaders.line-vert ShaderLanguage.SPIRV ShaderStage.Vertex
-        frag := ShaderModule shaders.sprite-frag ShaderLanguage.SPIRV ShaderStage.Fragment
+        frag := ShaderModule shaders.generic-frag ShaderLanguage.SPIRV ShaderStage.Fragment
         pipeline :=
             RenderPipeline
                 layout = (nullof PipelineLayout)
@@ -60,7 +60,7 @@ struct LineRenderer
                     start = vertices @ idx
                     end = vertices @ (idx + 1)
                     color = (vec4 1)
-                    width = 10
+                    width = 1
 
     fn draw (self render-pass)
         if (not self.outdated?)

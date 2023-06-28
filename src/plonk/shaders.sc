@@ -4,7 +4,7 @@ using import glsl
 using import struct
 
 do
-    fn sprite-vert ()
+    fn generic-vert ()
         buffer input-data :
             struct VertexData plain
                 data : (array VertexAttributes)
@@ -59,7 +59,7 @@ do
         vtexcoords = (vec2)
         vcolor = segment.color
 
-    fn sprite-frag ()
+    fn generic-frag ()
         uniform s : sampler (set = 1) (binding = 0)
         uniform t : texture2D (set = 1) (binding = 1)
 

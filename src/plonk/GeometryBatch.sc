@@ -1,9 +1,12 @@
 using import Array
 using import glm
 using import Option
+using import String
 using import struct
 
 import ..math
+import .shaders
+using import ..enums
 using import ..gpu.types
 using import .common
 
@@ -19,8 +22,41 @@ struct GeometryBatch
     index-offset  : usize
 
     pipeline : RenderPipeline
-    bind-group : (Option BindGroup)
+    bind-group : BindGroup
     cached-buffer-id : u64
+
+    inline __typecall (cls)
+        vert := ShaderModule shaders.generic-vert ShaderLanguage.SPIRV ShaderStage.Vertex
+        frag := ShaderModule shaders.generic-frag ShaderLanguage.SPIRV ShaderStage.Fragment
+        pipeline :=
+            RenderPipeline
+                layout = (nullof PipelineLayout)
+                topology = PrimitiveTopology.TriangleList
+                winding = FrontFace.CCW
+                vertex-stage =
+                    VertexStage
+                        shader = vert
+                        entry-point = S"main"
+                fragment-stage =
+                    FragmentStage
+                        shader = frag
+                        entry-point = S"main"
+                        color-targets =
+                            arrayof ColorTarget
+                                typeinit
+                                    format = TextureFormat.BGRA8UnormSrgb
+
+        attrbuf := (StorageBuffer VertexAttributes) 4096
+        uniform-buffer := (UniformBuffer Uniforms) 1
+        bind-group := BindGroup ('get-bind-group-layout pipeline 0) (view attrbuf) (view uniform-buffer)
+
+        super-type.__typecall cls
+            cached-buffer-id = copy ('get-id attrbuf)
+            attribute-buffer = attrbuf
+            index-buffer = typeinit 8192
+            uniform-buffer = uniform-buffer
+            pipeline = pipeline
+            bind-group = bind-group
 
     fn flush (self render-pass)
         if (not (self.outdated-vertices? or self.outdated-indices?))
@@ -55,7 +91,7 @@ struct GeometryBatch
         index-count := (countof self.index-data)
         'set-index-buffer render-pass self.index-buffer
         'set-pipeline render-pass self.pipeline
-        'set-bind-group render-pass 0 ('force-unwrap self.bind-group)
+        'set-bind-group render-pass 0 self.bind-group
         'draw-indexed render-pass (index-count as u32) 1:u32 (u32 self.index-offset)
 
         self.vertex-offset += (countof self.vertex-data)
