@@ -21,7 +21,6 @@ fn (dt)
     'clear line-vertices
     for i in (range w)
         'append line-vertices (vec2 i (calculate-height i))
-        'append line-vertices (vec2 (i + 1) (calculate-height (i + 1)))
 
 @@ 'on bottle.render
 fn ()

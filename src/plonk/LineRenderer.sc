@@ -53,12 +53,11 @@ struct LineRenderer
 
     fn add-segments (self vertices)
         self.outdated? = true
-        for i in (range ((countof vertices) // 2))
-            idx := i * 2
+        for i in (range ((countof vertices) - 1))
             'append self.segment-data
                 LineSegment
-                    start = vertices @ idx
-                    end = vertices @ (idx + 1)
+                    start = vertices @ i
+                    end = vertices @ (i + 1)
                     color = (vec4 1)
                     width = 1
 
