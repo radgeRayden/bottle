@@ -21,18 +21,23 @@ struct GfxState
 
 global istate : GfxState
 
+# TODO: fill the capability struct in as part of initialization and then have different functions querying this info
 fn get-preferred-surface-format ()
     local capabilities : wgpu.SurfaceCapabilities
     wgpu.SurfaceGetCapabilities istate.surface istate.adapter &capabilities
+    capabilities.formats = alloca-array wgpu.TextureFormat capabilities.formatCount
+    capabilities.presentModes = alloca-array wgpu.PresentMode capabilities.presentModeCount
+    capabilities.alphaModes = alloca-array wgpu.CompositeAlphaMode capabilities.alphaModeCount
 
-    let selected-format = wgpu.TextureFormat.BGRA8UnormSrgb
-        # FIXME: currently the surface format array is not getting filled, so we can't iterate over it
-        # fold (selected-format = wgpu.TextureFormat.Undefined) for i in (range capabilities.formatCount)
-        #     let format = (capabilities.formats @ i)
-        #     if (format == wgpu.TextureFormat.BGRA8UnormSrgb)
-        #         break (copy format)
-        #     else
-        #         selected-format
+    wgpu.SurfaceGetCapabilities istate.surface istate.adapter &capabilities
+
+    let selected-format =
+        fold (selected-format = wgpu.TextureFormat.Undefined) for i in (range capabilities.formatCount)
+            let format = (capabilities.formats @ i)
+            if (format == wgpu.TextureFormat.BGRA8UnormSrgb)
+                break (copy format)
+            else
+                selected-format
 
     assert (selected-format != wgpu.TextureFormat.Undefined)
         "it was not possible to select an appropriate surface format on this platform"
