@@ -6,6 +6,12 @@ struct VertexAttributes plain
     texcoords : vec2
     color : vec4
 
+struct LineSegment plain
+    color : vec4
+    start : vec2
+    end   : vec2
+    width : f32
+
 struct Uniforms
     mvp : mat4
 
@@ -14,5 +20,5 @@ struct Quad plain
     extent : vec2
 
 do
-    let Quad VertexAttributes Uniforms
+    let Quad VertexAttributes LineSegment Uniforms
     local-scope;

@@ -8,8 +8,8 @@ using import ..gpu.types
 using import ..enums
 using import .SpriteAtlas
 using import .GeometryBatch
+using import .LineRenderer
 import ..asset
-import ..callbacks
 import ..gpu
 import ..math
 import ..window
@@ -17,6 +17,7 @@ import .shaders
 
 struct PlonkState
     batch : GeometryBatch
+    line-renderer : LineRenderer
     sampler : Sampler
     default-texture-binding : BindGroup
     render-pass : (Option RenderPass)
@@ -76,6 +77,7 @@ fn begin-frame ()
             math.orthographic-projection w h
             math.translation-matrix (vec3 (-w / 2) (-h / 2) 0)
     'frame-write ctx.batch.uniform-buffer (Uniforms mvp)
+    'frame-write ctx.line-renderer.uniform-buffer (Uniforms mvp)
 
     cmd-encoder := (gpu.get-cmd-encoder)
     swapchain-image := (gpu.get-swapchain-image)
@@ -119,6 +121,12 @@ fn polygon (...)
     set-texture ctx ctx.default-texture-binding ctx.default-texture
     'add-polygon ctx.batch ...
 
+fn line (vertices)
+    ctx := 'force-unwrap context
+    set-texture ctx ctx.default-texture-binding ctx.default-texture
+    'add-segments ctx.line-renderer vertices
+    'draw ctx.line-renderer ('force-unwrap ctx.render-pass)
+
 fn submit ()
     ctx := 'force-unwrap context
 
@@ -127,6 +135,6 @@ fn submit ()
     'finish rp
 
 do
-    let init begin-frame sprite rectangle circle polygon submit
-    let SpriteAtlas
+    let init begin-frame sprite rectangle circle polygon line submit
+    let SpriteAtlas Quad
     local-scope;
