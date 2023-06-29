@@ -97,10 +97,10 @@ fn polygon (...)
     set-texture ctx ctx.default-texture-binding ctx.default-texture
     'add-polygon ctx.batch ...
 
-fn line (vertices)
+fn line (...)
     ctx := 'force-unwrap context
     set-texture ctx ctx.default-texture-binding ctx.default-texture
-    'add-segments ctx.line-renderer vertices
+    'add-segments ctx.line-renderer ...
     'draw ctx.line-renderer ('force-unwrap ctx.render-pass)
 
 fn submit ()

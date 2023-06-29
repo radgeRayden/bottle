@@ -51,15 +51,15 @@ struct LineRenderer
             pipeline = pipeline
             bind-group = bind-group
 
-    fn add-segments (self vertices)
+    fn... add-segments (self, vertices, width : f32 = 1.0, color : vec4 = (vec4 1))
         self.outdated? = true
         for i in (range ((countof vertices) - 1))
             'append self.segment-data
                 LineSegment
                     start = vertices @ i
                     end = vertices @ (i + 1)
-                    color = (vec4 1)
-                    width = 1
+                    color = color
+                    width = width
 
     fn draw (self render-pass)
         if (not self.outdated?)

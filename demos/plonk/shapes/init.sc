@@ -8,6 +8,7 @@ fn (cfg)
     cfg.window.title = "geometric shapes"
 
 global rotation : f32
+global line-width : f32
 global line-vertices : (Array vec2)
 
 @@ 'on bottle.update
@@ -21,11 +22,12 @@ fn (dt)
     'clear line-vertices
     for i in (range w)
         'append line-vertices (vec2 i (calculate-height i))
+    line-width = ((cos (f32 (bottle.time.get-time))) + 1) * 12.5
 
 @@ 'on bottle.render
 fn ()
     plonk := bottle.plonk
-    plonk.line line-vertices
+    plonk.line line-vertices line-width (vec4 1 0.5 0.7 1)
     plonk.rectangle (vec2 50 100) (vec2 200) rotation (vec4 1 0 1 1)
     plonk.circle (vec2 150 200) 100 (color = (vec4 0 1 0 1))
     plonk.polygon (vec2 150 200) 3 100 rotation (vec4 0 0.5 0.5 1)
