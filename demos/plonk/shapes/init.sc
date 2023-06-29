@@ -16,18 +16,22 @@ fn (dt)
     rotation += (f32 dt) * 4
 
     w h := (bottle.window.get-size)
-    inline calculate-height (i)
-        (((sin (((i / w) * pi * 10) + (f32 (bottle.time.get-time)))) * (f32 h)) / 2) + ((f32 h) / 2)
-
     'clear line-vertices
-    for i in (range w)
-        'append line-vertices (vec2 i (calculate-height i))
-    line-width = ((cos (f32 (bottle.time.get-time))) + 1) * 12.5
+    count := 6
+    time := (bottle.time.get-time)
+    for i in (range count)
+        scaling := ((sin (f32 time)) + 1) / 2
+        spacing := (w / count) * scaling
+        margin := ((f32 w) - spacing * count) / 2
+        'append line-vertices
+            vec2 (margin + (spacing * (f32 i))) 100
+        'append line-vertices
+            vec2 (margin + (spacing * (f32 i)) + (spacing / 2)) (h - 100)
 
 @@ 'on bottle.render
 fn ()
     plonk := bottle.plonk
-    plonk.line line-vertices line-width (vec4 1 0.5 0.7 1)
+    plonk.line line-vertices 50:f32 (vec4 1 0.5 0.7 1)
     plonk.rectangle (vec2 50 100) (vec2 200) rotation (vec4 1 0 1 1)
     plonk.circle (vec2 150 200) 100 (color = (vec4 0 1 0 1))
     plonk.polygon (vec2 150 200) 3 100 rotation (vec4 0 0.5 0.5 1)

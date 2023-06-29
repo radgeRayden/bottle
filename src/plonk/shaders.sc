@@ -56,6 +56,28 @@ do
         vtexcoords = (vec2)
         vcolor = segment.color
 
+    @@ vertex-shader LineSegment
+    inline join-vert (data uniforms vtexcoords vcolor)
+        idx := gl_InstanceIndex
+        last next := data @ idx, data @ (idx + 1)
+
+        inline get-perpendicular (segment)
+            dir := segment.end - segment.start
+            normalize (vec2 dir.y -dir.x)
+        perp-A perp-B := get-perpendicular last, get-perpendicular next
+
+        local vertices =
+            arrayof vec2
+                last.end - perp-A * (last.width / 2)
+                last.end
+                next.start - perp-B * (next.width / 2)
+
+        vpos := vertices @ gl_VertexIndex
+
+        gl_Position = uniforms.mvp * (vec4 vpos 0 1)
+        vtexcoords = (vec2)
+        vcolor = last.color
+
     fn generic-frag ()
         uniform s : sampler (set = 1) (binding = 0)
         uniform t : texture2D (set = 1) (binding = 1)
