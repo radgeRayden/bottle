@@ -65,12 +65,16 @@ do
             dir := segment.end - segment.start
             normalize (vec2 dir.y -dir.x)
         perp-A perp-B := get-perpendicular last, get-perpendicular next
+        tangent := perp-B - perp-A
+        normal := normalize (vec2 tangent.y -tangent.x)
+
+        sigma := sign (dot (perp-A + perp-B) normal)
 
         local vertices =
             arrayof vec2
-                last.end - perp-A * (last.width / 2)
+                last.end + (perp-A * (last.width / 2) * sigma)
                 last.end
-                next.start - perp-B * (next.width / 2)
+                next.start + (perp-B * (next.width / 2) * sigma)
 
         vpos := vertices @ gl_VertexIndex
 
