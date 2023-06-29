@@ -19,10 +19,11 @@ fn (dt)
     'clear line-vertices
     count := 6
     time := (bottle.time.get-time)
+    scaling := ((sin (f32 time)) + 1) / 2
+    spacing := (w / count) * scaling * 0.9
+    margin  := ((f32 w) - spacing * count) / 2 + spacing / 4
+
     for i in (range count)
-        scaling := ((sin (f32 time)) + 1) / 2
-        spacing := (w / count) * scaling
-        margin := ((f32 w) - spacing * count) / 2
         'append line-vertices
             vec2 (margin + (spacing * (f32 i))) 100
         'append line-vertices
