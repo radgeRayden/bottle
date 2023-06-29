@@ -1,4 +1,3 @@
-using import compiler.Printer
 using import String
 using import struct
 

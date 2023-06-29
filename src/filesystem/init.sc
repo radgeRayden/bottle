@@ -2,7 +2,6 @@ cfg := `(. (import ..config) istate-cfg filesystem)
 run-stage;
 
 import C.string
-using import compiler.Printer
 using import String
 using import Array
 import physfs

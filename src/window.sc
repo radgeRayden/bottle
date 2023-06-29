@@ -1,7 +1,6 @@
 cfg := `(. (import .config) istate-cfg window)
 run-stage;
 
-using import compiler.Printer
 using import String
 import sdl
 

@@ -6,7 +6,7 @@ cfg := config.istate-cfg
 name argc argv := (script-launch-args)
 let demo =
     if (argc > 0)
-        String (argv @ 0)
+        'from-rawstring String (argv @ 0)
     else
         S"gpu.hello-triangle"
 
