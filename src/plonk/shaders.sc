@@ -3,42 +3,39 @@ using import glm
 using import glsl
 using import struct
 
+@@ memo
+inline make-buffer-type (T)
+    struct ((tostring T) .. "Buffer") plain
+        data : (array T)
+
+inline vertex-shader (attrT)
+    inline (f)
+        fn ()
+            buffer input-data : (make-buffer-type attrT)
+                set = 0
+                binding = 0
+
+            uniform uniforms : Uniforms
+                set = 0
+                binding = 1
+
+            out vtexcoords : vec2 (location = 0)
+            out vcolor : vec4 (location = 1)
+
+            f input-data.data uniforms vtexcoords vcolor
+
 do
-    fn generic-vert ()
-        buffer input-data :
-            struct VertexData plain
-                data : (array VertexAttributes)
-            set = 0
-            binding = 0
-
-        uniform uniforms : Uniforms
-            set = 0
-            binding = 1
-
-        out vtexcoords : vec2 (location = 0)
-        out vcolor : vec4 (location = 1)
-
+    @@ vertex-shader VertexAttributes
+    inline generic-vert (data uniforms vtexcoords vcolor)
         idx := gl_VertexIndex
-        vertex := (input-data.data @ idx)
+        vertex := data @ idx
 
         gl_Position = uniforms.mvp * (vec4 vertex.position 0.0 1.0)
         vtexcoords = vertex.texcoords
         vcolor = vertex.color
 
-    fn line-vert ()
-        buffer input-data :
-            struct SegmentData plain
-                data : (array LineSegment)
-            set = 0
-            binding = 0
-
-        uniform uniforms : Uniforms
-            set = 0
-            binding = 1
-
-        out vtexcoords : vec2 (location = 0)
-        out vcolor : vec4 (location = 1)
-
+    @@ vertex-shader LineSegment
+    inline line-vert (data uniforms vtexcoords vcolor)
         local vertices =
             arrayof vec2
                 vec2 (-0.5,  1.0) #tl
@@ -49,7 +46,7 @@ do
                 vec2 (-0.5,  1.0) #tl
 
         vertex := vertices @ gl_VertexIndex
-        segment := input-data.data @ gl_InstanceIndex
+        segment := data @ gl_InstanceIndex
 
         dir := segment.end - segment.start
         perp := normalize (vec2 dir.y -dir.x)
