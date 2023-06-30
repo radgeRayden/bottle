@@ -80,7 +80,11 @@ struct LineRenderer
 
         try
             'frame-write self.segment-buffer self.segment-data self.buffer-offset
-        else ()
+        else
+            # resize then try again
+            self.segment-buffer = ('clone self.segment-buffer (self.segment-buffer.Capacity * 2:usize))
+            return (this-function self render-pass)
+
         self.outdated? = false
 
         'set-bind-group render-pass 0 self.bind-group
