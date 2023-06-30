@@ -2,3 +2,8 @@
 /.eo/
 /include/
 /lib/
+/.doit.db
+/__pycache__/
+/bin/
+/eo
+/demos/bottle-demos.zip
