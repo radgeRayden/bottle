@@ -34,6 +34,7 @@ struct LineRenderer
     outdated?    : bool
 
     segment-buffer : DataBufferType
+    buffer-offset : usize
     uniform-buffer : UniformBufferType
     segment-pipeline : RenderPipeline
     join-pipeline : RenderPipeline
@@ -78,7 +79,7 @@ struct LineRenderer
             return;
 
         try
-            'frame-write self.segment-buffer self.segment-data
+            'frame-write self.segment-buffer self.segment-data self.buffer-offset
         else ()
         self.outdated? = false
 
@@ -86,12 +87,16 @@ struct LineRenderer
 
         segment-count := u32 (countof self.segment-data)
         'set-pipeline render-pass self.segment-pipeline
-        'draw render-pass 6 segment-count
+        'draw render-pass 6 segment-count 0:u32 (u32 self.buffer-offset)
 
         'set-pipeline render-pass self.join-pipeline
-        'draw render-pass 3 (segment-count - 1)
+        'draw render-pass 3 (segment-count - 1) 0:u32 (u32 self.buffer-offset)
 
+        self.buffer-offset += (countof self.segment-data)
         'clear self.segment-data
+
+    fn finish (self)
+        self.buffer-offset = 0
 
 do
     let LineRenderer

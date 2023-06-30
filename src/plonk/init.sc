@@ -115,6 +115,7 @@ fn line (...)
     ctx := 'force-unwrap context
     set-batch BatchType.Lines ctx ctx.default-texture-binding ctx.default-texture
     'add-segments ctx.line-renderer ...
+    'draw ctx.line-renderer ('force-unwrap ctx.render-pass)
 
 fn submit ()
     ctx := 'force-unwrap context
@@ -122,6 +123,7 @@ fn submit ()
 
     rp := 'force-unwrap ('swap ctx.render-pass none)
     'finish ctx.geometry-batch rp
+    'finish ctx.line-renderer
     'finish rp
 
 do
