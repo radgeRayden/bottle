@@ -58,6 +58,8 @@ fn init ()
 
 fn begin-frame ()
     ctx := 'force-unwrap context
+    'begin-frame ctx.line-renderer
+    'begin-frame ctx.geometry-batch
 
     w h := (window.get-size)
     mvp :=

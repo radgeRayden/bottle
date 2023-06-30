@@ -40,6 +40,11 @@ struct LineRenderer
     join-pipeline : RenderPipeline
     bind-group : BindGroup
 
+    # FIXME: this is a workaround for a lifetime issue. Review if this is
+    # really necessary.
+    obsolete-bindgroups : (Array BindGroup)
+    obsolete-buffers : (Array DataBufferType)
+
     inline __typecall (cls)
         frag := ShaderModule shaders.generic-frag ShaderLanguage.SPIRV ShaderStage.Fragment
 
@@ -64,6 +69,10 @@ struct LineRenderer
             join-pipeline = join-pipeline
             bind-group = bind-group
 
+    fn begin-frame (self)
+        'clear self.obsolete-bindgroups
+        'clear self.obsolete-buffers
+
     fn... add-segments (self, vertices, width : f32 = 1.0, color : vec4 = (vec4 1))
         self.outdated? = true
         for i in (range ((countof vertices) - 1))
@@ -82,7 +91,14 @@ struct LineRenderer
             'frame-write self.segment-buffer self.segment-data self.buffer-offset
         else
             # resize then try again
-            self.segment-buffer = ('clone self.segment-buffer (self.segment-buffer.Capacity * 2:usize))
+            'append self.obsolete-buffers
+                popswap
+                    self.segment-buffer
+                    'clone self.segment-buffer (self.segment-buffer.Capacity * 2:usize)
+            'append self.obsolete-bindgroups
+                popswap
+                    self.bind-group
+                    BindGroup ('get-bind-group-layout self.segment-pipeline 0) (view self.segment-buffer) (view self.uniform-buffer)
             return (this-function self render-pass)
 
         self.outdated? = false
@@ -101,7 +117,6 @@ struct LineRenderer
 
     fn finish (self)
         self.buffer-offset = 0
-
 do
     let LineRenderer
     local-scope;

@@ -10,6 +10,7 @@ using import ..enums
 using import ..gpu.types
 using import .common
 
+# TODO: unify batch interfaces
 struct GeometryBatch
     attribute-buffer : (StorageBuffer VertexAttributes)
     index-buffer     : (IndexBuffer u32)
@@ -24,6 +25,12 @@ struct GeometryBatch
     pipeline : RenderPipeline
     bind-group : BindGroup
     cached-buffer-id : u64
+
+    # FIXME: this is a workaround for a lifetime issue. Review if this is
+    # really necessary.
+    obsolete-bindgroups : (Array BindGroup)
+    obsolete-buffers : (Array (StorageBuffer VertexAttributes))
+    obsolete-index-buffers : (Array (IndexBuffer u32))
 
     inline __typecall (cls)
         vert := ShaderModule shaders.generic-vert ShaderLanguage.SPIRV ShaderStage.Vertex
@@ -58,6 +65,11 @@ struct GeometryBatch
             pipeline = pipeline
             bind-group = bind-group
 
+    fn begin-frame (self)
+        'clear self.obsolete-bindgroups
+        'clear self.obsolete-buffers
+        'clear self.obsolete-index-buffers
+
     fn flush (self render-pass)
         if (not (self.outdated-vertices? or self.outdated-indices?))
             return;
@@ -68,11 +80,17 @@ struct GeometryBatch
                 'frame-write attrbuf self.vertex-data self.vertex-offset
             else
                 # resize then try again
-                self.attribute-buffer = ('clone attrbuf (attrbuf.Capacity * 2:usize))
+                'append self.obsolete-buffers
+                    popswap
+                        self.attribute-buffer
+                        'clone attrbuf (attrbuf.Capacity * 2:usize)
                 return (this-function self render-pass)
 
             if (self.cached-buffer-id != ('get-id attrbuf))
-                self.bind-group = BindGroup ('get-bind-group-layout self.pipeline 0) attrbuf self.uniform-buffer
+                'append self.obsolete-bindgroups
+                    popswap
+                        self.bind-group
+                        BindGroup ('get-bind-group-layout self.pipeline 0) attrbuf self.uniform-buffer
                 self.cached-buffer-id = ('get-id attrbuf)
 
             self.outdated-vertices? = false
@@ -83,7 +101,10 @@ struct GeometryBatch
                 'frame-write idxbuf self.index-data self.index-offset
             else
                 # resize then try again
-                self.index-buffer = ('clone idxbuf (idxbuf.Capacity * 2:usize))
+                'append self.obsolete-index-buffers
+                    popswap
+                        self.index-buffer
+                        'clone idxbuf (idxbuf.Capacity * 2:usize)
                 return (this-function self render-pass)
 
             self.outdated-indices? = false
