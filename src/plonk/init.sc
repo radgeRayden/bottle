@@ -113,7 +113,7 @@ fn polygon (...)
 
 fn line (...)
     ctx := 'force-unwrap context
-    set-batch BatchType.GenericGeometry ctx ctx.default-texture-binding ctx.default-texture
+    set-batch BatchType.Lines ctx ctx.default-texture-binding ctx.default-texture
     'add-segments ctx.line-renderer ...
 
 fn submit ()
