@@ -4,7 +4,7 @@ set -euxo pipefail
 SCRIPT_SRC=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 cd $SCRIPT_SRC
 
-rm -rf ./dist ./bottle-demos
+rm -rf ./dist ./bottle-demos bottle-demos.zip
 mkdir ./dist
 mkdir ./dist/bin
 mkdir ./dist/obj
@@ -15,6 +15,7 @@ scopes -e ./build.sc ".gpu.buffers"
 scopes -e ./build.sc ".gpu.textures"
 scopes -e ./build.sc ".plonk.sprites"
 scopes -e ./build.sc ".plonk.shapes"
+scopes -e ./build.sc ".plonk.line-benchmark"
 scopes -e ./build.sc ".snake"
 
 cp ./gpu/textures/linus.jpg ./dist/bin
