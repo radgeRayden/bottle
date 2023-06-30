@@ -1,6 +1,7 @@
 using import String
 using import C.stdlib
 using import radl.strfmt
+using import print
 
 bottle := __env.bottle
 obj-dir := "./dist/obj"
@@ -43,7 +44,11 @@ fn build-demo (name)
 
     cmd := f"gcc -o ${bin-dir}/${exe-name} ${obj-dir}/${obj-name} -I../include ../src/scopesrt.c -lm -L${bin-dir} ${libflags} -Wl,-rpath '-Wl,$ORIGIN'"
     print "+" cmd
-    system cmd
+    status := system cmd
+    if (status == -1)
+        error "failed to execute compilation command"
+    else
+        status >> 8
 
 sugar-if main-module?
     name argc argv := (script-launch-args)

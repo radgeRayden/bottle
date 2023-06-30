@@ -1,7 +1,7 @@
-using import String
 using import C.stdlib
+using import String
+using import print
 using import radl.strfmt
-using import compiler.Printer
 
 libs... :=
     va-map
