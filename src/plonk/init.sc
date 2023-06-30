@@ -118,11 +118,11 @@ fn line (...)
 
 fn submit ()
     ctx := 'force-unwrap context
+    ctx.current-batch = BatchType.None
 
-    rp := ('force-unwrap ctx.render-pass)
+    rp := 'force-unwrap ('swap ctx.render-pass none)
     'finish ctx.geometry-batch rp
-    set-batch BatchType.None ctx ctx.default-texture-binding ctx.default-texture
-    'finish ('force-unwrap ('swap ctx.render-pass none))
+    'finish rp
 
 do
     let init begin-frame sprite rectangle circle polygon line submit
