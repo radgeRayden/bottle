@@ -4,6 +4,7 @@ run-stage;
 import C.string
 using import String
 using import Array
+using import print
 import physfs
 
 using import ..exceptions

@@ -1,6 +1,7 @@
 using import glm
 using import Map
 using import Option
+using import print
 using import String
 using import struct
 using import ..exceptions
@@ -47,7 +48,7 @@ fn get-preferred-surface-format ()
 spice wrap-nullable-object (cls object)
     spice-quote
         if (object == null)
-            print "OBJECT CREATION FAILED:" [(tostring ('anchor object))]
+            print "OBJECT CREATION FAILED:" [(static-tostring ('anchor object))]
             raise GPUError.ObjectCreationFailed
         else
             imply object cls

@@ -1,6 +1,7 @@
 cfg := `(. (import .config) istate-cfg window)
 run-stage;
 
+using import print
 using import String
 import sdl
 
@@ -44,7 +45,7 @@ fn get-desktop-size (display)
 
     if (result != 0)
         msg := (sdl.GetError)
-        print "Failed to get desktop size:" msg
+        print "Failed to get desktop size:" ('from-rawstring String msg)
         return 1366 768
 
     _ mode.w mode.h
@@ -86,7 +87,7 @@ fn init ()
 
     if (status < 0)
         msg := (sdl.GetError)
-        print "SDL initialization failed:" msg
+        print "SDL initialization failed:" ('from-rawstring String msg)
 
     relative-width relative-height := (get-relative-size 0 cfg.relative-width cfg.relative-height)
     let width =
