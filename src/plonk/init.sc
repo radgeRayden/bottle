@@ -1,3 +1,4 @@
+using import enum
 using import glm
 using import Option
 using import String
@@ -15,15 +16,23 @@ import ..math
 import ..window
 import .shaders
 
+enum BatchType plain
+    None
+    GenericGeometry
+    Lines
+
 struct PlonkState
-    batch : GeometryBatch
-    line-renderer : LineRenderer
     sampler : Sampler
+    default-texture : TextureView
     default-texture-binding : BindGroup
     render-pass : (Option RenderPass)
 
+    geometry-batch : GeometryBatch
+    line-renderer : LineRenderer
+
     last-texture    : u64
-    default-texture : u64
+
+    current-batch : BatchType
 
 global context : (Option PlonkState)
 
@@ -36,12 +45,15 @@ fn init ()
 
         default-texture := TextureView (Texture default-texture-imdata)
         # FIXME: switch to explicit layout
-        batch := (GeometryBatch)
+        geometry-batch := (GeometryBatch)
         context =
             PlonkState
-                default-texture-binding = (BindGroup ('get-bind-group-layout batch.pipeline 1) (view sampler) (view default-texture))
+                default-texture-binding = (BindGroup ('get-bind-group-layout geometry-batch.pipeline 1) (view sampler) (view default-texture))
+                default-texture = default-texture
                 sampler = sampler
-                batch = batch
+                geometry-batch = geometry-batch
+                current-batch = BatchType.None
+
     else ()
 
 fn begin-frame ()
@@ -52,63 +64,65 @@ fn begin-frame ()
         *
             math.orthographic-projection w h
             math.translation-matrix (vec3 (-w / 2) (-h / 2) 0)
-    'frame-write ctx.batch.uniform-buffer (Uniforms mvp)
+    'frame-write ctx.geometry-batch.uniform-buffer (Uniforms mvp)
     'frame-write ctx.line-renderer.uniform-buffer (Uniforms mvp)
 
     cmd-encoder := (gpu.get-cmd-encoder)
     swapchain-image := (gpu.get-swapchain-image)
-    ctx.last-texture = ('get-id swapchain-image)
+    ctx.last-texture = 0
     rp := RenderPass cmd-encoder (ColorAttachment swapchain-image false)
     'set-bind-group rp 1 ctx.default-texture-binding
 
     ctx.render-pass = rp
 
-fn set-texture (ctx bind-group id)
-    if (ctx.last-texture != id)
-        rp := ('force-unwrap ctx.render-pass)
+fn set-batch (kind ctx bind-group texture-view)
+    texture-id := ('get-id texture-view)
+    rp := ('force-unwrap ctx.render-pass)
 
-        if (ctx.last-texture != 0)
-            'flush ctx.batch rp
+    if ((ctx.current-batch != kind) or (ctx.last-texture != texture-id))
+        'flush ctx.geometry-batch rp
+        'draw ctx.line-renderer rp
 
-        'set-bind-group rp 1 bind-group
-        ctx.last-texture = id
+    'set-bind-group rp 1 bind-group
+    ctx.last-texture = texture-id
+    ctx.current-batch = kind
 
 fn... sprite (atlas : SpriteAtlas, ...)
     ctx := 'force-unwrap context
 
     if (not atlas.bind-group)
-        atlas.bind-group = BindGroup ('get-bind-group-layout ctx.batch.pipeline 1) ctx.sampler atlas.texture-view
+        atlas.bind-group = BindGroup ('get-bind-group-layout ctx.geometry-batch.pipeline 1) ctx.sampler atlas.texture-view
 
-    set-texture ctx ('force-unwrap atlas.bind-group) ('get-id atlas.texture-view)
-    'add-quad ctx.batch ...
+    set-batch BatchType.GenericGeometry ctx ('force-unwrap atlas.bind-group) atlas.texture-view
+    'add-quad ctx.geometry-batch ...
 
 fn... rectangle (position, size, rotation, color)
     ctx := 'force-unwrap context
-    set-texture ctx ctx.default-texture-binding ctx.default-texture
-    'add-quad ctx.batch position size rotation (color = color)
+    set-batch BatchType.GenericGeometry ctx ctx.default-texture-binding ctx.default-texture
+    'add-quad ctx.geometry-batch position size rotation (color = color)
 
 fn circle (...)
     ctx := 'force-unwrap context
-    set-texture ctx ctx.default-texture-binding ctx.default-texture
-    'add-circle ctx.batch ...
+    set-batch BatchType.GenericGeometry ctx ctx.default-texture-binding ctx.default-texture
+    'add-circle ctx.geometry-batch ...
 
 fn polygon (...)
     ctx := 'force-unwrap context
-    set-texture ctx ctx.default-texture-binding ctx.default-texture
-    'add-polygon ctx.batch ...
+    set-batch BatchType.GenericGeometry ctx ctx.default-texture-binding ctx.default-texture
+    'add-polygon ctx.geometry-batch ...
 
 fn line (...)
     ctx := 'force-unwrap context
-    set-texture ctx ctx.default-texture-binding ctx.default-texture
+    set-batch BatchType.GenericGeometry ctx ctx.default-texture-binding ctx.default-texture
     'add-segments ctx.line-renderer ...
-    'draw ctx.line-renderer ('force-unwrap ctx.render-pass)
 
 fn submit ()
     ctx := 'force-unwrap context
 
-    rp := ('force-unwrap ('swap ctx.render-pass none))
-    'finish ctx.batch rp
-    'finish rp
+    rp := ('force-unwrap ctx.render-pass)
+    'finish ctx.geometry-batch rp
+    set-batch BatchType.None ctx ctx.default-texture-binding ctx.default-texture
+    'finish ('force-unwrap ('swap ctx.render-pass none))
 
 do
     let init begin-frame sprite rectangle circle polygon line submit

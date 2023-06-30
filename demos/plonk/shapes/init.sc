@@ -32,10 +32,10 @@ fn (dt)
 @@ 'on bottle.render
 fn ()
     plonk := bottle.plonk
-    plonk.line line-vertices 50:f32 (vec4 1 0.5 0.7 1)
     plonk.rectangle (vec2 50 100) (vec2 200) rotation (vec4 1 0 1 1)
     plonk.circle (vec2 150 200) 100 (color = (vec4 0 1 0 1))
     plonk.polygon (vec2 150 200) 3 100 rotation (vec4 0 0.5 0.5 1)
+    plonk.line line-vertices 50:f32 (vec4 1 0.5 0.7 1)
     plonk.polygon (vec2 500 200) 5 100 rotation
 
 sugar-if main-module?
