@@ -109,6 +109,9 @@ fn init ()
             ;
         null
 
+    local adapter-limits : wgpu.SupportedLimits
+    wgpu.AdapterGetLimits istate.adapter &adapter-limits
+
     wgpu.AdapterRequestDevice istate.adapter
         &local wgpu.DeviceDescriptor
             requiredLimits =
@@ -148,6 +151,10 @@ fn init ()
             istate.device = result
             ;
         null
+
+    local device-limits : wgpu.SupportedLimits
+    wgpu.DeviceGetLimits istate.device &device-limits
+    istate.limits = device-limits.limits
 
     wgpu.DeviceSetUncapturedErrorCallback istate.device
         fn (errtype msg userdata)
