@@ -1,13 +1,15 @@
 bottle := __env.bottle
 import C.stdio
+using import print
 using import String
 
 @@ 'on bottle.load
 fn ()
     renderer-info := (bottle.gpu.get-info)
     # FIXME: using this while compiler.Printer is broken for String
-    C.stdio.printf "bottle version: %s\n" ((bottle.get-version) as rawstring)
-    C.stdio.printf "%s\n" ((copy (imply renderer-info.RendererString String)) as rawstring)
+    print "bottle version:" (bottle.get-version)
+    print renderer-info.APIString
+    print renderer-info.GPUString
     ()
 
 @@ 'on bottle.key-released

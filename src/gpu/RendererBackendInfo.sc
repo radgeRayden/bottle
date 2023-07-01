@@ -33,14 +33,16 @@ struct RendererBackendInfo
     adapter : wgpu.AdapterType
     low-level-api : wgpu.BackendType
 
-    RendererString :=
+    APIString :=
         property
             inline "getter" (self)
                 s := self
-                str :=
-                    f""""WebGPU ${s.version} over ${s.low-level-api}
-                         ${s.device} (${s.adapter}) - driver ${s.driver}
-                lslice str ((countof str) - 1) # remove newline
+                f"WebGPU ${s.version} over ${s.low-level-api}"
+    GPUString :=
+        property
+            inline "getter" (self)
+                s := self
+                f"${s.device} (${s.adapter}) - driver ${s.driver}"
 
     inline __typecall (cls)
         local p : wgpu.AdapterProperties
