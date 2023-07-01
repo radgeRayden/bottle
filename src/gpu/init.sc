@@ -1,3 +1,4 @@
+import C.stdlib
 using import print
 using import String
 using import struct
@@ -59,12 +60,42 @@ fn create-swapchain (width height)
 fn update-render-area ()
     istate.swapchain = (create-swapchain (window.get-drawable-size))
 
+fn wgpu-backend-from-environment ()
+    env-var := C.stdlib.getenv "BOTTLE_FORCE_WGPU_BACKEND"
+    if (env-var == null)
+        return wgpu.InstanceBackend.Primary
+    env-var := 'from-rawstring String env-var
+
+    match env-var
+    case "vulkan"
+        wgpu.InstanceBackend.Vulkan
+    case "dx12"
+        wgpu.InstanceBackend.DX12
+    case "metal"
+        wgpu.InstanceBackend.Metal
+    case "gl"
+        wgpu.InstanceBackend.GL
+    case "dx11"
+        wgpu.InstanceBackend.DX11
+    case "browser"
+        wgpu.InstanceBackend.BrowserWebGPU
+    default
+        print "Unrecognized backend option:" env-var
+        wgpu.InstanceBackend.Primary
+
 fn init ()
     cfg := from (import ..config) let istate-cfg
+
+    local instance-extras : wgpu.InstanceExtras
+        chain =
+            wgpu.ChainedStruct
+                sType = (bitcast wgpu.NativeSType.InstanceExtras wgpu.SType)
+        backends = (wgpu-backend-from-environment)
 
     istate.instance =
         wgpu.CreateInstance
             &local wgpu.InstanceDescriptor
+                nextInChain = &instance-extras as (mutable@ wgpu.ChainedStruct)
 
     istate.surface = (create-surface)
 
