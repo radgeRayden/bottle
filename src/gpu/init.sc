@@ -195,13 +195,9 @@ fn begin-frame ()
     # clear
     'finish
         RenderPass cmd-encoder (ColorAttachment (view swapchain-image) true istate.clear-color)
-
-    swapchain-image := imply swapchain-image TextureView
-    render-pass := RenderPass cmd-encoder (ColorAttachment (view swapchain-image) false istate.clear-color)
     istate.swapchain-image = swapchain-image
 
     istate.cmd-encoder = cmd-encoder
-    render-pass
 
 fn present ()
     using types
