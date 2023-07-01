@@ -14,7 +14,8 @@ using import .common
 struct GeometryBatch
     attribute-buffer : (StorageBuffer VertexAttributes)
     index-buffer     : (IndexBuffer u32)
-    uniform-buffer   : (UniformBuffer Uniforms)
+    uniform-buffer   : (UniformBuffer GenericUniforms)
+    uniforms    : GenericUniforms
     vertex-data : (Array VertexAttributes)
     index-data  : (Array u32)
     outdated-vertices? : bool = true
@@ -54,7 +55,7 @@ struct GeometryBatch
                                     format = TextureFormat.BGRA8UnormSrgb
 
         attrbuf := (StorageBuffer VertexAttributes) 4096
-        uniform-buffer := (UniformBuffer Uniforms) 1
+        uniform-buffer := (UniformBuffer GenericUniforms) 1
         bind-group := BindGroup ('get-bind-group-layout pipeline 0) (view attrbuf) (view uniform-buffer)
 
         super-type.__typecall cls
@@ -64,6 +65,10 @@ struct GeometryBatch
             uniform-buffer = uniform-buffer
             pipeline = pipeline
             bind-group = bind-group
+
+    fn set-projection (self mvp)
+        self.uniforms.mvp = mvp
+        'frame-write self.uniform-buffer self.uniforms
 
     fn begin-frame (self)
         'clear self.obsolete-bindgroups

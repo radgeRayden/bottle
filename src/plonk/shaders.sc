@@ -8,14 +8,14 @@ inline make-buffer-type (T)
     struct ((tostring T) .. "Buffer") plain
         data : (array T)
 
-inline vertex-shader (attrT)
+inline vertex-shader (attrT uniformT)
     inline (f)
         fn ()
             buffer input-data : (make-buffer-type attrT)
                 set = 0
                 binding = 0
 
-            uniform uniforms : Uniforms
+            uniform uniforms : uniformT
                 set = 0
                 binding = 1
 
@@ -25,7 +25,7 @@ inline vertex-shader (attrT)
             f input-data.data uniforms vtexcoords vcolor
 
 do
-    @@ vertex-shader VertexAttributes
+    @@ vertex-shader VertexAttributes GenericUniforms
     inline generic-vert (data uniforms vtexcoords vcolor)
         idx := gl_VertexIndex
         vertex := data @ idx
@@ -34,7 +34,7 @@ do
         vtexcoords = vertex.texcoords
         vcolor = vertex.color
 
-    @@ vertex-shader LineSegment
+    @@ vertex-shader LineSegment LineUniforms
     inline line-vert (data uniforms vtexcoords vcolor)
         local vertices =
             arrayof vec2
@@ -56,7 +56,7 @@ do
         vtexcoords = (vec2)
         vcolor = segment.color
 
-    @@ vertex-shader LineSegment
+    @@ vertex-shader LineSegment LineUniforms
     inline join-vert (data uniforms vtexcoords vcolor)
         idx := gl_InstanceIndex
         last next := data @ idx, data @ (idx + 1)

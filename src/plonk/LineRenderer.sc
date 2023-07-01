@@ -28,8 +28,9 @@ fn make-pipeline (vshader fshader)
 
 struct LineRenderer
     DataBufferType := StorageBuffer LineSegment
-    UniformBufferType := UniformBuffer Uniforms
+    UniformBufferType := UniformBuffer LineUniforms
 
+    uniforms : LineUniforms
     segment-data : (Array LineSegment)
     outdated?    : bool
 
@@ -68,6 +69,10 @@ struct LineRenderer
             segment-pipeline = segment-pipeline
             join-pipeline = join-pipeline
             bind-group = bind-group
+
+    fn set-projection (self mvp)
+        self.uniforms.mvp = mvp
+        'frame-write self.uniform-buffer self.uniforms
 
     fn begin-frame (self)
         'clear self.obsolete-bindgroups

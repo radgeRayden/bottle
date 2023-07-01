@@ -12,7 +12,10 @@ struct LineSegment plain
     end   : vec2
     width : f32
 
-struct Uniforms
+struct LineUniforms plain
+    mvp : mat4
+
+struct GenericUniforms plain
     mvp : mat4
 
 struct Quad plain
@@ -20,5 +23,5 @@ struct Quad plain
     extent : vec2
 
 do
-    let Quad VertexAttributes LineSegment Uniforms
+    let Quad VertexAttributes LineSegment LineUniforms GenericUniforms
     local-scope;

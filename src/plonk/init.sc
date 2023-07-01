@@ -66,8 +66,8 @@ fn begin-frame ()
         *
             math.orthographic-projection w h
             math.translation-matrix (vec3 (-w / 2) (-h / 2) 0)
-    'frame-write ctx.geometry-batch.uniform-buffer (Uniforms mvp)
-    'frame-write ctx.line-renderer.uniform-buffer (Uniforms mvp)
+    'set-projection ctx.geometry-batch mvp
+    'set-projection ctx.line-renderer mvp
 
     cmd-encoder := (gpu.get-cmd-encoder)
     swapchain-image := (gpu.get-swapchain-image)
