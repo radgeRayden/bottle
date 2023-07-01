@@ -1,4 +1,3 @@
-import C.string
 using import String
 using import struct
 using import property
@@ -48,15 +47,12 @@ struct RendererBackendInfo
         local p : wgpu.AdapterProperties
         wgpu.AdapterGetProperties istate.adapter &p
 
-        inline make-String (rstr)
-            String rstr (C.string.strlen rstr)
-
         super-type.__typecall cls
             version = typeinit (wgpu.GetVersion)
-            vendor = make-String p.vendorName
-            architecture = make-String p.architecture
-            device = make-String p.name
-            driver = make-String p.driverDescription
+            vendor = 'from-rawstring String p.vendorName
+            architecture = 'from-rawstring String p.architecture
+            device = 'from-rawstring String p.name
+            driver = 'from-rawstring String p.driverDescription
             adapter = p.adapterType
             low-level-api = p.backendType
 

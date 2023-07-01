@@ -125,9 +125,8 @@ fn init ()
 
     if (handle == null)
         # TODO: unify error handling
-        from (import C.string) let strlen
         msg := (sdl.GetError)
-        assert false (.. "Error while creating window:" (String msg (strlen msg)))
+        assert false (.. "Error while creating window:" ('from-rawstring String msg))
     ;
 
 fn shutdown ()

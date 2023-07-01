@@ -1,7 +1,6 @@
 cfg := `(. (import ..config) istate-cfg filesystem)
 run-stage;
 
-import C.string
 using import String
 using import Array
 using import print
@@ -12,7 +11,7 @@ using import ..exceptions
 fn get-error ()
     err := (physfs.getLastErrorCode)
     msg := (physfs.getErrorByCode err)
-    .. "Filesystem error: " (String msg (C.string.strlen msg))
+    .. "Filesystem error: " ('from-rawstring String msg)
 
 fn... check-error (result, failure-code = 0)
     let code =
