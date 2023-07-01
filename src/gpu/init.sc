@@ -86,6 +86,12 @@ fn wgpu-backend-from-environment ()
 fn init ()
     cfg := from (import ..config) let istate-cfg
 
+    wgpu.SetLogCallback
+        fn (log-level message userdata)
+            print ('from-rawstring String message)
+        null
+    wgpu.SetLogLevel wgpu.LogLevel.Error
+
     local instance-extras : wgpu.InstanceExtras
         chain =
             wgpu.ChainedStruct
