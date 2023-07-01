@@ -26,6 +26,9 @@ inline define-object (name super destructor)
             elseif (otherT == (superof thisT))
                 inline (incoming)
                     bitcast incoming thisT
+            elseif (otherT == Nothing)
+                inline ()
+                    nullof thisT
 
         inline __imply (thisT otherT)
             static-if (otherT == super)
