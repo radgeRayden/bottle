@@ -1,3 +1,6 @@
+cfg := `(. (import ..config) istate-cfg gpu)
+run-stage;
+
 import C.stdlib
 using import print
 using import String
@@ -61,20 +64,17 @@ fn update-render-area ()
     istate.swapchain = (create-swapchain (window.get-drawable-size))
 
 fn init ()
-    cfg := from (import ..config) let istate-cfg
-    env := (config.BottleEnvironmentVariables)
-
     wgpu.SetLogCallback
         fn (log-level message userdata)
             print ('from-rawstring String message)
         null
-    wgpu.SetLogLevel env.wgpu-log-level
+    wgpu.SetLogLevel cfg.wgpu-log-level
 
     local instance-extras : wgpu.InstanceExtras
         chain =
             wgpu.ChainedStruct
                 sType = (bitcast wgpu.NativeSType.InstanceExtras wgpu.SType)
-        backends = env.wgpu-backend
+        backends = cfg.wgpu-low-level-api
 
     istate.instance =
         wgpu.CreateInstance
@@ -87,7 +87,7 @@ fn init ()
     wgpu.InstanceRequestAdapter istate.instance
         &local wgpu.RequestAdapterOptions
             compatibleSurface = istate.surface
-            powerPreference = cfg.gpu.power-preference
+            powerPreference = cfg.power-preference
         fn (status result msg userdata)
             istate.adapter = result
             ;

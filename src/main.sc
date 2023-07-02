@@ -29,6 +29,7 @@ fn run ()
 
     cfg := config.istate-cfg
     callbacks.configure cfg
+    'apply-env-overrides cfg
 
     filesystem.init;
     window.init;

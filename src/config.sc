@@ -42,8 +42,7 @@ struct BottleEnvironmentVariables plain
             (env-wgpu-log-level)
 
 struct BottleConfig
-    # TODO: use this as override
-    # ignore-environment-variables? = false
+    ignore-environment-variables? = false
     window :
         struct WindowConfig
             title = S"Game from Scratch Re:Birth"
@@ -70,9 +69,17 @@ struct BottleConfig
     gpu :
         struct GPUConfig
             power-preference = PowerPreference.HighPerformance
+            wgpu-low-level-api = wgpu.InstanceBackend.Primary
+            wgpu-log-level = wgpu.LogLevel.Error
+
+    fn apply-env-overrides (self)
+        if (not self.ignore-environment-variables?)
+            env := (BottleEnvironmentVariables)
+            self.gpu.wgpu-low-level-api = env.wgpu-backend
+            self.gpu.wgpu-log-level     = env.wgpu-log-level
 
 global istate-cfg : BottleConfig
 
 do
-    let istate-cfg BottleEnvironmentVariables
+    let istate-cfg
     locals;
