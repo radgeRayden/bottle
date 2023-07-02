@@ -1,10 +1,12 @@
 import platform
+import os
 from doit.tools import LongRunning
 
 DOIT_CONFIG = {'default_tasks': ['build_demos']}
+FILTER_ANSI = os.getenv("DOIT_FILTER_ANSI")
 
 def cmd(cmd):
-    if platform.system() == "Linux":
+    if platform.system() == "Linux" and FILTER_ANSI:
         return f"bash -c \"{cmd} | ansi2txt\" || {cmd}"
     else:
         return f"bash -c \"{cmd}\""
