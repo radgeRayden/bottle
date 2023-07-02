@@ -70,13 +70,21 @@ do
 
         sigma := sign (dot (perp-A + perp-B) normal)
 
-        local vertices =
-            arrayof vec2
-                last.end + (perp-A * (last.width / 2) * sigma)
-                last.end
-                next.start + (perp-B * (next.width / 2) * sigma)
+        let vpos =
+            switch uniforms.join-kind
+            case LineJoinKind.Bevel
+                local vertices =
+                    arrayof vec2
+                        last.end + (perp-A * (last.width / 2) * sigma)
+                        last.end
+                        next.start + (perp-B * (next.width / 2) * sigma)
 
-        vpos := vertices @ gl_VertexIndex
+                deref (vertices @ gl_VertexIndex)
+            case LineJoinKind.Miter
+                (vec2)
+            case LineJoinKind.Round
+                (vec2)
+            default (vec2)
 
         gl_Position = uniforms.mvp * (vec4 vpos 0 1)
         vtexcoords = (vec2)

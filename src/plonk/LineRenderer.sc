@@ -74,11 +74,12 @@ struct LineRenderer
 
     fn set-projection (self mvp)
         self.uniforms.mvp = mvp
-        'frame-write self.uniform-buffer self.uniforms
 
     fn begin-frame (self)
         'clear self.obsolete-bindgroups
         'clear self.obsolete-buffers
+        self.uniforms.join-kind = LineJoinKind.Bevel
+        'frame-write self.uniform-buffer self.uniforms
 
     fn... add-segments (self, vertices, width : f32 = 1.0, color : vec4 = (vec4 1))
         self.outdated? = true

@@ -13,9 +13,6 @@ struct LineSegment plain
     end   : vec2
     width : f32
 
-struct LineUniforms plain
-    mvp : mat4
-
 enum LineJoinKind plain
     Bevel
     Miter
@@ -25,6 +22,12 @@ enum LineCapKind plain
     Butt
     Square
     Round
+
+struct LineUniforms plain
+    mvp : mat4
+    join-kind = LineJoinKind.Bevel
+    cap-kind = LineCapKind.Butt
+    semicircle-segments : u32
 
 struct GenericUniforms plain
     mvp : mat4
