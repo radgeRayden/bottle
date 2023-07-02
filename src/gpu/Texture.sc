@@ -19,7 +19,8 @@ type Texture <:: wgpu.Texture
                           dimension = wgpu.TextureDimension.2D,
                           slices = 1:u32,
                           mipmap-levels = 1:u32,
-                          generate-mipmaps? = false)
+                          generate-mipmaps? = false,
+                          sample-count = 1:u32)
 
         usage :=
             | wgpu.TextureUsage.CopyDst
@@ -36,12 +37,11 @@ type Texture <:: wgpu.Texture
                 &local wgpu.TextureDescriptor
                     label = "Bottle Texture"
                     usage = usage
-
                     dimension = dimension
                     size = (wgpu.Extent3D width height slices)
                     format = format
                     mipLevelCount = mipmap-levels
-                    sampleCount = 1
+                    sampleCount = sample-count
 
         self := wrap-nullable-object cls handle
 

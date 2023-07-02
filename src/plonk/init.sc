@@ -72,7 +72,7 @@ fn begin-frame ()
     cmd-encoder := (gpu.get-cmd-encoder)
     swapchain-image := (gpu.get-swapchain-image)
     ctx.last-texture = 0
-    rp := RenderPass cmd-encoder (ColorAttachment swapchain-image false)
+    rp := RenderPass cmd-encoder (ColorAttachment swapchain-image none false)
     'set-bind-group rp 1 ctx.default-texture-binding
 
     ctx.render-pass = rp

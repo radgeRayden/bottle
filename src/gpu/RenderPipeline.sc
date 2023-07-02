@@ -79,7 +79,7 @@ type PipelineLayout <:: wgpu.PipelineLayout
         wrap-nullable-object cls
             make-pipeline-layout 0:u32 null
 
-fn make-pipeline (layout topology winding vertex-stage fragment-stage)
+fn make-pipeline (layout topology winding vertex-stage fragment-stage sample-count)
     wgpu.DeviceCreateRenderPipeline istate.device
         &local wgpu.RenderPipelineDescriptor
             label = "Bottle Render Pipeline"
@@ -91,9 +91,8 @@ fn make-pipeline (layout topology winding vertex-stage fragment-stage)
                     frontFace = winding
             multisample =
                 wgpu.MultisampleState
-                    count = 1
+                    count = sample-count
                     mask = ~0:u32
-
                     alphaToCoverageEnabled = false
             fragment = (&local (imply fragment-stage (superof fragment-stage)))
 
@@ -103,7 +102,8 @@ type RenderPipeline <:: wgpu.RenderPipeline
                           topology       : wgpu.PrimitiveTopology,
                           winding        : wgpu.FrontFace,
                           vertex-stage   : VertexStage,
-                          fragment-stage : FragmentStage)
+                          fragment-stage : FragmentStage,
+                          msaa-samples : u32 = 1:u32)
 
         cls ... := *...
         wrap-nullable-object cls (make-pipeline ...)

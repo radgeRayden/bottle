@@ -48,6 +48,7 @@ global render-state : (Option RendererState)
 @@ 'on bottle.configure
 fn (cfg)
     cfg.window.title = "hello, triangle!"
+    cfg.gpu.msaa-samples = 4
     ;
 
 @@ 'on bottle.load
@@ -73,6 +74,7 @@ fn ()
                             arrayof ColorTarget
                                 typeinit
                                     format = (bottle.gpu.get-preferred-surface-format)
+                msaa-samples = 4:u32
         render-state =
             RendererState
                 pipeline = pipeline
@@ -83,7 +85,11 @@ fn ()
 fn ()
     ctx := 'force-unwrap render-state
 
-    rp := RenderPass (bottle.gpu.get-cmd-encoder) (ColorAttachment (bottle.gpu.get-swapchain-image) false)
+    rp :=
+        RenderPass (bottle.gpu.get-cmd-encoder)
+            ColorAttachment (bottle.gpu.get-swapchain-resolve-source)
+                resolve-target = (bottle.gpu.get-swapchain-image)
+                clear? = false
     'set-pipeline rp ctx.pipeline
     'draw rp 3
     'finish rp

@@ -60,8 +60,24 @@ fn create-swapchain (width height)
             height = (height as u32)
             presentMode = wgpu.PresentMode.Fifo
 
+fn create-swapchain-resolve-source (width height)
+    using types
+    try
+        TextureView
+            Texture (u32 width) (u32 height) (get-preferred-surface-format) none
+                render-target? = true
+                sample-count = cfg.msaa-samples
+    # FIXME: better way of handling or reporting this kind of error?
+    else (assert false "FATAL ERROR: could not create MSAA resolve source")
+
+fn msaa-enabled? ()
+    cfg.msaa-samples > 1
+
 fn update-render-area ()
-    istate.swapchain = (create-swapchain (window.get-drawable-size))
+    istate.swapchain = create-swapchain (window.get-drawable-size)
+    if (msaa-enabled?)
+        istate.swapchain-resolve-source =
+            create-swapchain-resolve-source (window.get-drawable-size)
 
 fn init ()
     wgpu.SetLogCallback
@@ -148,6 +164,7 @@ fn init ()
         null
 
     istate.swapchain = (create-swapchain (window.get-drawable-size))
+    istate.swapchain-resolve-source = (create-swapchain-resolve-source (window.get-drawable-size))
     istate.queue = (wgpu.DeviceGetQueue istate.device)
     ;
 
@@ -164,6 +181,14 @@ fn get-swapchain-image ()
     using types
     imply (view ('force-unwrap istate.swapchain-image)) TextureView
 
+fn get-swapchain-resolve-source ()
+    using types
+    try
+        imply
+            view (deref ('unwrap istate.swapchain-resolve-source))
+            TextureView
+    else (view (nullof TextureView))
+
 fn begin-frame ()
     using types
 
@@ -177,10 +202,14 @@ fn begin-frame ()
     cmd-encoder := (wgpu.DeviceCreateCommandEncoder istate.device (&local wgpu.CommandEncoderDescriptor))
 
     # clear
-    'finish
-        RenderPass cmd-encoder (ColorAttachment (view swapchain-image) true istate.clear-color)
-    istate.swapchain-image = swapchain-image
+    if (not (msaa-enabled?))
+        'finish
+            RenderPass cmd-encoder (ColorAttachment (view swapchain-image) none true istate.clear-color)
+    else
+        'finish
+            RenderPass cmd-encoder (ColorAttachment (get-swapchain-resolve-source) (view swapchain-image) true istate.clear-color)
 
+    istate.swapchain-image = swapchain-image
     istate.cmd-encoder = cmd-encoder
 
 fn present ()
@@ -195,6 +224,7 @@ fn present ()
 do
     let init update-render-area set-clear-color begin-frame present
     let types
-    let get-info get-preferred-surface-format get-cmd-encoder get-swapchain-image
+    let get-info get-preferred-surface-format get-cmd-encoder
+    let get-swapchain-image get-swapchain-resolve-source
 
     locals;

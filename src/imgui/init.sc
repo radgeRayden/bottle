@@ -52,7 +52,7 @@ fn render ()
     using gpu.types
 
     ig.Render;
-    render-pass := RenderPass (gpu.get-cmd-encoder) (ColorAttachment (gpu.get-swapchain-image) false)
+    render-pass := RenderPass (gpu.get-cmd-encoder) (ColorAttachment (gpu.get-swapchain-image) (clear? = false))
     ig.ImplWGPU_RenderDrawData (ig.GetDrawData) render-pass
     'finish render-pass
 

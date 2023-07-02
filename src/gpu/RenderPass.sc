@@ -12,10 +12,11 @@ using import .RenderPipeline
 import .wgpu
 
 type ColorAttachment <: wgpu.RenderPassColorAttachment
-    inline... __typecall (cls, view : TextureView, clear? = true, clear-color = (vec4))
+    inline... __typecall (cls, view : TextureView, resolve-target : TextureView = null, clear? = true, clear-color = (vec4))
         let attachment =
             wgpu.RenderPassColorAttachment
-                view = (storagecast view)
+                view = view
+                resolveTarget = resolve-target
                 loadOp = (clear? wgpu.LoadOp.Clear wgpu.LoadOp.Load)
                 storeOp = wgpu.StoreOp.Store
                 clearValue = wgpu.Color (unpack clear-color)

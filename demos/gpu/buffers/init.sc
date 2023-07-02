@@ -109,7 +109,7 @@ fn ()
     using import glm
 
     ctx := 'force-unwrap render-state
-    rp := RenderPass (bottle.gpu.get-cmd-encoder) (ColorAttachment (bottle.gpu.get-swapchain-image) false)
+    rp := RenderPass (bottle.gpu.get-cmd-encoder) (ColorAttachment (bottle.gpu.get-swapchain-image) (clear? = false))
     time := (bottle.time.get-time) - time-offset
     'frame-write ctx.uniform-buffer (Uniforms (bottle.math.orthographic-projection (bottle.window.get-size)) (time as f32))
 

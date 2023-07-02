@@ -17,6 +17,7 @@ struct GfxState
     queue       : wgpu.Queue
     cmd-encoder : (Option wgpu.CommandEncoder)
     swapchain-image : (Option wgpu.TextureView)
+    swapchain-resolve-source : (Option wgpu.TextureView)
     limits      : wgpu.Limits
 
     clear-color = (vec4 0.017 0.017 0.017 1.0)

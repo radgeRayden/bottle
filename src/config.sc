@@ -61,6 +61,8 @@ struct BottleConfig
     gpu :
         struct GPUConfig
             power-preference = PowerPreference.HighPerformance
+            # FIXME: validate this
+            msaa-samples = 1:u8
             wgpu-low-level-api = wgpu.InstanceBackend.Primary
             wgpu-log-level = wgpu.LogLevel.Error
 
