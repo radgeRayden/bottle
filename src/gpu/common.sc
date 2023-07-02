@@ -49,7 +49,7 @@ fn get-preferred-surface-format ()
 spice wrap-nullable-object (cls object)
     spice-quote
         if (object == null)
-            print "OBJECT CREATION FAILED:" [(static-tostring ('anchor object))]
+            print "OBJECT CREATION FAILED:" [((tostring ('anchor object)) as string)]
             raise GPUError.ObjectCreationFailed
         else
             imply object cls
