@@ -33,14 +33,6 @@ fn env-wgpu-log-level (value)
     match-string-enum wgpu.LogLevel value
         _ 'Off 'Error 'Warn 'Info 'Debug 'Trace
 
-struct BottleEnvironmentVariables plain
-    wgpu-backend   : wgpu.InstanceBackendFlags
-    wgpu-log-level : wgpu.LogLevel
-    inline __typecall (cls)
-        super-type.__typecall cls
-            (env-wgpu-backend)
-            (env-wgpu-log-level)
-
 struct BottleConfig
     ignore-environment-variables? = false
     window :
@@ -74,9 +66,8 @@ struct BottleConfig
 
     fn apply-env-overrides (self)
         if (not self.ignore-environment-variables?)
-            env := (BottleEnvironmentVariables)
-            self.gpu.wgpu-low-level-api = env.wgpu-backend
-            self.gpu.wgpu-log-level     = env.wgpu-log-level
+            self.gpu.wgpu-low-level-api = (env-wgpu-backend)
+            self.gpu.wgpu-log-level     = (env-wgpu-log-level)
 
 global istate-cfg : BottleConfig
 
