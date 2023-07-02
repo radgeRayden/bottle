@@ -1,67 +1,45 @@
-using import struct
 using import Option
+using import print
 using import String
+using import struct
 
 using import .enums
 wgpu := import .gpu.wgpu
 
-spice static-hash (str)
-    `[(hash (str as string))]
-run-stage;
-
 inline env-var (name def)
-    inline (f)
+    inline (handler)
         fn ()
             using import C.stdlib
             env-var := getenv name
+
             if (env-var == null) def
             else
-                try (f ('from-rawstring String env-var))
-                else def
+                env-var := 'from-rawstring String env-var
+                try (handler env-var)
+                else
+                    using import radl.strfmt
+                    print f"Unrecognized option for ${name}: ${env-var}"
+                    def
 
-using import switcher
-inline match-string-enum (enum-type value cases...)
-    call
-        switcher sw
-            va-map
-                inline (arg...)
-                    let k v = (keyof arg...) arg...
-                    case (static-hash v)
-                        getattr enum-type k
-                cases...
-            default
-                print "Unrecognized option:" value
-                raise;
-        value
+from (import .helpers) let match-string-enum
 
-@@ env-var "BOTTLE_FORCE_WGPU_BACKEND" wgpu.InstanceBackend.Primary
-fn wgpu-backend (value)
-    match-string-enum wgpu.InstanceBackend (hash value)
-        _
-            Vulkan = "vulkan"
-            DX12 = "dx12"
-            Metal = "metal"
-            GL = "gl"
-            DX11 = "dx11"
+@@ env-var "BOTTLE_WGPU_INSTANCE_BACKEND" wgpu.InstanceBackend.Primary
+fn env-wgpu-backend (value)
+    match-string-enum wgpu.InstanceBackend value
+        _ 'Vulkan 'DX12 'Metal 'GL 'DX11
 
 @@ env-var "BOTTLE_WGPU_LOG_LEVEL" wgpu.LogLevel.Error
-fn wgpu-log-level (value)
-    match-string-enum wgpu.LogLevel (hash value)
-        _
-            Off = "off"
-            Error = "error"
-            Warn = "warn"
-            Info = "info"
-            Debug = "debug"
-            Trace = "trace"
+fn env-wgpu-log-level (value)
+    match-string-enum wgpu.LogLevel value
+        _ 'Off 'Error 'Warn 'Info 'Debug 'Trace
 
 struct BottleEnvironmentVariables plain
     wgpu-backend   : wgpu.InstanceBackendFlags
     wgpu-log-level : wgpu.LogLevel
     inline __typecall (cls)
         super-type.__typecall cls
-            (wgpu-backend)
-            (wgpu-log-level)
+            (env-wgpu-backend)
+            (env-wgpu-log-level)
 
 struct BottleConfig
     # TODO: use this as override

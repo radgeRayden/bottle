@@ -19,7 +19,6 @@ inline array->ptr (value)
         local v = value
         _ 1 &v
 
-
 @@ memo
 inline param? (pT)
     typedef (.. "param?<" (tostring pT) ">")
@@ -30,4 +29,45 @@ inline param? (pT)
         inline __rimply (cls T)
             inline (self) self
 
-local-scope;
+spice static-hash (str)
+    `[(hash (str as string))]
+
+fn tolower (str)
+    using import String
+
+    delta := char"a" - char"A"
+    local result : String
+    for c in str
+        if (c >= char"A" and c <= char"Z")
+            'append result (c + delta)
+        else
+            'append result c
+    result
+
+spice static-tolower (str)
+    `[((tolower (str as string)) as string)]
+
+run-stage;
+
+inline match-string-enum (enum-type value cases...)
+    using import switcher
+    using import print
+
+    call
+        switcher sw
+            va-map
+                inline (k)
+                    kname := static-tostring k
+                    case (static-hash (static-tolower kname))
+                        getattr enum-type k
+                cases...
+            default
+                raise;
+        hash (tolower value)
+
+do
+    let &local
+        array->ptr
+        param?
+        match-string-enum
+    local-scope;
