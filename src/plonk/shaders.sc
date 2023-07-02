@@ -5,9 +5,9 @@ using import struct
 import ..math
 
 @@ memo
-inline make-buffer-type (T)
+inline make-buffer-type (T max-size...)
     struct ((tostring T) .. "Buffer") plain
-        data : (array T)
+        data : (array T max-size...)
 
 inline vertex-shader (attrT uniformT)
     inline (f)
@@ -35,7 +35,7 @@ do
         vtexcoords = vertex.texcoords
         vcolor = vertex.color
 
-    @@ vertex-shader LineSegment LineUniforms
+    @@ vertex-shader LineSegment (make-buffer-type LineUniforms 256)
     inline line-vert (data uniforms vtexcoords vcolor)
         local vertices =
             arrayof vec2
@@ -48,19 +48,22 @@ do
 
         vertex := vertices @ gl_VertexIndex
         segment := data @ gl_InstanceIndex
+        uniforms := uniforms.data @ segment.line-index
+
 
         dir := segment.end - segment.start
         perp := normalize (vec2 dir.y -dir.x)
-        vpos := segment.start + (dir * vertex.y) + (perp * vertex.x * segment.width)
+        vpos := segment.start + (dir * vertex.y) + (perp * vertex.x * uniforms.width)
 
         gl_Position = uniforms.mvp * (vec4 vpos 0.0 1.0)
         vtexcoords = (vec2)
         vcolor = segment.color
 
-    @@ vertex-shader LineSegment LineUniforms
+    @@ vertex-shader LineSegment (make-buffer-type LineUniforms 256)
     inline join-vert (data uniforms vtexcoords vcolor)
         idx := gl_InstanceIndex
         last next := data @ idx, data @ (idx + 1)
+        uniforms := uniforms.data @ last.line-index
 
         inline get-perpendicular (segment)
             dir := segment.end - segment.start
@@ -76,15 +79,15 @@ do
             case LineJoinKind.Bevel
                 local vertices =
                     arrayof vec2
-                        last.end + (perp-A * (last.width / 2) * sigma)
+                        last.end + (perp-A * (uniforms.width / 2) * sigma)
                         last.end
-                        next.start + (perp-B * (next.width / 2) * sigma)
+                        next.start + (perp-B * (uniforms.width / 2) * sigma)
 
                 deref (vertices @ gl_VertexIndex)
             case LineJoinKind.Miter
                 (vec2)
             case LineJoinKind.Round
-                radius := last.width / 2
+                radius := uniforms.width / 2
                 idx := gl_VertexIndex
                 tri := idx // 3
                 inline get-segment-angle (i)

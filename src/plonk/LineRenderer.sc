@@ -5,6 +5,7 @@ using import struct
 
 using import ..enums
 using import ..gpu.types
+using import ..helpers
 using import .common
 import ..gpu
 import .shaders
@@ -33,6 +34,7 @@ struct LineRenderer
     UniformBufferType := UniformBuffer LineUniforms
 
     uniforms : LineUniforms
+    uniform-data : (Array LineUniforms)
     segment-data : (Array LineSegment)
     outdated?    : bool
 
@@ -62,7 +64,7 @@ struct LineRenderer
                 frag
 
         segment-buffer := DataBufferType 4096
-        uniform-buffer := UniformBufferType 1
+        uniform-buffer := UniformBufferType 256
         bind-group := BindGroup ('get-bind-group-layout segment-pipeline 0) (view segment-buffer) (view uniform-buffer)
 
         super-type.__typecall cls
@@ -79,9 +81,10 @@ struct LineRenderer
         'clear self.obsolete-bindgroups
         'clear self.obsolete-buffers
         self.uniforms.join-kind = LineJoinKind.Round
-        'frame-write self.uniform-buffer self.uniforms
 
-    fn... add-segments (self, vertices, width : f32 = 1.0, color : vec4 = (vec4 1))
+    fn... add-segments (self, vertices, width : f32 = 1.0, color : vec4 = (vec4 1),
+                        join-kind : (param? LineJoinKind) = none,
+                        cap-kind : (param? LineCapKind) = none)
         self.outdated? = true
         for i in (range ((countof vertices) - 1))
             'append self.segment-data
@@ -89,7 +92,15 @@ struct LineRenderer
                     start = vertices @ i
                     end = vertices @ (i + 1)
                     color = color
-                    width = width
+                    line-index = (countof self.uniform-data) as u32
+
+        self.uniforms.width = width
+        static-if (not (none? join-kind))
+            self.uniforms.join-kind = join-kind
+        static-if (not (none? cap-kind))
+            self.uniforms.join-kind = cap-kind
+
+        'append self.uniform-data (copy self.uniforms)
 
     fn draw (self render-pass)
         if (not self.outdated?)
@@ -130,6 +141,8 @@ struct LineRenderer
         'clear self.segment-data
 
     fn finish (self)
+        'frame-write self.uniform-buffer self.uniform-data
+        'clear self.uniform-data
         self.buffer-offset = 0
 do
     let LineRenderer

@@ -11,7 +11,7 @@ struct LineSegment plain
     color : vec4
     start : vec2
     end   : vec2
-    width : f32
+    line-index : u32
 
 enum LineJoinKind plain
     Bevel
@@ -28,6 +28,7 @@ struct LineUniforms plain
     join-kind = LineJoinKind.Bevel
     cap-kind = LineCapKind.Butt
     semicircle-segments : f32 = 25
+    width : f32
 
 struct GenericUniforms plain
     mvp : mat4
@@ -38,5 +39,5 @@ struct Quad plain
 
 do
     let Quad VertexAttributes LineSegment LineUniforms GenericUniforms \
-        LineJoinKind
+        LineJoinKind LineCapKind
     local-scope;
