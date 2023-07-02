@@ -225,9 +225,11 @@ fn present ()
     ;
 
 do
-    let init update-render-area set-clear-color begin-frame present
+    let init update-render-area set-clear-color begin-frame present \
+        get-info get-preferred-surface-format get-cmd-encoder \
+        get-swapchain-image get-swapchain-resolve-source \
+        get-msaa-sample-count msaa-enabled? \
+
     let types
-    let get-info get-preferred-surface-format get-cmd-encoder
-    let get-swapchain-image get-swapchain-resolve-source get-msaa-sample-count
 
     locals;

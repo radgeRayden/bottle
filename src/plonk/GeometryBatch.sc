@@ -4,6 +4,7 @@ using import Option
 using import String
 using import struct
 
+import ..gpu
 import ..math
 import .shaders
 using import ..enums
@@ -53,6 +54,7 @@ struct GeometryBatch
                             arrayof ColorTarget
                                 typeinit
                                     format = TextureFormat.BGRA8UnormSrgb
+                msaa-samples = (gpu.get-msaa-sample-count)
 
         attrbuf := (StorageBuffer VertexAttributes) 4096
         uniform-buffer := (UniformBuffer GenericUniforms) 1

@@ -6,6 +6,7 @@ using import struct
 using import ..enums
 using import ..gpu.types
 using import .common
+import ..gpu
 import .shaders
 
 fn make-pipeline (vshader fshader)
@@ -25,6 +26,7 @@ fn make-pipeline (vshader fshader)
                     arrayof ColorTarget
                         typeinit
                             format = TextureFormat.BGRA8UnormSrgb
+        msaa-samples = (gpu.get-msaa-sample-count)
 
 struct LineRenderer
     DataBufferType := StorageBuffer LineSegment

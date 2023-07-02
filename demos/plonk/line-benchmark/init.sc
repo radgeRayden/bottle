@@ -10,6 +10,7 @@ import ...demo-common
 fn (cfg)
     cfg.window.title = "many, many lines"
     cfg.window.fullscreen? = true
+    cfg.gpu.msaa-samples = 4
 
 LINES-X LINES-Y := 75, 75
 @@ 'on bottle.render

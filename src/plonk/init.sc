@@ -72,7 +72,12 @@ fn begin-frame ()
     cmd-encoder := (gpu.get-cmd-encoder)
     swapchain-image := (gpu.get-swapchain-image)
     ctx.last-texture = 0
-    rp := RenderPass cmd-encoder (ColorAttachment swapchain-image none false)
+    let rp =
+        if (not (gpu.msaa-enabled?))
+            RenderPass cmd-encoder (ColorAttachment swapchain-image none false)
+        else
+            resolve-source := (gpu.get-swapchain-resolve-source)
+            RenderPass cmd-encoder (ColorAttachment resolve-source swapchain-image false)
     'set-bind-group rp 1 ctx.default-texture-binding
 
     ctx.render-pass = rp

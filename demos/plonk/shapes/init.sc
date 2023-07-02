@@ -7,6 +7,7 @@ bottle := __env.bottle
 fn (cfg)
     cfg.window.title = "geometric shapes"
     cfg.window.fullscreen? = true
+    cfg.gpu.msaa-samples = 4
 
 global rotation : f32
 global line-width : f32
