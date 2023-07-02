@@ -78,7 +78,7 @@ struct LineRenderer
     fn begin-frame (self)
         'clear self.obsolete-bindgroups
         'clear self.obsolete-buffers
-        self.uniforms.join-kind = LineJoinKind.Bevel
+        self.uniforms.join-kind = LineJoinKind.Round
         'frame-write self.uniform-buffer self.uniforms
 
     fn... add-segments (self, vertices, width : f32 = 1.0, color : vec4 = (vec4 1))
@@ -118,7 +118,13 @@ struct LineRenderer
         'draw render-pass 6 segment-count 0:u32 (u32 self.buffer-offset)
 
         'set-pipeline render-pass self.join-pipeline
-        'draw render-pass 3 (segment-count - 1) 0:u32 (u32 self.buffer-offset)
+        let join-vertex-count =
+            switch self.uniforms.join-kind
+            case LineJoinKind.Bevel 3:u32
+            case LineJoinKind.Miter 6:u32
+            case LineJoinKind.Round (25:u32 * 3) # FIXME: calculate this
+            default (unreachable)
+        'draw render-pass join-vertex-count (segment-count - 1) 0:u32 (u32 self.buffer-offset)
 
         self.buffer-offset += (countof self.segment-data)
         'clear self.segment-data

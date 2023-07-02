@@ -27,7 +27,7 @@ struct LineUniforms plain
     mvp : mat4
     join-kind = LineJoinKind.Bevel
     cap-kind = LineCapKind.Butt
-    semicircle-segments : u32
+    semicircle-segments : f32 = 25
 
 struct GenericUniforms plain
     mvp : mat4

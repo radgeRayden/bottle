@@ -2,6 +2,7 @@ using import .common
 using import glm
 using import glsl
 using import struct
+import ..math
 
 @@ memo
 inline make-buffer-type (T)
@@ -83,7 +84,18 @@ do
             case LineJoinKind.Miter
                 (vec2)
             case LineJoinKind.Round
-                (vec2)
+                radius := last.width / 2
+                idx := gl_VertexIndex
+                tri := idx // 3
+                inline get-segment-angle (i)
+                    (pi / uniforms.semicircle-segments) * (f32 i)
+
+                local tri-verts =
+                    arrayof vec2
+                        last.end
+                        last.end + (math.rotate2D perp-A (get-segment-angle tri)) * radius
+                        last.end + (math.rotate2D perp-A (get-segment-angle (tri + 1))) * radius
+                deref (tri-verts @ (idx % 3))
             default (vec2)
 
         gl_Position = uniforms.mvp * (vec4 vpos 0 1)
