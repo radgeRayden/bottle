@@ -179,7 +179,7 @@ fn get-cmd-encoder ()
 
 fn get-swapchain-image ()
     using types
-    imply (view ('force-unwrap istate.swapchain-image)) TextureView
+    imply (view (deref ('force-unwrap istate.swapchain-image))) TextureView
 
 fn get-swapchain-resolve-source ()
     using types
@@ -188,6 +188,9 @@ fn get-swapchain-resolve-source ()
             view (deref ('unwrap istate.swapchain-resolve-source))
             TextureView
     else (view (nullof TextureView))
+
+fn get-msaa-sample-count ()
+    deref cfg.msaa-samples
 
 fn begin-frame ()
     using types
@@ -225,6 +228,6 @@ do
     let init update-render-area set-clear-color begin-frame present
     let types
     let get-info get-preferred-surface-format get-cmd-encoder
-    let get-swapchain-image get-swapchain-resolve-source
+    let get-swapchain-image get-swapchain-resolve-source get-msaa-sample-count
 
     locals;

@@ -74,7 +74,7 @@ fn ()
                             arrayof ColorTarget
                                 typeinit
                                     format = (bottle.gpu.get-preferred-surface-format)
-                msaa-samples = 4:u32
+                msaa-samples = (bottle.gpu.get-msaa-sample-count)
         render-state =
             RendererState
                 pipeline = pipeline
