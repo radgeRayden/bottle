@@ -10,6 +10,7 @@ import .shaders
 using import ..enums
 using import ..gpu.types
 using import .common
+using import ..helpers
 
 # TODO: unify batch interfaces
 struct GeometryBatch
@@ -216,13 +217,18 @@ struct GeometryBatch
             'append self.index-data (vtx-offset + i + 1)
         ()
 
-    fn... add-circle (self, center, radius, color : vec4 = (vec4 1))
+    fn... add-circle (self, center, radius, color : vec4 = (vec4 1), segments : (param? i32) = none)
         self.outdated-vertices? = true
         self.outdated-indices? = true
 
-        radius as:= f32
-        segments := math.ceil (pi / (acos (1.0 - 0.5 / (max radius 0.5))))
-        segments := max 5:u32 (u32 segments)
+        let segments =
+            static-if (none? segments)
+                radius as:= f32
+                errorv := 0.33
+                segments := math.ceil (pi / (acos (1 - errorv / (max radius errorv))))
+                max 5:u32 (u32 segments)
+            else
+                segments
 
         'add-polygon self center segments radius 0:f32 color
         ()

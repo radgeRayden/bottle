@@ -1,3 +1,4 @@
+using import enum
 using import glm
 using import struct
 
@@ -15,6 +16,16 @@ struct LineSegment plain
 struct LineUniforms plain
     mvp : mat4
 
+enum LineJoinKind plain
+    Bevel
+    Miter
+    Round
+
+enum LineCapKind plain
+    Butt
+    Square
+    Round
+
 struct GenericUniforms plain
     mvp : mat4
 
@@ -23,5 +34,6 @@ struct Quad plain
     extent : vec2
 
 do
-    let Quad VertexAttributes LineSegment LineUniforms GenericUniforms
+    let Quad VertexAttributes LineSegment LineUniforms GenericUniforms \
+        LineJoinKind
     local-scope;
