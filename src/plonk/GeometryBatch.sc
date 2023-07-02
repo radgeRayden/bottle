@@ -18,8 +18,8 @@ struct GeometryBatch
     uniforms    : GenericUniforms
     vertex-data : (Array VertexAttributes)
     index-data  : (Array u32)
-    outdated-vertices? : bool = true
-    outdated-indices?  : bool = true
+    outdated-vertices? : bool
+    outdated-indices?  : bool
     vertex-offset : usize
     index-offset  : usize
 
