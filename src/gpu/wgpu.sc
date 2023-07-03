@@ -112,28 +112,28 @@ for scope in ('lineage wgpu)
 run-stage;
 
 do
-    Instance := define-object "WGPUInstance" wgpu.Instance wgpu.InstanceDrop
-    Adapter := define-object "WGPUAdapter" wgpu.Adapter
-    BindGroup := define-object "WGPUBindGroup" wgpu.BindGroup wgpu.BindGroupDrop
-    BindGroupLayout := define-object "WGPUBindGroupLayout" wgpu.BindGroupLayout wgpu.BindGroupLayoutDrop
-    Buffer := define-object "WGPUBuffer" wgpu.Buffer wgpu.BufferDrop wgpu.DeviceCreateBuffer
-    CommandBuffer := define-object "WGPUCommandBuffer" wgpu.CommandBuffer wgpu.CommandBufferDrop
-    CommandEncoder := define-object "WGPUCommandEncoder" wgpu.CommandEncoder wgpu.CommandEncoderDrop
-    RenderPassEncoder := define-object "WGPURenderPassEncoder" wgpu.RenderPassEncoder wgpu.RenderPassEncoderDrop
-    ComputePassEncoder := define-object "WGPUComputePassEncoder" wgpu.ComputePassEncoder wgpu.ComputePassEncoderDrop
-    RenderBundleEncoder := define-object "WGPURenderBundleEncoder" wgpu.RenderBundleEncoder wgpu.RenderBundleEncoderDrop
-    ComputePipeline := define-object "WGPUComputePipeline" wgpu.ComputePipeline wgpu.ComputePipelineDrop
-    Device := define-object "WGPUDevice" wgpu.Device
-    PipelineLayout := define-object "WGPUPipelineLayout" wgpu.PipelineLayout wgpu.PipelineLayoutDrop
-    QuerySet := define-object "WGPUQuerySet" wgpu.QuerySet wgpu.QuerySetDrop
-    RenderBundle := define-object "WGPURenderBundle" wgpu.RenderBundle wgpu.RenderBundleDrop
-    RenderPipeline := define-object "WGPURenderPipeline" wgpu.RenderPipeline wgpu.RenderPipelineDrop
-    Sampler := define-object "WGPUSampler" wgpu.Sampler wgpu.SamplerDrop
-    ShaderModule := define-object "WGPUShaderModule" wgpu.ShaderModule wgpu.ShaderModuleDrop
-    Surface := define-object "WGPUSurface" wgpu.Surface wgpu.SurfaceDrop
-    SwapChain := define-object "WGPUSwapChain" wgpu.SwapChain wgpu.SwapChainDrop
-    Texture := define-object "WGPUTexture" wgpu.Texture wgpu.TextureDrop
-    TextureView := define-object "WGPUTextureView" wgpu.TextureView wgpu.TextureViewDrop
+    Instance := define-object "WGPUInstance" wgpu.Instance wgpu.InstanceRelease
+    Adapter := define-object "WGPUAdapter" wgpu.Adapter wgpu.AdapterRelease
+    BindGroup := define-object "WGPUBindGroup" wgpu.BindGroup wgpu.BindGroupRelease
+    BindGroupLayout := define-object "WGPUBindGroupLayout" wgpu.BindGroupLayout wgpu.BindGroupLayoutRelease
+    Buffer := define-object "WGPUBuffer" wgpu.Buffer wgpu.BufferRelease
+    CommandBuffer := define-object "WGPUCommandBuffer" wgpu.CommandBuffer wgpu.CommandBufferRelease
+    CommandEncoder := define-object "WGPUCommandEncoder" wgpu.CommandEncoder wgpu.CommandEncoderRelease
+    RenderPassEncoder := define-object "WGPURenderPassEncoder" wgpu.RenderPassEncoder wgpu.RenderPassEncoderRelease
+    ComputePassEncoder := define-object "WGPUComputePassEncoder" wgpu.ComputePassEncoder wgpu.ComputePassEncoderRelease
+    RenderBundleEncoder := define-object "WGPURenderBundleEncoder" wgpu.RenderBundleEncoder wgpu.RenderBundleEncoderRelease
+    ComputePipeline := define-object "WGPUComputePipeline" wgpu.ComputePipeline wgpu.ComputePipelineRelease
+    Device := define-object "WGPUDevice" wgpu.Device wgpu.DeviceRelease
+    PipelineLayout := define-object "WGPUPipelineLayout" wgpu.PipelineLayout wgpu.PipelineLayoutRelease
+    QuerySet := define-object "WGPUQuerySet" wgpu.QuerySet wgpu.QuerySetRelease
+    RenderBundle := define-object "WGPURenderBundle" wgpu.RenderBundle wgpu.RenderBundleRelease
+    RenderPipeline := define-object "WGPURenderPipeline" wgpu.RenderPipeline wgpu.RenderPipelineRelease
+    Sampler := define-object "WGPUSampler" wgpu.Sampler wgpu.SamplerRelease
+    ShaderModule := define-object "WGPUShaderModule" wgpu.ShaderModule wgpu.ShaderModuleRelease
+    Surface := define-object "WGPUSurface" wgpu.Surface wgpu.SurfaceRelease
+    SwapChain := define-object "WGPUSwapChain" wgpu.SwapChain wgpu.SwapChainRelease
+    Texture := define-object "WGPUTexture" wgpu.Texture wgpu.TextureRelease
+    TextureView := define-object "WGPUTextureView" wgpu.TextureView wgpu.TextureViewRelease
 
     TextureCreateView := wrap-constructor wgpu.TextureCreateView TextureView
     DeviceCreateTexture := wrap-constructor wgpu.DeviceCreateTexture Texture
@@ -145,7 +145,6 @@ do
     RenderBundleEncoderFinish := wrap-constructor wgpu.RenderBundleEncoderFinish RenderBundle
     DeviceCreateQuerySet := wrap-constructor wgpu.DeviceCreateQuerySet QuerySet
     DeviceCreatePipelineLayout := wrap-constructor wgpu.DeviceCreatePipelineLayout PipelineLayout
-    DeviceDrop := wrap-constructor wgpu.DeviceDrop Device
     DeviceCreateComputePipeline := wrap-constructor wgpu.DeviceCreateComputePipeline ComputePipeline
     DeviceCreateRenderBundleEncoder := wrap-constructor wgpu.DeviceCreateRenderBundleEncoder RenderBundleEncoder
     CommandEncoderBeginComputePass := wrap-constructor wgpu.CommandEncoderBeginComputePass ComputePassEncoder
@@ -154,7 +153,6 @@ do
     DeviceCreateBuffer := wrap-constructor wgpu.DeviceCreateBuffer Buffer
     DeviceCreateBindGroupLayout := wrap-constructor wgpu.DeviceCreateBindGroupLayout BindGroupLayout
     DeviceCreateBindGroup := wrap-constructor wgpu.DeviceCreateBindGroup BindGroup
-    AdapterDrop := wrap-constructor wgpu.AdapterDrop Adapter
     CreateInstance := wrap-constructor wgpu.CreateInstance Instance
 
     # special cases that transform input

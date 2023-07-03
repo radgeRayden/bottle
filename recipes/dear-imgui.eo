@@ -19,14 +19,14 @@ fn imgui-git (platform wgpu-lib sdl-lib)
         backend-dir := "{build-path}/imgui/backends"
 
         cmd "cp {imgui-wgpu}/imgui_impl_wgpu.cpp {backend-dir}/"
-        cmd "cp {imgui-wgpu}/imgui_impl_wgpu.h {backend-dir}/"
         cmd "cp {imgui-wgpu}/build_{platform}.sh ./"
         cmd "mkdir lib"
         cmd "cp {project-path}/lib/{wgpu-lib} ./lib"
         cmd "cp {project-path}/lib/{sdl-lib} ./lib"
         cmd "cp -r {project-path}/include/SDL2 ./include"
-        cmd "cp {project-path}/include/wgpu.h ./include"
-        cmd "cp {project-path}/include/webgpu.h ./include"
+        mkdir "{build-path}/include/webgpu"
+        cmd "cp {project-path}/include/wgpu.h ./include/webgpu"
+        cmd "cp {project-path}/include/webgpu.h ./include/webgpu"
 
         cmd "bash ./build_{platform}.sh"
 
