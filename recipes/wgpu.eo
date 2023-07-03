@@ -15,6 +15,11 @@ fn git-release-dir (make)
 
         cmd "git clone https://github.com/gfx-rs/wgpu-native/ --recurse-submodules ."
         cmd "git checkout {VERSION}"
+        tag := ((rshell build-path) "git describe --abbrev=0 --tags HEAD")
+        cmd :=
+            shell build-path
+                dict
+                    WGPU_NATIVE_VERSION = tag
         cmd "{make} package -j {cpu-core-count}"
         commonpath (extract "{build-path}/dist/wgpu--release.zip")
 
