@@ -80,6 +80,8 @@ fn update-render-area ()
             create-swapchain-resolve-source (window.get-drawable-size)
 
 fn init ()
+    raising noreturn
+
     wgpu.SetLogCallback
         fn (log-level message userdata)
             print ('from-rawstring String message)
