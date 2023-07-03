@@ -163,15 +163,6 @@ do
             lose cmd-encoder
         imply result CommandBuffer
 
-    inline RenderPassEncoderEnd (render-pass)
-        wgpu.RenderPassEncoderEnd render-pass
-        static-if LOSE-ENCODERS-ON-FINISH
-            lose render-pass
-
-    inline QueueSubmit (queue count cmd-buffers)
-        wgpu.QueueSubmit queue count cmd-buffers
-        lose cmd-buffers
-
     type ShaderStageFlags < integer : u32
         let __typecall = (define-flags wgpu.ShaderStage)
 
