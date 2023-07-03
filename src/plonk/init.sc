@@ -15,6 +15,7 @@ import ..gpu
 import ..math
 import ..window
 import .shaders
+from (import ..config) let if-module-enabled
 
 enum BatchType plain
     None
@@ -36,6 +37,7 @@ struct PlonkState
 
 global context : (Option PlonkState)
 
+@@ if-module-enabled 'plonk
 fn init ()
     try # none of this is supposed to fail. If it does, we will crash as we should when trying to unwrap state.
         sampler := (Sampler)
@@ -53,9 +55,9 @@ fn init ()
                 sampler = sampler
                 geometry-batch = geometry-batch
                 current-batch = BatchType.None
-
     else ()
 
+@@ if-module-enabled 'plonk
 fn begin-frame ()
     ctx := 'force-unwrap context
     'begin-frame ctx.line-renderer
@@ -124,6 +126,7 @@ fn line (...)
     'add-segments ctx.line-renderer ...
     'draw ctx.line-renderer ('force-unwrap ctx.render-pass)
 
+@@ if-module-enabled 'plonk
 fn submit ()
     ctx := 'force-unwrap context
     ctx.current-batch = BatchType.None

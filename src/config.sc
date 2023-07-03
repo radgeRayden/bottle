@@ -6,7 +6,7 @@ using import struct
 using import .enums
 wgpu := import .gpu.wgpu
 
-inline env-var (name def)
+inline from-environment (name def)
     inline (handler)
         fn ()
             using import C.stdlib
@@ -23,15 +23,21 @@ inline env-var (name def)
 
 from (import .helpers) let match-string-enum
 
-@@ env-var "BOTTLE_WGPU_INSTANCE_BACKEND" wgpu.InstanceBackend.Primary
+@@ from-environment "BOTTLE_WGPU_INSTANCE_BACKEND" wgpu.InstanceBackend.Primary
 fn env-wgpu-backend (value)
     match-string-enum wgpu.InstanceBackend value
         _ 'Vulkan 'DX12 'Metal 'GL 'DX11
 
-@@ env-var "BOTTLE_WGPU_LOG_LEVEL" wgpu.LogLevel.Error
+@@ from-environment "BOTTLE_WGPU_LOG_LEVEL" wgpu.LogLevel.Error
 fn env-wgpu-log-level (value)
     match-string-enum wgpu.LogLevel value
         _ 'Off 'Error 'Warn 'Info 'Debug 'Trace
+
+@@ from-environment "BOTTLE_DISABLED_MODULES" S""
+fn env-disabled-modules (value)
+    using import radl.String+
+    # TODO
+    ;
 
 struct BottleConfig
     ignore-environment-variables? = false
@@ -65,6 +71,10 @@ struct BottleConfig
             msaa-samples = 1:u8
             wgpu-low-level-api = wgpu.InstanceBackend.Primary
             wgpu-log-level = wgpu.LogLevel.Error
+    enabled-modules :
+        struct BottleEnabledModules plain
+            plonk = true
+            imgui = true
 
     fn apply-env-overrides (self)
         if (not self.ignore-environment-variables?)
@@ -73,6 +83,29 @@ struct BottleConfig
 
 global istate-cfg : BottleConfig
 
+spice inline? (f)
+    `[(sc_template_is_inline (sc_closure_get_template (f as Closure)))]
+run-stage;
+
+inline if-module-enabled (name)
+    inline (f)
+        inline (...)
+            enabled? := getattr istate-cfg.enabled-modules name
+            let f =
+                static-if (inline? f)
+                    fn (...)
+                        f ...
+                else
+                    f
+
+            retT :=
+                returnof
+                    static-typify f (va-map typeof ...)
+            if enabled?
+                f ...
+            else
+                (retT)
+
 do
-    let istate-cfg
+    let istate-cfg if-module-enabled
     locals;

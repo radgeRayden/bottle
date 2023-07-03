@@ -2,6 +2,7 @@ bottle := __env.bottle
 import C.stdio
 using import print
 using import String
+from (import ..src.config) let if-module-enabled
 
 @@ 'on bottle.load
 fn ()
@@ -19,6 +20,7 @@ fn (key)
         bottle.quit!;
 
 @@ 'on bottle.render
+@@ if-module-enabled 'imgui
 fn display-fps ()
     ig := import ..src.imgui
     using import glm

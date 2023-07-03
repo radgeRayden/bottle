@@ -49,6 +49,7 @@ global render-state : (Option RendererState)
 fn (cfg)
     cfg.window.title = "hello, triangle!"
     cfg.gpu.msaa-samples = 4
+    cfg.enabled-modules.plonk = false
     ;
 
 @@ 'on bottle.load
