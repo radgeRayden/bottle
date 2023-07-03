@@ -1,3 +1,4 @@
+using import Array
 using import Option
 using import print
 using import String
@@ -12,7 +13,11 @@ inline from-environment (name def)
             using import C.stdlib
             env-var := getenv name
 
-            if (env-var == null) def
+            if (env-var == null)
+                static-if ((typeof def) == Closure)
+                    (def)
+                else
+                    def
             else
                 env-var := 'from-rawstring String env-var
                 try (handler env-var)
@@ -33,11 +38,10 @@ fn env-wgpu-log-level (value)
     match-string-enum wgpu.LogLevel value
         _ 'Off 'Error 'Warn 'Info 'Debug 'Trace
 
-@@ from-environment "BOTTLE_DISABLED_MODULES" S""
+@@ from-environment "BOTTLE_DISABLED_MODULES" (() -> ((Array String)))
 fn env-disabled-modules (value)
     using import radl.String+
-    # TODO
-    ;
+    split value S","
 
 struct BottleConfig
     ignore-environment-variables? = false
@@ -76,10 +80,22 @@ struct BottleConfig
             plonk = true
             imgui = true
 
+    fn disable-module-by-name (self name)
+        inline may-disable-module (k)
+            if (name == (static-tostring k))
+                (getattr self.enabled-modules k) = false
+
+        may-disable-module 'plonk
+        may-disable-module 'imgui
+
     fn apply-env-overrides (self)
         if (not self.ignore-environment-variables?)
             self.gpu.wgpu-low-level-api = (env-wgpu-backend)
             self.gpu.wgpu-log-level     = (env-wgpu-log-level)
+
+            disabled-modules := (env-disabled-modules)
+            for module in (env-disabled-modules)
+                'disable-module-by-name self module
 
 global istate-cfg : BottleConfig
 
