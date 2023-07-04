@@ -10,14 +10,14 @@ inline wrap-constructor (f T)
             f ...
             T
 
-inline define-object (name super destructor)
+inline define-object (name super release reference)
     type (_ name) < Struct :: super
         inline __typecall (cls)
             bitcast null cls
 
         inline __drop (self)
             if ((storagecast self) != null)
-                destructor (bitcast self super)
+                release (bitcast self super)
 
         inline __rimply (otherT thisT)
             static-if (otherT == super)
@@ -43,6 +43,13 @@ inline define-object (name super destructor)
 
         inline get-id (self)
             ptrtoint (storagecast (view self)) u64
+
+        inline __copy (self)
+            ptr := storagecast (view self)
+            if (ptr != null)
+                reference ptr
+
+            imply (copy ptr) (typeof self)
 
 inline define-flags (enumT)
     inline __typecall (cls flags...)
@@ -112,28 +119,28 @@ for scope in ('lineage wgpu)
 run-stage;
 
 do
-    Instance := define-object "WGPUInstance" wgpu.Instance wgpu.InstanceRelease
-    Adapter := define-object "WGPUAdapter" wgpu.Adapter wgpu.AdapterRelease
-    BindGroup := define-object "WGPUBindGroup" wgpu.BindGroup wgpu.BindGroupRelease
-    BindGroupLayout := define-object "WGPUBindGroupLayout" wgpu.BindGroupLayout wgpu.BindGroupLayoutRelease
-    Buffer := define-object "WGPUBuffer" wgpu.Buffer wgpu.BufferRelease
-    CommandBuffer := define-object "WGPUCommandBuffer" wgpu.CommandBuffer wgpu.CommandBufferRelease
-    CommandEncoder := define-object "WGPUCommandEncoder" wgpu.CommandEncoder wgpu.CommandEncoderRelease
-    RenderPassEncoder := define-object "WGPURenderPassEncoder" wgpu.RenderPassEncoder wgpu.RenderPassEncoderRelease
-    ComputePassEncoder := define-object "WGPUComputePassEncoder" wgpu.ComputePassEncoder wgpu.ComputePassEncoderRelease
-    RenderBundleEncoder := define-object "WGPURenderBundleEncoder" wgpu.RenderBundleEncoder wgpu.RenderBundleEncoderRelease
-    ComputePipeline := define-object "WGPUComputePipeline" wgpu.ComputePipeline wgpu.ComputePipelineRelease
-    Device := define-object "WGPUDevice" wgpu.Device wgpu.DeviceRelease
-    PipelineLayout := define-object "WGPUPipelineLayout" wgpu.PipelineLayout wgpu.PipelineLayoutRelease
-    QuerySet := define-object "WGPUQuerySet" wgpu.QuerySet wgpu.QuerySetRelease
-    RenderBundle := define-object "WGPURenderBundle" wgpu.RenderBundle wgpu.RenderBundleRelease
-    RenderPipeline := define-object "WGPURenderPipeline" wgpu.RenderPipeline wgpu.RenderPipelineRelease
-    Sampler := define-object "WGPUSampler" wgpu.Sampler wgpu.SamplerRelease
-    ShaderModule := define-object "WGPUShaderModule" wgpu.ShaderModule wgpu.ShaderModuleRelease
-    Surface := define-object "WGPUSurface" wgpu.Surface wgpu.SurfaceRelease
-    SwapChain := define-object "WGPUSwapChain" wgpu.SwapChain wgpu.SwapChainRelease
-    Texture := define-object "WGPUTexture" wgpu.Texture wgpu.TextureRelease
-    TextureView := define-object "WGPUTextureView" wgpu.TextureView wgpu.TextureViewRelease
+    Instance := define-object "WGPUInstance" wgpu.Instance wgpu.InstanceRelease wgpu.InstanceReference
+    Adapter := define-object "WGPUAdapter" wgpu.Adapter wgpu.AdapterRelease wgpu.AdapterReference
+    BindGroup := define-object "WGPUBindGroup" wgpu.BindGroup wgpu.BindGroupRelease wgpu.BindGroupReference
+    BindGroupLayout := define-object "WGPUBindGroupLayout" wgpu.BindGroupLayout wgpu.BindGroupLayoutRelease wgpu.BindGroupLayoutReference
+    Buffer := define-object "WGPUBuffer" wgpu.Buffer wgpu.BufferRelease wgpu.BufferReference
+    CommandBuffer := define-object "WGPUCommandBuffer" wgpu.CommandBuffer wgpu.CommandBufferRelease wgpu.CommandBufferReference
+    CommandEncoder := define-object "WGPUCommandEncoder" wgpu.CommandEncoder wgpu.CommandEncoderRelease wgpu.CommandEncoderReference
+    RenderPassEncoder := define-object "WGPURenderPassEncoder" wgpu.RenderPassEncoder wgpu.RenderPassEncoderRelease wgpu.RenderPassEncoderReference
+    ComputePassEncoder := define-object "WGPUComputePassEncoder" wgpu.ComputePassEncoder wgpu.ComputePassEncoderRelease wgpu.ComputePassEncoderReference
+    RenderBundleEncoder := define-object "WGPURenderBundleEncoder" wgpu.RenderBundleEncoder wgpu.RenderBundleEncoderRelease wgpu.RenderBundleEncoderReference
+    ComputePipeline := define-object "WGPUComputePipeline" wgpu.ComputePipeline wgpu.ComputePipelineRelease wgpu.ComputePipelineReference
+    Device := define-object "WGPUDevice" wgpu.Device wgpu.DeviceRelease wgpu.DeviceReference
+    PipelineLayout := define-object "WGPUPipelineLayout" wgpu.PipelineLayout wgpu.PipelineLayoutRelease wgpu.PipelineLayoutReference
+    QuerySet := define-object "WGPUQuerySet" wgpu.QuerySet wgpu.QuerySetRelease wgpu.QuerySetReference
+    RenderBundle := define-object "WGPURenderBundle" wgpu.RenderBundle wgpu.RenderBundleRelease wgpu.RenderBundleReference
+    RenderPipeline := define-object "WGPURenderPipeline" wgpu.RenderPipeline wgpu.RenderPipelineRelease wgpu.RenderPipelineReference
+    Sampler := define-object "WGPUSampler" wgpu.Sampler wgpu.SamplerRelease wgpu.SamplerReference
+    ShaderModule := define-object "WGPUShaderModule" wgpu.ShaderModule wgpu.ShaderModuleRelease wgpu.ShaderModuleReference
+    Surface := define-object "WGPUSurface" wgpu.Surface wgpu.SurfaceRelease wgpu.SurfaceReference
+    SwapChain := define-object "WGPUSwapChain" wgpu.SwapChain wgpu.SwapChainRelease wgpu.SwapChainReference
+    Texture := define-object "WGPUTexture" wgpu.Texture wgpu.TextureRelease wgpu.TextureReference
+    TextureView := define-object "WGPUTextureView" wgpu.TextureView wgpu.TextureViewRelease wgpu.TextureViewReference
 
     TextureCreateView := wrap-constructor wgpu.TextureCreateView TextureView
     DeviceCreateTexture := wrap-constructor wgpu.DeviceCreateTexture Texture
