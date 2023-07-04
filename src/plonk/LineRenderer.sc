@@ -8,6 +8,7 @@ using import ..gpu.types
 using import ..helpers
 using import .common
 import ..gpu
+import ..math
 import .shaders
 
 fn make-pipeline (vshader fshader)
@@ -28,6 +29,12 @@ fn make-pipeline (vshader fshader)
                         typeinit
                             format = TextureFormat.BGRA8UnormSrgb
         msaa-samples = (gpu.get-msaa-sample-count)
+
+fn calculate-semicircle-segments (radius)
+    radius as:= f32
+    errorv := 0.33
+    segments := math.ceil ((pi / (acos (1 - errorv / (max radius errorv)))) / 2)
+    max 5:u32 (u32 segments)
 
 struct LineRenderer
     SegmentBufferType := StorageBuffer LineSegment
@@ -99,7 +106,7 @@ struct LineRenderer
 
         let semicircle-segments =
             if (join-kind == LineJoinKind.Round or cap-kind == LineCapKind.Round)
-                25:u32 # TODO: actually calculate this
+                calculate-semicircle-segments (width / 2)
             else
                 0:u32
 
@@ -138,11 +145,12 @@ struct LineRenderer
         'draw render-pass 6 segment-count 0:u32 (u32 self.buffer-offset)
 
         'set-pipeline render-pass self.join-pipeline
+        line := deref ('last self.line-data)
         let join-vertex-count =
-            switch (('last self.line-data) . join-kind)
+            switch line.join-kind
             case LineJoinKind.Bevel 3:u32
             case LineJoinKind.Miter 6:u32
-            case LineJoinKind.Round (25:u32 * 3) # FIXME: calculate this
+            case LineJoinKind.Round (line.semicircle-segments * 3)
             default (unreachable)
         'draw render-pass join-vertex-count (segment-count - 1) 0:u32 (u32 self.buffer-offset)
 
