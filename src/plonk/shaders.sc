@@ -1,33 +1,40 @@
 using import .common
 using import glm
 using import glsl
+using import print
 using import struct
 import ..math
 
 @@ memo
 inline make-buffer-type (T max-size...)
-    struct ((tostring T) .. "Buffer") plain
+    struct ((static-tostring T) .. "Buffer") plain
         data : (array T max-size...)
 
-inline vertex-shader (attrT uniformT)
+inline vertex-shader (uniformT bindings...)
     inline (f)
         fn ()
-            buffer input-data : (make-buffer-type attrT)
+            uniform uniforms : uniformT
                 set = 0
                 binding = 0
 
-            uniform uniforms : uniformT
-                set = 0
-                binding = 1
+            data-bindings... :=
+                va-map
+                    inline (i)
+                        binding := i + 1
+                        buffer input-data : (make-buffer-type (va@ i bindings...))
+                            set = 0
+                            binding = binding
+                        input-data.data
+                    va-range (va-countof bindings...)
 
             out vtexcoords : vec2 (location = 0)
             out vcolor : vec4 (location = 1)
 
-            f input-data.data uniforms vtexcoords vcolor
+            f uniforms vtexcoords vcolor data-bindings...
 
 do
-    @@ vertex-shader VertexAttributes GenericUniforms
-    inline generic-vert (data uniforms vtexcoords vcolor)
+    @@ vertex-shader PlonkUniforms VertexAttributes
+    inline generic-vert (uniforms vtexcoords vcolor data)
         idx := gl_VertexIndex
         vertex := data @ idx
 
@@ -35,8 +42,8 @@ do
         vtexcoords = vertex.texcoords
         vcolor = vertex.color
 
-    @@ vertex-shader LineSegment (make-buffer-type LineUniforms 256)
-    inline line-vert (data uniforms vtexcoords vcolor)
+    @@ vertex-shader PlonkUniforms LineSegment LineData
+    inline line-vert (uniforms vtexcoords vcolor segments lines)
         local vertices =
             arrayof vec2
                 vec2 (-0.5,  1.0) #tl
@@ -47,23 +54,22 @@ do
                 vec2 (-0.5,  1.0) #tl
 
         vertex := vertices @ gl_VertexIndex
-        segment := data @ gl_InstanceIndex
-        uniforms := uniforms.data @ segment.line-index
-
+        segment := segments @ gl_InstanceIndex
+        line := lines @ segment.line-index
 
         dir := segment.end - segment.start
         perp := normalize (vec2 dir.y -dir.x)
-        vpos := segment.start + (dir * vertex.y) + (perp * vertex.x * uniforms.width)
+        vpos := segment.start + (dir * vertex.y) + (perp * vertex.x * line.width)
 
         gl_Position = uniforms.mvp * (vec4 vpos 0.0 1.0)
         vtexcoords = (vec2)
-        vcolor = segment.color
+        vcolor = line.color
 
-    @@ vertex-shader LineSegment (make-buffer-type LineUniforms 256)
-    inline join-vert (data uniforms vtexcoords vcolor)
+    @@ vertex-shader PlonkUniforms LineSegment LineData
+    inline join-vert (uniforms vtexcoords vcolor segments lines)
         idx := gl_InstanceIndex
-        last next := data @ idx, data @ (idx + 1)
-        uniforms := uniforms.data @ last.line-index
+        last next := segments @ idx, segments @ (idx + 1)
+        line := lines @ last.line-index
 
         inline get-perpendicular (segment)
             dir := segment.end - segment.start
@@ -75,23 +81,23 @@ do
         sigma := sign (dot (perp-A + perp-B) normal)
 
         let vpos =
-            switch uniforms.join-kind
+            switch line.join-kind
             case LineJoinKind.Bevel
                 local vertices =
                     arrayof vec2
-                        last.end + (perp-A * (uniforms.width / 2) * sigma)
+                        last.end + (perp-A * (line.width / 2) * sigma)
                         last.end
-                        next.start + (perp-B * (uniforms.width / 2) * sigma)
+                        next.start + (perp-B * (line.width / 2) * sigma)
 
                 deref (vertices @ gl_VertexIndex)
             case LineJoinKind.Miter
-                (vec2)
+                (vec2) #TODO
             case LineJoinKind.Round
-                radius := uniforms.width / 2
+                radius := line.width / 2
                 idx := gl_VertexIndex
                 tri := idx // 3
                 inline get-segment-angle (i)
-                    (pi / uniforms.semicircle-segments) * (f32 i)
+                    (pi / (f32 line.semicircle-segments)) * (f32 i)
 
                 local tri-verts =
                     arrayof vec2
@@ -103,7 +109,7 @@ do
 
         gl_Position = uniforms.mvp * (vec4 vpos 0 1)
         vtexcoords = (vec2)
-        vcolor = last.color
+        vcolor = line.color
 
     fn generic-frag ()
         uniform s : sampler (set = 1) (binding = 0)

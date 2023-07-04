@@ -8,7 +8,6 @@ struct VertexAttributes plain
     color : vec4
 
 struct LineSegment plain
-    color : vec4
     start : vec2
     end   : vec2
     line-index : u32
@@ -23,14 +22,14 @@ enum LineCapKind plain
     Square
     Round
 
-struct LineUniforms plain
-    mvp : mat4
+struct LineData plain
     join-kind = LineJoinKind.Bevel
     cap-kind = LineCapKind.Butt
-    semicircle-segments : f32 = 25
+    semicircle-segments : u32 = 25
     width : f32
+    color : vec4
 
-struct GenericUniforms plain
+struct PlonkUniforms plain
     mvp : mat4
 
 struct Quad plain
@@ -38,6 +37,6 @@ struct Quad plain
     extent : vec2
 
 do
-    let Quad VertexAttributes LineSegment LineUniforms GenericUniforms \
+    let PlonkUniforms Quad VertexAttributes LineSegment LineData \
         LineJoinKind LineCapKind
     local-scope;

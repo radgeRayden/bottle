@@ -138,5 +138,5 @@ fn submit ()
 
 do
     let init begin-frame sprite rectangle circle polygon line submit
-    let SpriteAtlas Quad
+    let SpriteAtlas Quad LineJoinKind LineCapKind
     local-scope;

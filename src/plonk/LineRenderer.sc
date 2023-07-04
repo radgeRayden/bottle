@@ -30,15 +30,17 @@ fn make-pipeline (vshader fshader)
         msaa-samples = (gpu.get-msaa-sample-count)
 
 struct LineRenderer
-    DataBufferType := StorageBuffer LineSegment
-    UniformBufferType := UniformBuffer LineUniforms
+    SegmentBufferType := StorageBuffer LineSegment
+    LineBufferType    := StorageBuffer LineData
+    UniformBufferType := UniformBuffer PlonkUniforms
 
-    uniforms : LineUniforms
-    uniform-data : (Array LineUniforms)
+    uniforms : PlonkUniforms
     segment-data : (Array LineSegment)
+    line-data    : (Array LineData)
     outdated?    : bool
 
-    segment-buffer : DataBufferType
+    segment-buffer : SegmentBufferType
+    line-buffer    : LineBufferType
     buffer-offset : usize
     uniform-buffer : UniformBufferType
     segment-pipeline : RenderPipeline
@@ -48,7 +50,7 @@ struct LineRenderer
     # FIXME: this is a workaround for a lifetime issue. Review if this is
     # really necessary.
     obsolete-bindgroups : (Array BindGroup)
-    obsolete-buffers : (Array DataBufferType)
+    obsolete-buffers : (Array SegmentBufferType)
 
     inline __typecall (cls)
         frag := ShaderModule shaders.generic-frag ShaderLanguage.SPIRV ShaderStage.Fragment
@@ -63,12 +65,14 @@ struct LineRenderer
                 ShaderModule shaders.join-vert ShaderLanguage.SPIRV ShaderStage.Vertex
                 frag
 
-        segment-buffer := DataBufferType 4096
-        uniform-buffer := UniformBufferType 256
-        bind-group := BindGroup ('get-bind-group-layout segment-pipeline 0) (view segment-buffer) (view uniform-buffer)
+        segment-buffer := SegmentBufferType 4096
+        line-buffer    := LineBufferType 10000 # ought to be enough draw calls in a single frame for everyone
+        uniform-buffer := UniformBufferType 1
+        bind-group := BindGroup ('get-bind-group-layout segment-pipeline 0) (view uniform-buffer) (view segment-buffer) (view line-buffer)
 
         super-type.__typecall cls
             segment-buffer = segment-buffer
+            line-buffer = line-buffer
             uniform-buffer = uniform-buffer
             segment-pipeline = segment-pipeline
             join-pipeline = join-pipeline
@@ -80,27 +84,32 @@ struct LineRenderer
     fn begin-frame (self)
         'clear self.obsolete-bindgroups
         'clear self.obsolete-buffers
-        self.uniforms.join-kind = LineJoinKind.Round
+        'frame-write self.uniform-buffer self.uniforms
 
     fn... add-segments (self, vertices, width : f32 = 1.0, color : vec4 = (vec4 1),
-                        join-kind : (param? LineJoinKind) = none,
-                        cap-kind : (param? LineCapKind) = none)
+                        join-kind : LineJoinKind = LineJoinKind.Bevel,
+                        cap-kind : LineCapKind = LineCapKind.Butt)
         self.outdated? = true
         for i in (range ((countof vertices) - 1))
             'append self.segment-data
                 LineSegment
                     start = vertices @ i
                     end = vertices @ (i + 1)
-                    color = color
-                    line-index = (countof self.uniform-data) as u32
+                    line-index = (countof self.line-data) as u32
 
-        self.uniforms.width = width
-        static-if (not (none? join-kind))
-            self.uniforms.join-kind = join-kind
-        static-if (not (none? cap-kind))
-            self.uniforms.join-kind = cap-kind
+        let semicircle-segments =
+            if (join-kind == LineJoinKind.Round or cap-kind == LineCapKind.Round)
+                25:u32 # TODO: actually calculate this
+            else
+                0:u32
 
-        'append self.uniform-data (copy self.uniforms)
+        'append self.line-data
+            LineData
+                join-kind = join-kind
+                cap-kind = cap-kind
+                semicircle-segments = semicircle-segments
+                color = color
+                width = width
 
     fn draw (self render-pass)
         if (not self.outdated?)
@@ -117,7 +126,7 @@ struct LineRenderer
             'append self.obsolete-bindgroups
                 popswap
                     self.bind-group
-                    BindGroup ('get-bind-group-layout self.segment-pipeline 0) (view self.segment-buffer) (view self.uniform-buffer)
+                    BindGroup ('get-bind-group-layout self.segment-pipeline 0) (view self.uniform-buffer) (view self.segment-buffer) (view self.line-buffer)
             return (this-function self render-pass)
 
         self.outdated? = false
@@ -130,7 +139,7 @@ struct LineRenderer
 
         'set-pipeline render-pass self.join-pipeline
         let join-vertex-count =
-            switch self.uniforms.join-kind
+            switch (('last self.line-data) . join-kind)
             case LineJoinKind.Bevel 3:u32
             case LineJoinKind.Miter 6:u32
             case LineJoinKind.Round (25:u32 * 3) # FIXME: calculate this
@@ -141,9 +150,11 @@ struct LineRenderer
         'clear self.segment-data
 
     fn finish (self)
-        'frame-write self.uniform-buffer self.uniform-data
-        'clear self.uniform-data
         self.buffer-offset = 0
+        try
+            'frame-write self.line-buffer self.line-data
+        else ()
+        'clear self.line-data
 do
     let LineRenderer
     local-scope;

@@ -16,8 +16,8 @@ using import ..helpers
 struct GeometryBatch
     attribute-buffer : (StorageBuffer VertexAttributes)
     index-buffer     : (IndexBuffer u32)
-    uniform-buffer   : (UniformBuffer GenericUniforms)
-    uniforms    : GenericUniforms
+    uniform-buffer   : (UniformBuffer PlonkUniforms)
+    uniforms    : PlonkUniforms
     vertex-data : (Array VertexAttributes)
     index-data  : (Array u32)
     outdated-vertices? : bool
@@ -58,8 +58,8 @@ struct GeometryBatch
                 msaa-samples = (gpu.get-msaa-sample-count)
 
         attrbuf := (StorageBuffer VertexAttributes) 4096
-        uniform-buffer := (UniformBuffer GenericUniforms) 1
-        bind-group := BindGroup ('get-bind-group-layout pipeline 0) (view attrbuf) (view uniform-buffer)
+        uniform-buffer := (UniformBuffer PlonkUniforms) 1
+        bind-group := BindGroup ('get-bind-group-layout pipeline 0) (view uniform-buffer) (view attrbuf)
 
         super-type.__typecall cls
             cached-buffer-id = copy ('get-id attrbuf)
@@ -98,7 +98,7 @@ struct GeometryBatch
                 'append self.obsolete-bindgroups
                     popswap
                         self.bind-group
-                        BindGroup ('get-bind-group-layout self.pipeline 0) attrbuf self.uniform-buffer
+                        BindGroup ('get-bind-group-layout self.pipeline 0) self.uniform-buffer attrbuf
                 self.cached-buffer-id = ('get-id attrbuf)
 
             self.outdated-vertices? = false
