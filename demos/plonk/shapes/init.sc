@@ -15,21 +15,25 @@ global line-vertices : (Array vec2)
 
 @@ 'on bottle.update
 fn (dt)
-    rotation += (f32 dt) * 4
+    rotation += (f32 dt)
 
     w h := (bottle.window.get-size)
-    'clear line-vertices
-    count := 6
-    time := (bottle.time.get-time)
-    scaling := ((sin (f32 time)) + 1) / 2
-    spacing := (w / count) * scaling * 0.9
-    margin  := ((f32 w) - spacing * count) / 2 + spacing / 4
+    center := vec2 (w / 2) (h / 2)
+    segments := 2000
+    inline get-point (k)
+        k as:= f32
+        radius := (k / segments) * 300
+        theta := (pi / (segments / 10)) * k + rotation
+        center + (vec2 (cos theta) (sin theta)) * radius
 
-    for i in (range count)
-        'append line-vertices
-            vec2 (margin + (spacing * (f32 i))) 250
-        'append line-vertices
-            vec2 (margin + (spacing * (f32 i)) + (spacing / 2)) (h - 250)
+    'clear line-vertices
+
+    t := (f32 (bottle.time.get-time)) / 3
+    progress := usize (bottle.math.ceil (segments * t))
+    for i in (range (progress % 5000))
+        k := i * 2
+        'append line-vertices (get-point k)
+        'append line-vertices (get-point (k + 1))
 
 @@ 'on bottle.render
 fn ()
@@ -38,8 +42,8 @@ fn ()
     plonk.rectangle (vec2 50 100) (vec2 200) rotation (vec4 1 0 1 1)
     plonk.circle (vec2 150 200) 100 (color = (vec4 0 1 0 1))
     plonk.polygon (vec2 150 200) 3 100 rotation (vec4 0 0.5 0.5 1)
-    plonk.line line-vertices 100:f32 (vec4 1 0.5 0.7 1) LineJoinKind.Round LineCapKind.Round
-    plonk.line line-vertices 75:f32 (vec4 0 0.5 0.7 1) LineJoinKind.Round LineCapKind.Round
+    plonk.line line-vertices 15:f32 (vec4 1 0.5 0.7 1) LineJoinKind.Round LineCapKind.Round
+    plonk.line line-vertices 7:f32 (vec4 0 0.5 0.7 1) LineJoinKind.Round LineCapKind.Round
     plonk.polygon (vec2 500 200) 5 100 rotation
 
 sugar-if main-module?
