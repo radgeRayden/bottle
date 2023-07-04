@@ -120,11 +120,28 @@ fn polygon (...)
     set-batch BatchType.GenericGeometry ctx ctx.default-texture-binding ctx.default-texture
     'add-polygon ctx.geometry-batch ...
 
-fn line (...)
+fn... line (vertices, width : f32 = 1.0, color : vec4 = (vec4 1),
+            join-kind : LineJoinKind = LineJoinKind.Bevel,
+            cap-kind : LineCapKind = LineCapKind.Butt)
     ctx := 'force-unwrap context
     set-batch BatchType.Lines ctx ctx.default-texture-binding ctx.default-texture
-    'add-segments ctx.line-renderer ...
+    'add-segments ctx.line-renderer *...
     'draw ctx.line-renderer ('force-unwrap ctx.render-pass)
+    if ((countof vertices) < 2)
+        return;
+
+    start end := vertices @ 0, vertices @ ((countof vertices) - 1)
+    start+1 end-1 := vertices @ 1, vertices @ ((countof vertices) - 2)
+    sangle eangle := atan2 (unpack ((start+1 - start) . yx)), atan2 (unpack ((end - end-1) . yx))
+    switch cap-kind
+    case LineCapKind.Round
+        circle start (width / 2) color
+        circle end (width / 2) color
+    case LineCapKind.Square
+        radius := (width / 2) * (sqrt 2:f32)
+        polygon start 4 radius (sangle - (pi / 4)) color
+        polygon end 4 radius (eangle - (pi / 4)) color
+    default ()
 
 @@ if-module-enabled 'plonk
 fn submit ()
