@@ -91,7 +91,6 @@ struct LineRenderer
     fn begin-frame (self)
         'clear self.obsolete-bindgroups
         'clear self.obsolete-buffers
-        'frame-write self.uniform-buffer self.uniforms
 
     fn... add-segments (self, vertices, width : f32 = 1.0, color : vec4 = (vec4 1),
                         join-kind : LineJoinKind = LineJoinKind.Bevel,
@@ -161,6 +160,7 @@ struct LineRenderer
         self.buffer-offset = 0
         try
             'frame-write self.line-buffer self.line-data
+            'frame-write self.uniform-buffer self.uniforms
         else ()
         'clear self.line-data
 do

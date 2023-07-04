@@ -71,7 +71,6 @@ struct GeometryBatch
 
     fn set-projection (self mvp)
         self.uniforms.mvp = mvp
-        'frame-write self.uniform-buffer self.uniforms
 
     fn begin-frame (self)
         'clear self.obsolete-bindgroups
@@ -237,6 +236,8 @@ struct GeometryBatch
         'flush self render-pass
         self.vertex-offset = 0
         self.index-offset = 0
+        try ('frame-write self.uniform-buffer self.uniforms)
+        else ()
 
 do
     let GeometryBatch
