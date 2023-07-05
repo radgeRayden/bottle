@@ -23,6 +23,7 @@ inline chain-callback (cb f...)
 chain-callback 'load imgui.init plonk.init
 chain-callback 'begin-frame imgui.begin-frame plonk.begin-frame
 chain-callback 'end-frame plonk.submit imgui.end-frame imgui.render
+chain-callback 'invalidate-frame imgui.reset-gpu-state imgui.end-frame
 
 fn run ()
     raising noreturn
@@ -70,8 +71,7 @@ fn run ()
             case GPUError.ObjectCreationFailed
                 assert false "unhandled GPU Object creation failure"
             case GPUError.OutdatedSwapchain
-                imgui.wgpu-reset;
-                imgui.end-frame;
+                callbacks.invalidate-frame;
             default ()
 
     imgui.shutdown;

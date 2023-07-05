@@ -10,5 +10,6 @@ do
     fnchain begin-frame
     fnchain render
     fnchain end-frame
+    fnchain invalidate-frame
 
     local-scope;

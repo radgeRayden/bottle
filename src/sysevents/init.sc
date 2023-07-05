@@ -4,6 +4,7 @@ import sdl
 import .callbacks
 import ..gpu
 import ..enums
+import ..imgui
 
 struct SysEventsState
     really-quit? : bool
@@ -68,8 +69,10 @@ inline dispatch (handler)
             switch event.window.event
             case sdl.SDL_WINDOWEVENT_RESIZED
                 gpu.update-render-area;
+                imgui.reset-gpu-state;
             case sdl.SDL_WINDOWEVENT_RESTORED
                 gpu.update-render-area;
+                imgui.reset-gpu-state;
             default
                 ;
 

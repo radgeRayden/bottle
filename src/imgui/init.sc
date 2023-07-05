@@ -19,21 +19,17 @@ fn init ()
     io.IniFilename = null
     ()
 
-global reset : bool
 @@ if-module-enabled 'imgui
 fn begin-frame ()
-    if reset
-        ig.ImplWGPU_CreateDeviceObjects;
-        reset = false
-        return;
-
     ig.ImplSDL2_NewFrame;
     ig.ImplWGPU_NewFrame;
     ig.NewFrame;
 
-fn wgpu-reset ()
-    ig.ImplWGPU_InvalidateDeviceObjects;
+global reset : bool
+@@ if-module-enabled 'imgui
+fn reset-gpu-state ()
     reset = true
+    ()
 
 @@ if-module-enabled 'imgui
 fn process-event (event)
@@ -51,14 +47,20 @@ fn process-event (event)
     do (deref io.WantCaptureKeyboard)
     default false #result
 
+global recreate-objects? : bool
 @@ if-module-enabled 'imgui
 fn render ()
     using gpu.types
 
     ig.Render;
-    render-pass := RenderPass (gpu.get-cmd-encoder) (ColorAttachment (gpu.get-swapchain-image) (clear? = false))
-    ig.ImplWGPU_RenderDrawData (ig.GetDrawData) render-pass
-    'finish render-pass
+    if (not reset)
+        render-pass := RenderPass (gpu.get-cmd-encoder) (ColorAttachment (gpu.get-swapchain-image) (clear? = false))
+        ig.ImplWGPU_RenderDrawData (ig.GetDrawData) render-pass
+        'finish render-pass
+    else
+        ig.ImplWGPU_CreateDeviceObjects;
+        ig.ImplWGPU_InvalidateDeviceObjects;
+        reset = false
 
 @@ if-module-enabled 'imgui
 fn shutdown ()
@@ -72,6 +74,6 @@ fn end-frame ()
 
 ..
     do
-        let init begin-frame wgpu-reset process-event render shutdown end-frame
+        let init begin-frame reset-gpu-state process-event render shutdown end-frame
         local-scope;
     ig
