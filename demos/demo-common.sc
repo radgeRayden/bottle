@@ -18,6 +18,8 @@ fn (key)
     using bottle.enums
     if (key == KeyboardKey.Escape)
         bottle.quit!;
+    if (key == KeyboardKey.F11)
+        bottle.window.toggle-fullscreen;
 
 @@ 'on bottle.render
 @@ if-module-enabled 'imgui

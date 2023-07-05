@@ -3,18 +3,23 @@ run-stage;
 
 using import print
 using import String
+using import struct
 import sdl
 
-global handle : (mutable@ sdl.Window)
+struct BottleWindowState plain
+    handle : (mutable@ sdl.Window)
+    fullscreen? : bool
 
-fn get-handle ()
-    handle
+global istate : BottleWindowState
+
+inline get-handle ()
+    istate.handle
 
 fn get-native-info ()
     local info : sdl.SysWMinfo
     sdl.SDL_VERSION &info.version
 
-    assert (storagecast (sdl.GetWindowWMInfo handle &info))
+    assert (storagecast (sdl.GetWindowWMInfo (get-handle) &info))
 
     let info = info.info
 
@@ -30,13 +35,13 @@ fn get-native-info ()
 fn get-size ()
     local w : i32
     local h : i32
-    sdl.GetWindowSize handle &w &h
+    sdl.GetWindowSize (get-handle) &w &h
     _ w h
 
 fn get-drawable-size ()
     local w : i32
     local h : i32
-    sdl.GetWindowSizeInPixels handle &w &h
+    sdl.GetWindowSizeInPixels (get-handle) &w &h
     _ w h
 
 fn get-desktop-size (display)
@@ -66,15 +71,26 @@ fn get-relative-size (display wratio hratio)
 
 fn minimized? ()
     as
-        (sdl.GetWindowFlags handle) & sdl.SDL_WINDOW_MINIMIZED
+        (sdl.GetWindowFlags (get-handle)) & sdl.SDL_WINDOW_MINIMIZED
         bool
 
 fn set-title (title)
-    sdl.SetWindowTitle handle (title as rawstring)
+    sdl.SetWindowTitle (get-handle) (title as rawstring)
     ()
 
 fn get-title ()
-    String (sdl.GetWindowTitle handle)
+    String (sdl.GetWindowTitle (get-handle))
+
+fn set-fullscreen (value)
+    istate.fullscreen? = value
+    sdl.SetWindowFullscreen (get-handle)
+        ? value sdl.SDL_WINDOW_FULLSCREEN_DESKTOP (bitcast 0:u32 sdl.WindowFlags)
+
+fn fullscreen? ()
+    deref istate.fullscreen?
+
+fn toggle-fullscreen ()
+    set-fullscreen (not (fullscreen?))
 
 fn init ()
     if (operating-system == 'windows)
@@ -107,7 +123,7 @@ fn init ()
                     result
             flags...
 
-    handle =
+    handle :=
         sdl.CreateWindow
             cfg.title
             sdl.SDL_WINDOWPOS_UNDEFINED
@@ -127,10 +143,15 @@ fn init ()
         # TODO: unify error handling
         msg := (sdl.GetError)
         assert false (.. "Error while creating window:" ('from-rawstring String msg))
+
+    istate =
+        typeinit
+            handle = handle
+            fullscreen? = cfg.fullscreen?
     ;
 
 fn shutdown ()
-    sdl.DestroyWindow handle
+    sdl.DestroyWindow (get-handle)
     sdl.Quit;
 
 do
@@ -139,6 +160,9 @@ do
         get-native-info
 
         init
+        fullscreen?
+        set-fullscreen
+        toggle-fullscreen
         get-size
         get-drawable-size
         get-desktop-scaling-factor
