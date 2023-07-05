@@ -88,11 +88,20 @@ inline gen-buffer-type (parent-type prefix backing-type usage-flags)
         fn get-byte-size (self)
             self.Capacity * ElementSize
 
-        fn... clone (self, new-capacity : usize)
+        fn... clone (self, new-capacity : usize, copy-count : (param? usize) = none)
             new-buffer := (typeof self) new-capacity (wgpu.BufferGetUsage (view self))
             cmd-encoder := imply ('force-unwrap istate.cmd-encoder) CommandEncoder
+
+            src-capacity := self.Capacity
+            let copy-count =
+                static-if (not (none? copy-count))
+                    copy-count
+                else
+                    src-capacity
+
+            assert (copy-count < src-capacity)
             wgpu.CommandEncoderCopyBufferToBuffer \
-                cmd-encoder self 0:u64 new-buffer 0:u64 ('get-byte-size self)
+                cmd-encoder self 0:u64 new-buffer 0:u64 (copy-count * ElementSize)
             new-buffer
 
         inline __imply (this other)

@@ -81,6 +81,9 @@ struct GeometryBatch
         if (not (self.outdated-vertices? or self.outdated-indices?))
             return;
 
+        # NOTE: 'frame-write happens at the very beginning of the command buffer, which means
+        # we must avoid copying over what has been written. That's why now when resizing I pass in how much was
+        # previously written into the buffer prior to cloning.
         if self.outdated-vertices?
             attrbuf := self.attribute-buffer
             try
@@ -90,7 +93,7 @@ struct GeometryBatch
                 'append self.obsolete-buffers
                     popswap
                         self.attribute-buffer
-                        'clone attrbuf (attrbuf.Capacity * 2:usize)
+                        'clone attrbuf (max (countof self.vertex-data) (attrbuf.Capacity * 2:usize)) self.vertex-offset
                 return (this-function self render-pass)
 
             if (self.cached-buffer-id != ('get-id attrbuf))
@@ -111,7 +114,7 @@ struct GeometryBatch
                 'append self.obsolete-index-buffers
                     popswap
                         self.index-buffer
-                        'clone idxbuf (idxbuf.Capacity * 2:usize)
+                        'clone idxbuf (max (countof self.index-data) (idxbuf.Capacity * 2:usize)) self.vertex-offset
                 return (this-function self render-pass)
 
             self.outdated-indices? = false
