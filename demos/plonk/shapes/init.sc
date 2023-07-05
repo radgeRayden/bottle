@@ -30,7 +30,7 @@ fn (dt)
 
     t := (f32 (bottle.time.get-time)) / 3
     progress := usize (bottle.math.ceil (segments * t))
-    for i in (range (progress % 5000))
+    for i in (range (min progress 5000:usize))
         k := i * 2
         'append line-vertices (get-point k)
         'append line-vertices (get-point (k + 1))
