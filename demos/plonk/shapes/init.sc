@@ -64,6 +64,9 @@ fn ()
     plonk.line line-vertices2 35:f32 (vec4 1 0.5 0.7 1) LineJoinKind.Bevel LineCapKind.Square
     plonk.line line-vertices2 30:f32 (vec4 0 0.5 0.7 1) LineJoinKind.Bevel LineCapKind.Square
 
+    wsize := vec2 (bottle.window.get-size)
+    plonk.rectangle-line (wsize - (vec2 250)) (vec2 200) rotation
+
 sugar-if main-module?
     bottle.run;
 else

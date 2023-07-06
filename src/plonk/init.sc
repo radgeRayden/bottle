@@ -126,6 +126,14 @@ fn... line (vertices, width : f32 = 1.0, color : vec4 = (vec4 1),
     set-batch BatchType.GenericGeometry ctx ctx.default-texture-binding ctx.default-texture
     'add-line ctx.geometry-batch *...
 
+fn rectangle-line (...)
+    ctx := 'force-unwrap context
+    set-batch BatchType.GenericGeometry ctx ctx.default-texture-binding ctx.default-texture
+    'add-rectangle-line ctx.geometry-batch ...
+
+fn polygon-line ()
+fn circle-line ()
+
 @@ if-module-enabled 'plonk
 fn submit ()
     ctx := 'force-unwrap context
@@ -137,6 +145,6 @@ fn submit ()
     'finish rp
 
 do
-    let init begin-frame sprite rectangle circle polygon line submit
+    let init begin-frame sprite rectangle rectangle-line circle circle-line polygon polygon-line line submit
     let SpriteAtlas Quad LineJoinKind LineCapKind
     local-scope;

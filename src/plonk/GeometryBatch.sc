@@ -331,6 +331,26 @@ struct GeometryBatch
             'add-circle self end (width / 2) color
         default ()
 
+    fn... add-rectangle-line (self : this-type, position : vec2, size : vec2,
+                              rotation : f32 = 0:f32, line-width : f32 = 1:f32, color : vec4 = (vec4 1),
+                              join-kind : LineJoinKind = LineJoinKind.Bevel,
+                              cap-kind : LineCapKind = LineCapKind.Butt)
+        self.outdated-vertices? = true
+        self.outdated-indices? = true
+
+        local vertices : (array vec2 5)
+            va-map
+                inline (v)
+                    rotated := + (math.rotate2D (v - (vec2 0.5)) rotation) (vec2 0.5)
+                    position + (rotated * size)
+                _
+                    vec2 0 1 # top left
+                    vec2 1 1 # top right
+                    vec2 1 0 # bottom right
+                    vec2 0 0 # bottom left
+                    vec2 0 1 # top left
+        'add-line self vertices line-width color join-kind cap-kind
+
     fn finish (self render-pass)
         'flush self render-pass
         self.vertex-offset = 0
