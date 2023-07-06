@@ -11,8 +11,7 @@ let demo =
         S"gpu.hello-triangle"
 
 import-string := .. ".demos." demo
-path := dots-to-slashes (import-string as string)
-cfg.filesystem.root = module-dir .. "/" .. (rslice (String path) 1)
+cfg.filesystem.root = module-dir .. "/demos"
 
 let module =
     try

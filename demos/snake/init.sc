@@ -80,7 +80,7 @@ fn (cfg)
     root-dir = copy cfg.filesystem.root
 
 fn play-sfx (name)
-    audio.play-one-shot (.. root-dir "/" name ".wav")
+    audio.play-one-shot (.. root-dir "/assets/" name ".wav")
 
 fn spawn-snake ()
     for x in (range game-state.snake-length)
@@ -177,12 +177,12 @@ fn update-snake ()
 @@ 'on bottle.load
 fn ()
     try
-        font-data := bottle.filesystem.load-file "monogram.ttf"
+        font-data := bottle.filesystem.load-file "assets/monogram.ttf"
         font := bottle.font.Font font-data 39
 
         resources =
             GameResources
-                atlas = plonk.SpriteAtlas (bottle.asset.load-image "snake.png") 6 1
+                atlas = plonk.SpriteAtlas (bottle.asset.load-image "assets/snake.png") 6 1
                 font-atlas = plonk.SpriteAtlas ('pack-atlas font char" " char"~") 1 95
     else ()
 

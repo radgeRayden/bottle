@@ -23,7 +23,7 @@ fn ()
     try
         draw-state =
             DrawState
-                sprite = plonk.SpriteAtlas (bottle.asset.load-image "_Run.png") 10 1
+                sprite = plonk.SpriteAtlas (bottle.asset.load-image "assets/_Run.png") 10 1
     else ()
 
 @@ 'on bottle.update

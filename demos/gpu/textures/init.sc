@@ -44,7 +44,7 @@ fn ()
                                     format = (bottle.gpu.get-preferred-surface-format)
 
         let image-data =
-            bottle.asset.load-image "linus.jpg"
+            bottle.asset.load-image "assets/linus.jpg"
 
         my-texture := Texture (copy image-data.width) (copy image-data.height) none (image-data = image-data)
         texture-view := TextureView my-texture

@@ -16,11 +16,7 @@ for DEMO in $DEMOS; do
 done
 wait
 
-cp ./gpu/textures/linus.jpg ./dist/bin
-cp ./plonk/sprites/_Run.png ./dist/bin
-cp ./snake/*.png ./dist/bin/
-cp ./snake/*.wav ./dist/bin/
-cp ./snake/*.ttf ./dist/bin/
+cp -r ./assets ./dist/bin/
 mv ./dist/bin ./bottle-demos
 
 if [ "$(expr substr $(uname -s) 1 10)" == "MINGW64_NT" ]; then
@@ -32,4 +28,4 @@ if [ "$(expr substr $(uname -s) 1 10)" == "MINGW64_NT" ]; then
 fi
 
 zip bottle-demos.zip ./bottle-demos/*
-rm -r dist bottle-demos
+rm -r dist
