@@ -279,15 +279,16 @@ struct GeometryBatch
             va-map add-idx
                 _ 0 2 3 3 1 0
 
-        for i in (range 1 ((countof vertices) - 1))
-            first-index := (next-index)
-            idx := (i) -> ((u32 i) + first-index)
-            add-idx := (i) -> ('append self.index-data (idx i))
-            add-vtx := (v) -> ('append self.vertex-data v)
+        join-range := (range 1 ((countof vertices) - 1))
+        switch join-kind
+        case LineJoinKind.Bevel
+            for i in join-range
+                a-start ljoin b-end := vertices @ (i - 1), vertices @ i, vertices @ (i + 1)
+                first-index := (next-index)
+                idx := (i) -> ((u32 i) + first-index)
+                add-idx := (i) -> ('append self.index-data (idx i))
+                add-vtx := (v) -> ('append self.vertex-data v)
 
-            a-start ljoin b-end := vertices @ (i - 1), vertices @ i, vertices @ (i + 1)
-            switch join-kind
-            case LineJoinKind.Bevel
                 inline get-perpendicular (start end)
                     dir := end - start
                     normalize (vec2 dir.y -dir.x)
@@ -309,11 +310,12 @@ struct GeometryBatch
                         ljoin + (perp-B * (width / 2) * sigma)
                 va-map add-idx
                     _ 0 1 2
-            case LineJoinKind.Miter
-            case LineJoinKind.Round
+        case LineJoinKind.Miter
+        case LineJoinKind.Round
+            for i in join-range
                 # TODO: change to semicircle when that is a thing
-                'add-circle self ljoin (width / 2) color
-            default ()
+                'add-circle self (vertices @ i) (width / 2) color
+        default ()
 
         start end := vertices @ 0, vertices @ ((countof vertices) - 1)
         switch cap-kind
