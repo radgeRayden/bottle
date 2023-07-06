@@ -30,20 +30,24 @@ inline vertex-shader (uniformT bindings...)
             out vtexcoords : vec2 (location = 0)
             out vcolor : vec4 (location = 1)
 
-            f uniforms vtexcoords vcolor data-bindings...
+            let position texcoords color = (f uniforms data-bindings...)
+            gl_Position = position
+            vtexcoords = texcoords
+            vcolor = color
 
 do
     @@ vertex-shader PlonkUniforms VertexAttributes
-    inline generic-vert (uniforms vtexcoords vcolor data)
+    inline generic-vert (uniforms data)
         idx := gl_VertexIndex
         vertex := data @ idx
 
-        gl_Position = uniforms.mvp * (vec4 vertex.position 0.0 1.0)
-        vtexcoords = vertex.texcoords
-        vcolor = vertex.color
+        _
+            position = uniforms.mvp * (vec4 vertex.position 0.0 1.0)
+            texcoords = vertex.texcoords
+            color = vertex.color
 
     @@ vertex-shader PlonkUniforms LineSegment LineData
-    inline line-vert (uniforms vtexcoords vcolor segments lines)
+    inline line-vert (uniforms segments lines)
         local vertices =
             arrayof vec2
                 vec2 (-0.5,  1.0) #tl
@@ -61,12 +65,13 @@ do
         perp := normalize (vec2 dir.y -dir.x)
         vpos := segment.start + (dir * vertex.y) + (perp * vertex.x * line.width)
 
-        gl_Position = uniforms.mvp * (vec4 vpos 0.0 1.0)
-        vtexcoords = (vec2)
-        vcolor = line.color
+        _
+            position = uniforms.mvp * (vec4 vpos 0.0 1.0)
+            vtexcoords = (vec2)
+            vcolor = line.color
 
     @@ vertex-shader PlonkUniforms LineSegment LineData
-    inline join-vert (uniforms vtexcoords vcolor segments lines)
+    inline join-vert (uniforms segments lines)
         idx := gl_InstanceIndex
         last next := segments @ idx, segments @ (idx + 1)
         line := lines @ last.line-index
@@ -107,9 +112,10 @@ do
                 deref (tri-verts @ (idx % 3))
             default (vec2)
 
-        gl_Position = uniforms.mvp * (vec4 vpos 0 1)
-        vtexcoords = (vec2)
-        vcolor = line.color
+        _
+            position = uniforms.mvp * (vec4 vpos 0 1)
+            texcoords = (vec2)
+            color = line.color
 
     fn generic-frag ()
         uniform s : sampler (set = 1) (binding = 0)
