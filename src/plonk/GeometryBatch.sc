@@ -12,6 +12,16 @@ using import ..gpu.types
 using import .common
 using import ..helpers
 
+fn calculate-circle-segment-count (radius)
+    radius as:= f32
+    errorv := 0.33
+    segments := math.ceil (pi / (acos (1 - errorv / (max radius errorv))))
+    max 5:u32 (u32 segments)
+
+fn regular-polygon-point (center radius idx segments rotation-offset)
+    angle := (f32 idx) * (2 * pi / (f32 segments)) + (pi / 2) + rotation-offset
+    center + ((vec2 (cos angle) (sin angle)) * radius)
+
 # TODO: unify batch interfaces
 struct GeometryBatch
     attribute-buffer : (StorageBuffer VertexAttributes)
@@ -202,10 +212,9 @@ struct GeometryBatch
         'append self.vertex-data
             VertexAttributes (position = center) (color = color)
         for i in (range (segments + 1))
-            angle := (f32 i) * (2 * pi / (f32 segments)) + (pi / 2) + rotation
             'append self.vertex-data
                 VertexAttributes
-                    position = center + ((math.rotate2D (vec2 1 0) angle) * radius)
+                    position = (regular-polygon-point center radius i segments rotation)
                     color = color
         for i in (range (segments + 1))
             'append self.index-data vtx-offset # center
@@ -218,13 +227,8 @@ struct GeometryBatch
         self.outdated-indices? = true
 
         let segments =
-            static-if (none? segments)
-                radius as:= f32
-                errorv := 0.33
-                segments := math.ceil (pi / (acos (1 - errorv / (max radius errorv))))
-                max 5:u32 (u32 segments)
-            else
-                segments
+            static-if (none? segments) (calculate-circle-segment-count radius)
+            else segments
 
         'add-polygon self center segments radius 0:f32 color
         ()
@@ -343,6 +347,37 @@ struct GeometryBatch
                     vec2 0 0 # bottom left
                     vec2 0 1 # top left
         'add-line self vertices line-width color join-kind cap-kind
+        ()
+
+    fn... add-polygon-line (self, center, segments, radius, rotation,
+                            line-width : f32 = 1:f32, color : vec4 = (vec4 1),
+                            join-kind : LineJoinKind = LineJoinKind.Bevel,
+                            cap-kind : LineCapKind = LineCapKind.Butt)
+        self.outdated-vertices? = true
+        self.outdated-indices? = true
+
+        radius as:= f32
+        segments := (max (u32 segments) 3:u32)
+        # FIXME: maybe we can avoid this allocation in the future
+        local line-vertices : (Array vec2)
+        for i in (range (segments + 1))
+            'append line-vertices (regular-polygon-point center radius i segments rotation)
+        'add-line self line-vertices line-width color join-kind cap-kind
+        ()
+
+    fn... add-circle-line (self, center, radius, color : vec4 = (vec4 1),
+                           segments : (param? i32) = none, line-width : f32 = 1:f32,
+                           join-kind : LineJoinKind = LineJoinKind.Bevel,
+                           cap-kind : LineCapKind = LineCapKind.Butt)
+        self.outdated-vertices? = true
+        self.outdated-indices? = true
+
+        let segments =
+            static-if (none? segments) (calculate-circle-segment-count radius)
+            else segments
+
+        'add-polygon-line self center segments radius 0:f32 line-width color join-kind cap-kind
+        ()
 
     fn finish (self render-pass)
         'flush self render-pass

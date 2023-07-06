@@ -131,8 +131,15 @@ fn rectangle-line (...)
     set-batch BatchType.GenericGeometry ctx ctx.default-texture-binding ctx.default-texture
     'add-rectangle-line ctx.geometry-batch ...
 
-fn polygon-line ()
-fn circle-line ()
+fn polygon-line (...)
+    ctx := 'force-unwrap context
+    set-batch BatchType.GenericGeometry ctx ctx.default-texture-binding ctx.default-texture
+    'add-polygon-line ctx.geometry-batch ...
+
+fn circle-line (...)
+    ctx := 'force-unwrap context
+    set-batch BatchType.GenericGeometry ctx ctx.default-texture-binding ctx.default-texture
+    'add-circle-line ctx.geometry-batch ...
 
 @@ if-module-enabled 'plonk
 fn submit ()
