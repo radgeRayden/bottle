@@ -10,13 +10,11 @@ mkdir ./dist/bin
 mkdir ./dist/obj
 
 export LDFLAGS="$(scopes -e ./setup-dist.sc)"
-scopes -e ./build.sc ".gpu.hello-triangle"
-scopes -e ./build.sc ".gpu.buffers"
-scopes -e ./build.sc ".gpu.textures"
-scopes -e ./build.sc ".plonk.sprites"
-scopes -e ./build.sc ".plonk.shapes"
-scopes -e ./build.sc ".plonk.line-benchmark"
-scopes -e ./build.sc ".snake"
+DEMOS="$(cat demo-list.txt | tr '\n' ' ')"
+for DEMO in $DEMOS; do
+    scopes -e ./build.sc .$DEMO &
+done
+wait
 
 cp ./gpu/textures/linus.jpg ./dist/bin
 cp ./plonk/sprites/_Run.png ./dist/bin
