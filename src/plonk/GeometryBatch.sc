@@ -141,7 +141,7 @@ struct GeometryBatch
         'clear self.index-data
 
     fn... add-quad (self : this-type, position : vec2, size : vec2, rotation : f32 = 0:f32, quad : Quad = (Quad (vec2 0 0) (vec2 1 1)),
-                      fliph? : bool = false, flipv? : bool = false, color : vec4 = (vec4 1))
+                    origin : vec2 = (vec2 0.5), fliph? : bool = false, flipv? : bool = false, color : vec4 = (vec4 1))
 
         self.outdated-vertices? = true
         self.outdated-indices? = true
@@ -164,7 +164,7 @@ struct GeometryBatch
                 vec2 1 1 # bottom right
 
         inline make-vertex (vertex-index uv-index)
-            v := (norm-vertices @ vertex-index) * size
+            v := ((norm-vertices @ vertex-index) - origin) * size
             VertexAttributes
                 position = (position + (math.rotate2D v rotation))
                 texcoords = (quad.start + ((texcoords @ uv-index) * quad.extent))
@@ -330,7 +330,7 @@ struct GeometryBatch
         default ()
 
     fn... add-rectangle-line (self : this-type, position : vec2, size : vec2,
-                              rotation : f32 = 0:f32, line-width : f32 = 1:f32, color : vec4 = (vec4 1),
+                              rotation : f32 = 0:f32, origin : vec2 = (vec2 0.5), line-width : f32 = 1:f32, color : vec4 = (vec4 1),
                               join-kind : LineJoinKind = LineJoinKind.Bevel,
                               cap-kind : LineCapKind = LineCapKind.Butt)
         self.outdated-vertices? = true
@@ -339,7 +339,7 @@ struct GeometryBatch
         local vertices : (array vec2 5)
             va-map
                 inline (v)
-                    position + (math.rotate2D (v * size) rotation)
+                    position + (math.rotate2D ((v - origin) * size) rotation)
                 _
                     vec2 0 1 # top left
                     vec2 1 1 # top right

@@ -242,8 +242,9 @@ fn ()
 
     inline draw-tile (position tile rotation flip...)
         fliph? flipv? := (va-option fliph? flip... false), (va-option flipv? flip... false)
-        x y := unpack position
-        plonk.sprite ctx.atlas (vec2 (x * TILE-SIZE) (y * TILE-SIZE)) (vec2 TILE-SIZE) (rotation as f32) ('get-quad ctx.atlas tile)
+        tile-size := (vec2 TILE-SIZE)
+        drawpos := (vec2 position) * tile-size + (tile-size / 2)
+        plonk.sprite ctx.atlas drawpos tile-size (rotation as f32) ('get-quad ctx.atlas tile)
             fliph? = fliph?
             flipv? = flipv?
 
