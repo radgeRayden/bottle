@@ -235,6 +235,100 @@ struct GeometryBatch
         'add-polygon self center segments radius 0:f32 color
         ()
 
+    fn... add-line (self, vertices, width : f32 = 1.0, color : vec4 = (vec4 1),
+                    join-kind : LineJoinKind = LineJoinKind.Bevel,
+                    cap-kind : LineCapKind = LineCapKind.Butt)
+        self.outdated-vertices? = true
+        self.outdated-indices? = true
+
+        if ((countof vertices) < 2)
+            return;
+
+        local segment-vertices =
+            arrayof vec2
+                vec2 (-0.5,  1.0) #tl
+                vec2 ( 0.5,  1.0) #tr
+                vec2 (-0.5,  0.0) #bl
+                vec2 ( 0.5,  0.0) #br
+
+        inline next-index ()
+            u32 (self.vertex-offset + (countof self.vertex-data))
+
+        for i in (range ((countof vertices) - 1))
+            start end := vertices @ i, vertices @ (i + 1)
+            inline make-vertex (idx)
+                dir := end - start
+                perp := normalize (vec2 dir.y -dir.x)
+
+                vertex := segment-vertices @ idx
+                vpos := start + (dir * vertex.y) + (perp * vertex.x * width)
+                VertexAttributes
+                    position = vpos
+                    color = color
+
+            first-index := (next-index)
+            idx := (i) -> ((u32 i) + first-index)
+            add-idx := (i) -> ('append self.index-data (idx i))
+            add-vtx := (v) -> ('append self.vertex-data v)
+
+            va-map
+                inline (i)
+                    add-vtx (make-vertex i)
+                _ 0 1 2 3
+
+            va-map add-idx
+                _ 0 2 3 3 1 0
+
+        for i in (range 1 ((countof vertices) - 1))
+            first-index := (next-index)
+            idx := (i) -> ((u32 i) + first-index)
+            add-idx := (i) -> ('append self.index-data (idx i))
+            add-vtx := (v) -> ('append self.vertex-data v)
+
+            a-start ljoin b-end := vertices @ (i - 1), vertices @ i, vertices @ (i + 1)
+            switch join-kind
+            case LineJoinKind.Bevel
+                inline get-perpendicular (start end)
+                    dir := end - start
+                    normalize (vec2 dir.y -dir.x)
+
+                perp-A perp-B := get-perpendicular a-start ljoin, get-perpendicular ljoin b-end
+                tangent := perp-B - perp-A
+                normal := normalize (vec2 tangent.y -tangent.x)
+                sigma := sign (dot (perp-A + perp-B) normal)
+
+                va-map
+                    inline (vpos)
+                        add-vtx
+                            VertexAttributes
+                                position = vpos
+                                color = color
+                    _
+                        ljoin + (perp-A * (width / 2) * sigma)
+                        ljoin
+                        ljoin + (perp-B * (width / 2) * sigma)
+                va-map add-idx
+                    _ 0 1 2
+            case LineJoinKind.Miter
+            case LineJoinKind.Round
+                # TODO: change to semicircle when that is a thing
+                'add-circle self ljoin (width / 2) color
+            default ()
+
+        start end := vertices @ 0, vertices @ ((countof vertices) - 1)
+        switch cap-kind
+        case LineCapKind.Square
+            radius := (width / 2) * (static-eval (sqrt 2:f32))
+            start+1 end-1 := vertices @ 1, vertices @ ((countof vertices) - 2)
+            sangle eangle := atan2 (unpack ((start+1 - start) . yx)), atan2 (unpack ((end - end-1) . yx))
+            'add-polygon self start 4 radius (sangle - (pi / 4)) color
+            'add-polygon self end 4 radius (eangle - (pi / 4)) color
+        case LineCapKind.Round
+            # TODO: change to semicircle when that is a thing
+            'add-circle self start (width / 2) color
+            'add-circle self end (width / 2) color
+        default ()
+
     fn finish (self render-pass)
         'flush self render-pass
         self.vertex-offset = 0

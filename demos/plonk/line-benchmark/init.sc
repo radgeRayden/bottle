@@ -12,7 +12,7 @@ fn (cfg)
     cfg.window.fullscreen? = true
     cfg.gpu.msaa-samples = 4
 
-LINES-X LINES-Y := 75, 75
+LINES-X LINES-Y := 250, 250
 @@ 'on bottle.render
 fn ()
     ww wh := (bottle.window.get-size)
@@ -23,7 +23,7 @@ fn ()
         start := vec2 x0 y0
         end := start + (vec2 (cos t) (sin t)) * 15
         local vertices = (arrayof vec2 start end)
-        plonk.line vertices 5:f32
+        plonk.line vertices 2.5:f32
 
 sugar-if main-module?
     bottle.run;
