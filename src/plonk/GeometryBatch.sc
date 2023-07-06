@@ -154,15 +154,9 @@ struct GeometryBatch
                 vec2 1 1 # bottom right
 
         inline make-vertex (vertex-index uv-index)
-            vertex :=
-                +
-                    math.rotate2D
-                        (norm-vertices @ vertex-index) - (vec2 0.5)
-                        rotation
-                    vec2 0.5
-
+            v := (norm-vertices @ vertex-index) * size
             VertexAttributes
-                position = (position + (vertex * size))
+                position = (position + (math.rotate2D v rotation))
                 texcoords = (quad.start + ((texcoords @ uv-index) * quad.extent))
                 color = color
 
@@ -341,8 +335,7 @@ struct GeometryBatch
         local vertices : (array vec2 5)
             va-map
                 inline (v)
-                    rotated := + (math.rotate2D (v - (vec2 0.5)) rotation) (vec2 0.5)
-                    position + (rotated * size)
+                    position + (math.rotate2D (v * size) rotation)
                 _
                     vec2 0 1 # top left
                     vec2 1 1 # top right
