@@ -13,6 +13,8 @@ fn shared-lib (libname)
         cmd "gcc -shared -fPIC -O2 -o {libname} -I{src-dir} -x c {src-dir}/xxhash.c"
         "{libname}"
 
+license := (download "https://raw.githubusercontent.com/Cyan4973/xxHash/dev/LICENSE")
+
 package xxhash
     platform linux unknown
     summary SUMMARY
@@ -21,6 +23,7 @@ package xxhash
     libname := (shared-lib "libxxhash.so")
     alias "include/xxhash.h" "{src-dir}/xxhash.h"
     alias "lib/{libname}" "{src-dir}/{libname}"
+    alias "/licenses/xxHash.txt" license
 
 package xxhash
     platform windows-mingw
@@ -30,3 +33,4 @@ package xxhash
     libname := (shared-lib "xxhash.dll")
     alias "include/xxhash.h" "{src-dir}/xxhash.h"
     alias "lib/{libname}" "{src-dir}/{libname}"
+    alias "/licenses/xxHash.txt" license

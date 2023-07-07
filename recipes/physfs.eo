@@ -29,6 +29,8 @@ fn patchelf (soname libpath)
 bindings :=
     download "https://raw.githubusercontent.com/ScopesCommunity/eo-packages/main/bindings/physfs.sc"
 
+license := (download "https://raw.githubusercontent.com/icculus/physfs/main/LICENSE.txt")
+
 package physfs
     summary SUMMARY
     version VERSION
@@ -40,6 +42,7 @@ package physfs
     alias "lib/libphysfs.so" libpath
     alias "include/physfs.h" "{preinstall-dir}/include/physfs.h"
     alias "/lib/scopes/packages/physfs.sc" bindings
+    alias "/licenses/physfs.txt" license
 
 package physfs
     summary SUMMARY
@@ -50,3 +53,4 @@ package physfs
     alias "lib/physfs.dll" "{preinstall-dir}/bin/libphysfs.dll"
     alias "include/physfs.h" "{preinstall-dir}/include/physfs.h"
     alias "/lib/scopes/packages/physfs.sc" bindings
+    alias "/licenses/physfs.txt" license

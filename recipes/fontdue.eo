@@ -20,6 +20,9 @@ preinstall-dir :=
 bindings :=
     download "https://raw.githubusercontent.com/ScopesCommunity/eo-packages/main/bindings/fontdue.sc"
 
+fontdue-license := (download "https://raw.githubusercontent.com/mooman219/fontdue/master/LICENSE-ZLIB")
+fontdue-native-license :=  (download "https://raw.githubusercontent.com/spindlebink/fontdue-native/main/LICENSE.MIT")
+
 package fontdue-native
     platform linux unknown
     version VERSION
@@ -28,6 +31,8 @@ package fontdue-native
     alias "/include/fontdue.h" "{preinstall-dir}/ffi/fontdue.h"
     alias "/lib/libfontdue_native.so" "{preinstall-dir}/target/release/libfontdue_native.so"
     alias "/lib/scopes/packages/fontdue.sc" bindings
+    alias "/licenses/fontdue.txt" fontdue-license
+    alias "/licenses/fontdue-native.txt" fontdue-native-license
 
 package fontdue-native
     platform windows-mingw
@@ -37,3 +42,5 @@ package fontdue-native
     alias "/include/fontdue.h" "{preinstall-dir}/ffi/fontdue.h"
     alias "/lib/fontdue_native.dll" "{preinstall-dir}/target/release/fontdue_native.dll"
     alias "/lib/scopes/packages/fontdue.sc" bindings
+    alias "/licenses/fontdue.txt" fontdue-license
+    alias "/licenses/fontdue-native.txt" fontdue-native-license

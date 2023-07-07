@@ -33,6 +33,8 @@ fn patchelf (soname libpath)
 bindings :=
     download "https://raw.githubusercontent.com/ScopesCommunity/eo-packages/main/bindings/sdl.sc"
 
+license := (download "https://raw.githubusercontent.com/libsdl-org/SDL/SDL2/LICENSE.txt")
+
 package sdl2
     summary SUMMARY
     version VERSION
@@ -44,6 +46,7 @@ package sdl2
     alias "/lib/libSDL2.so" libpath
     alias "/lib/scopes/packages/sdl.sc" bindings
     in "/include" "{preinstall-dir}/include/SDL2"
+    alias "/licenses/sdl2.txt" license
 
 package sdl2
     summary SUMMARY
@@ -54,3 +57,4 @@ package sdl2
     alias "/lib/SDL2.dll" "{preinstall-dir}/bin/SDL2.dll"
     alias "/lib/scopes/packages/sdl.sc" bindings
     in "/include" "{preinstall-dir}/include/SDL2"
+    alias "/licenses/sdl2.txt" license

@@ -32,6 +32,8 @@ fn imgui-git (platform wgpu-lib sdl-lib)
 
         build-path
 
+cimgui-license := (download "https://raw.githubusercontent.com/cimgui/cimgui/{VERSION}/LICENSE")
+imgui-license := (download "https://raw.githubusercontent.com/ocornut/imgui/master/LICENSE.txt")
 
 package dear-imgui
     summary SUMMARY
@@ -42,6 +44,8 @@ package dear-imgui
     preinstall-dir := (imgui-git "windows" "wgpu_native.dll" "SDL2.dll")
     alias "/lib/cimgui.dll" "{preinstall-dir}/cimgui.dll"
     alias "/include/cimgui.h" "{preinstall-dir}/cimgui.h"
+    alias "/licenses/cimgui.txt" cimgui-license
+    alias "/licenses/dear-imgui.txt" imgui-license
 
 package dear-imgui
     summary SUMMARY
@@ -52,3 +56,5 @@ package dear-imgui
     preinstall-dir := (imgui-git "linux" "libwgpu_native.so" "libSDL2.so")
     alias "/lib/libcimgui.so" "{preinstall-dir}/libcimgui.so"
     alias "/include/cimgui.h" "{preinstall-dir}/cimgui.h"
+    alias "/licenses/cimgui.txt" cimgui-license
+    alias "/licenses/dear-imgui.txt" imgui-license
