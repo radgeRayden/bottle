@@ -15,6 +15,7 @@ using import Array
 using import enum
 using import Map
 using import Option
+using import print
 using import Rc
 using import Set
 using import String
@@ -23,11 +24,9 @@ using import struct
 import .enums
 import .mouse
 import .keyboard
-import .logger
 import sdl
 
 using enums
-using logger
 
 # ================================================================================
 enum ButtonInput plain

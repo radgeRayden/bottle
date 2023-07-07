@@ -8,7 +8,6 @@ let font = (import .src.font)
 let gpu = (import .src.gpu)
 let input = (import .src.input)
 let keyboard = (import .src.keyboard)
-let logger = (import .src.logger)
 let main = (import .src.main)
 let math = (import .src.math)
 let mouse = (import .src.mouse)
@@ -51,7 +50,6 @@ vvv bind bottle
             gpu
             input
             keyboard
-            logger
             math
             mouse
             plonk
