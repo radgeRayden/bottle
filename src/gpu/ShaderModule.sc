@@ -1,3 +1,4 @@
+using import compiler.target.SPIR-V
 using import enum
 using import String
 using import struct
@@ -101,10 +102,10 @@ type ShaderModule <:: wgpu.ShaderModule
         static-match source-language
         case ShaderLanguage.GLSL
             String
-                static-compile-glsl 450 target (static-typify f)
+                static-compile-glsl SPV_ENV_OPENGL_4_5 target (static-typify f)
         case ShaderLanguage.SPIRV
             String
-                static-compile-spirv 0x10400 target (static-typify f)
+                static-compile-spirv SPV_ENV_VULKAN_1_1_SPIRV_1_4 target (static-typify f)
         default
             assert false "invalid shader source type, only SPIRV and GLSL allowed"
 
