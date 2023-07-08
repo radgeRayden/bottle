@@ -15,7 +15,8 @@ cfg.filesystem.root = module-dir .. "/demos"
 
 let module =
     try
-        require-from module-dir import-string __env
+        require-from module-dir import-string
+            'bind __env 'bottle (import .init)
     except(ex)
         'dump ex
         error (.. "failed to load demo: " (demo as string))
