@@ -1,0 +1,44 @@
+VERSION := "master"
+SUMMARY := "A simple and nice looking cross platform C FileSystem with full C++ support"
+
+license := (download "https://raw.githubusercontent.com/BraedonWooding/cpath/{VERSION}/LICENSE")
+
+build-dir :=
+    commonpath
+        extract (download "https://github.com/radgeRayden/cpath/archive/{VERSION}.tar.gz")
+
+cflags := "-shared -O2 -fPIC"
+src :=
+    tempfile
+        """"#define _CPATH_FUNC_ extern
+            #include "cpath.h"
+
+library-linux :=
+    then
+        (shell build-dir)
+            "gcc -o libcpath.so {cflags} -x c {src} -I{build-dir} -Wl,--export-dynamic"
+        "{build-dir}/libcpath.so"
+
+library-windows :=
+    then
+        (shell build-dir)
+            "gcc -o cpath.dll {cflags} -x c {src} -I{build-dir} -Wl,--export-all"
+        "{build-dir}/cpath.dll"
+
+package cpath
+    summary SUMMARY
+    # version VERSION
+    platform linux unknown
+
+    alias "/lib/libcpath.so" library-linux
+    alias "/include/cpath.h" "{build-dir}/cpath.h"
+    alias "/licenses/cpath.txt" license
+
+package cpath
+    summary SUMMARY
+    version VERSION
+    platform windows-mingw
+
+    alias "/lib/cpath.dll" library-windows
+    alias "/include/cpath.h" "{build-dir}/cpath.h"
+    alias "/licenses/cpath.txt" license

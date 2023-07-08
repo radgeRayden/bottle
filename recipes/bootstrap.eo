@@ -2,4 +2,4 @@ package bootstrap
     summary "Install Bottle dependencies"
     version "main"
     platform linux windows-mingw unknown
-    depends fontdue-native wgpu-native-release sdl2 physfs stb radl dear-imgui miniaudio xxhash
+    depends fontdue-native wgpu-native-release sdl2 physfs cpath stb radl dear-imgui miniaudio xxhash
