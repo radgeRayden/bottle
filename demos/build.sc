@@ -3,7 +3,7 @@ using import C.stdlib
 using import radl.strfmt
 using import print
 
-bottle := __env.bottle
+bottle := import ..init
 obj-dir := "./dist/obj"
 bin-dir := "./dist/bin"
 
