@@ -7,18 +7,18 @@ using import .common
 using import radl.strfmt
 
 struct WGPUVersion
-    major : u32
-    minor : u32
-    patch : u32
-    revision : u32
+    major : u8
+    minor : u8
+    patch : u8
+    revision : u8
 
     inline __typecall (cls value)
         using import format
         super-type.__typecall cls
-            major = (value >> 24) & 0xFF
-            minor = (value >> 16) & 0xFF
-            patch = (value >> 8) & 0xFF
-            revision = value & 0xFF
+            major = ((value >> 24) & 0xFF) as u8
+            minor = ((value >> 16) & 0xFF) as u8
+            patch = ((value >> 8) & 0xFF) as u8
+            revision = (value & 0xFF) as u8
 
     inline __repr (self)
         f"v${self.major}.${self.minor}.${self.patch}.${self.revision}"
