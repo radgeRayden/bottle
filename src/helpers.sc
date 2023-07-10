@@ -30,6 +30,7 @@ inline param? (pT)
             inline (self) self
 
 spice static-hash (str)
+    using import hash
     `[(hash (str as string))]
 
 fn tolower (str)
@@ -50,6 +51,7 @@ spice static-tolower (str)
 run-stage;
 
 inline match-string-enum (enum-type value cases...)
+    using import hash
     using import switcher
     using import print
 

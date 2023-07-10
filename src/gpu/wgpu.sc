@@ -1,4 +1,5 @@
 using import Array
+using import hash
 using import String
 import wgpu
 
