@@ -17,5 +17,5 @@ touch ./__env.sc
 
 BOTTLE_DST=$(realpath $BOTTLE_DST)
 pushd $BOTTLE_SRC
-echo -n $(scopes -e -c "sc_write (__env.bottle.get-version)") > $BOTTLE_DST/BOTTLE_VERSION
+echo -n $(scopes -e -c "sc_write (((import .init) . get-version))") > $BOTTLE_DST/BOTTLE_VERSION
 popd
