@@ -12,9 +12,8 @@ mkdir ./dist/obj
 export LDFLAGS="$(scopes -e ./setup-dist.sc)"
 DEMOS="$(cat demo-list.txt | tr '\n' ' ')"
 for DEMO in $DEMOS; do
-    scopes -e ./build.sc .$DEMO &
+    scopes -e ./build.sc .$DEMO
 done
-wait
 
 cp -r ./assets ./dist/bin/
 mv ./dist/bin ./bottle-demos
