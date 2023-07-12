@@ -15,8 +15,10 @@ fn load-image (filename)
     # TODO: raise error
     assert (data != null)
 
-    data := 'wrap (Array u8) data (w * h * 4)
-    ImageData (w as u32) (h as u32) (slices = 1:u32) (data = data)
+    wrapped-data := 'wrap (Array u8) data (w * h * 4)
+    free data
+
+    ImageData (w as u32) (h as u32) (slices = 1:u32) (data = wrapped-data)
 
 do
     let load-image ImageData
