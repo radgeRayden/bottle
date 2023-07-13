@@ -6,7 +6,7 @@ using import String
 using import struct
 using import ..exceptions
 
-import wgpu
+import .wgpu
 
 struct GfxState
     instance    : wgpu.Instance

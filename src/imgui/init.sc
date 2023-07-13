@@ -6,6 +6,7 @@ from (import ..config) let if-module-enabled
 wgpu := import ..gpu.wgpu
 ig   := import .bindings
 
+@@ if-module-enabled 'imgui
 fn init ()
     using import ..gpu.common
 

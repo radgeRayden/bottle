@@ -26,7 +26,7 @@ let imgui-typedef = (filter-scope header.typedef "^Im")
 let imgui-const = (filter-scope header.const "^(?=Im)")
 run-stage;
 
-wgpu := import ..gpu.wgpu
+wgpu := import wgpu
 import sdl
 .. imgui-extern imgui-typedef imgui-const
     do
