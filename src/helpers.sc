@@ -23,11 +23,13 @@ inline array->ptr (value)
 inline param? (pT)
     typedef (.. "param?<" (tostring pT) ">")
         inline __typematch (cls T)
-            static-if ((imply? T pT) or (T == Nothing))
+            static-if ((typematch? T pT) or (T == Nothing))
                 true
             else false
         inline __rimply (cls T)
-            inline (self) self
+            inline (self)
+                static-if (not (none? self)) (imply self pT)
+                else none
 
 spice static-hash (str)
     using import hash
