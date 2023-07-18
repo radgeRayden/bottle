@@ -54,6 +54,9 @@ type FragmentStage <: wgpu.FragmentState
                 targets = ptr as (@ wgpu.ColorTargetState)
             cls
 
+    inline __toptr (self)
+        & (imply self super-type)
+
     inline __imply (this other)
         static-if (other == (superof this-type))
             inline (self)
@@ -94,7 +97,7 @@ fn make-pipeline (layout topology winding vertex-stage fragment-stage sample-cou
                     count = sample-count
                     mask = ~0:u32
                     alphaToCoverageEnabled = false
-            fragment = (&local (imply fragment-stage (superof fragment-stage)))
+            fragment = (&local fragment-stage)
 
 type RenderPipeline <:: wgpu.RenderPipeline
     inline... __typecall (cls,
