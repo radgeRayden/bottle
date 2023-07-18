@@ -1,8 +1,9 @@
-using import Array
+using import Buffer
 stbi := import stb.image
 
 import ..filesystem
 using import .ImageData
+using import ..gpu.types
 
 fn load-image (filename)
     local w : i32
@@ -15,9 +16,9 @@ fn load-image (filename)
     # TODO: raise error
     assert (data != null)
 
-    wrapped-data := 'wrap (Array u8) data (w * h * 4)
-    free data
-
+    wrapped-data := (Buffer (mutable@ u8)) data (w * h * 4)
+        fn (ptr)
+            stbi.image_free (ptr as voidstar)
     ImageData (w as u32) (h as u32) (slices = 1:u32) (data = wrapped-data)
 
 do
