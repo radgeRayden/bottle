@@ -8,7 +8,6 @@ src :=
 
 package radl
     summary SUMMARY
-    version VERSION
     platform linux windows-mingw unknown
     depends stb
 
