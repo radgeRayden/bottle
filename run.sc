@@ -16,6 +16,8 @@ cfg.filesystem.root = module-dir .. "/demos"
 let module =
     try
         require-from module-dir import-string
+            'bind-symbols __env
+                running-with-runner? = true
     except(ex)
         'dump ex
         error (.. "failed to load demo: " (demo as string))

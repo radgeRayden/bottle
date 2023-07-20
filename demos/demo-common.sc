@@ -4,6 +4,12 @@ using import String
 from (import ..src.config) let if-module-enabled
 
 import bottle
+
+@@ 'on bottle.configure
+fn (cfg)
+    static-if (not __env.running-from-runner?)
+        cfg.filesystem.root = module-dir
+
 @@ 'on bottle.load
 fn ()
     renderer-info := (bottle.gpu.get-info)
