@@ -40,9 +40,18 @@ fn load-file (filename)
     check-error (physfs.readBytes handle ((imply buf pointer) as voidstar) (len as u64)) -1
     buf
 
+fn realpath (path)
+    viewing path
+    dir := physfs.getRealDir path
+
+    if (dir == null)
+        raise FilesystemError.GenericError
+
+    .. ('from-rawstring String dir) path
+
 fn shutdown ()
     physfs.deinit;
 
 do
-    let init mount shutdown load-file
+    let init mount shutdown load-file realpath
     local-scope;

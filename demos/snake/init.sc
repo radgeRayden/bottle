@@ -80,7 +80,7 @@ fn (cfg)
     root-dir = copy cfg.filesystem.root
 
 fn play-sfx (name)
-    audio.play-one-shot (.. root-dir "/assets/" name ".wav")
+    audio.play-one-shot (.. "/assets/" name ".wav")
 
 fn spawn-snake ()
     for x in (range game-state.snake-length)

@@ -1,6 +1,7 @@
 using import Option
 using import struct
 ma := import miniaudio
+import .filesystem
 
 global engine = undef ma.engine
 
@@ -9,7 +10,8 @@ fn init ()
     assert (result == ma.MA_SUCCESS)
 
 fn play-one-shot (name)
-    ma.engine_play_sound &engine name null
+    try (ma.engine_play_sound &engine (filesystem.realpath name) null) ()
+    else ()
 
 fn shutdown ()
     ma.engine_uninit &engine
