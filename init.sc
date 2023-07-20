@@ -21,7 +21,7 @@ let window = (import .src.window)
 VERSION :=
     label get-version
         try
-            using import radl.IO
+            using import radl.IO.FileStream
             version-file := FileStream (module-dir .. "/BOTTLE_VERSION") FileMode.Read
             merge get-version ('read-all-string version-file)
         else ()
