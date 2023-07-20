@@ -1,9 +1,9 @@
-bottle := __env.bottle
 import C.stdio
 using import print
 using import String
 from (import ..src.config) let if-module-enabled
 
+import bottle
 @@ 'on bottle.load
 fn ()
     renderer-info := (bottle.gpu.get-info)

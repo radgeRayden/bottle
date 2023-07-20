@@ -1,7 +1,3 @@
-bottle := __env.bottle
-plonk := bottle.plonk
-audio := bottle.audio
-
 using import Array
 using import enum
 using import glm
@@ -10,6 +6,10 @@ using import Option
 using import String
 using import struct
 import ..demo-common
+
+import bottle
+plonk := bottle.plonk
+audio := bottle.audio
 
 TILE-SIZE := 32
 SCREEN-WIDTH SCREEN-HEIGHT := 800, 608

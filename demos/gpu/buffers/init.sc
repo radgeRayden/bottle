@@ -4,8 +4,8 @@ using import String
 using import struct
 using import .common
 
-bottle := __env.bottle
-random := import radl.random
+import bottle
+random := bottle.random
 import ...demo-common
 
 using bottle.gpu.types

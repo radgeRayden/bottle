@@ -3,14 +3,12 @@ using import C.stdlib
 using import radl.strfmt
 using import print
 
-bottle := import ..init
 obj-dir := "./dist/obj"
 bin-dir := "./dist/bin"
 
 fn build-demo (name)
     module :=
-        require-from module-dir name
-            'bind __env 'bottle bottle
+        require-from module-dir name __env
 
     local name : String = name as String
     for c in name
@@ -42,7 +40,7 @@ fn build-demo (name)
     assert (libflags != null)
     libflags := string libflags
 
-    cmd := f"gcc -o ${bin-dir}/${exe-name} ${obj-dir}/${obj-name} -I../include ../src/scopesrt.c -lm -L${bin-dir} ${libflags} -Wl,-rpath '-Wl,$ORIGIN'"
+    cmd := f"gcc -o ${bin-dir}/${exe-name} ${obj-dir}/${obj-name} -I../include -lm -L${bin-dir} ${libflags} -Wl,-rpath '-Wl,$ORIGIN'"
     print "+" cmd
     status := system cmd
     if (status == -1)

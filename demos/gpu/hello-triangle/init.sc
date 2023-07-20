@@ -2,7 +2,7 @@ using import struct
 using import Option
 import ...demo-common
 
-bottle := __env.bottle
+import bottle
 
 fn shaderf-vert ()
     using import glsl

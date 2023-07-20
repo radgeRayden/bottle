@@ -1,7 +1,7 @@
 using import Array
 using import glm
 import ...demo-common
-bottle := __env.bottle
+import bottle
 
 @@ 'on bottle.configure
 fn (cfg)

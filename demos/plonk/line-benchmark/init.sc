@@ -1,7 +1,7 @@
 using import glm
 using import itertools
 
-bottle := __env.bottle
+import bottle
 plonk := bottle.plonk
 
 import ...demo-common

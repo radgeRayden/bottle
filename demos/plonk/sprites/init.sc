@@ -2,8 +2,8 @@ using import glm
 using import Option
 using import struct
 import ...demo-common
+import bottle
 
-bottle := __env.bottle
 plonk  := bottle.plonk
 
 struct DrawState

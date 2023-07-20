@@ -3,7 +3,7 @@ using import Option
 using import struct
 using import String
 
-bottle := __env.bottle
+import bottle
 import ...demo-common
 
 using bottle.gpu.types
