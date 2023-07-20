@@ -1,6 +1,3 @@
-cfg := `(. (import ..config) istate-cfg gpu)
-run-stage;
-
 import C.stdlib
 using import print
 using import String
@@ -10,9 +7,12 @@ import sdl
 import .wgpu
 import .types
 
-using import ..helpers
 using import .common
+using import ..config
 using import ..exceptions
+using import ..helpers
+
+cfg := cfg-accessor 'gpu
 
 import ..window
 

@@ -28,7 +28,7 @@ chain-callback 'invalidate-frame imgui.reset-gpu-state imgui.end-frame
 fn run ()
     raising noreturn
 
-    cfg := config.istate-cfg
+    cfg := config.config
     callbacks.configure cfg
     'apply-env-overrides cfg
 

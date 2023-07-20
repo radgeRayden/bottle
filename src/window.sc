@@ -1,10 +1,10 @@
-cfg := `(. (import .config) istate-cfg window)
-run-stage;
-
 using import print
 using import String
 using import struct
 import sdl
+
+using import .config
+cfg := cfg-accessor 'window
 
 struct BottleWindowState plain
     handle : (mutable@ sdl.Window)

@@ -1,7 +1,7 @@
 using import String
 
 config := import .src.config
-cfg := config.istate-cfg
+cfg := config.config
 
 name argc argv := (script-launch-args)
 let demo =

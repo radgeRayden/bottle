@@ -1,10 +1,10 @@
-cfg := `(. (import ..config) istate-cfg filesystem)
-run-stage;
-
 using import String
 using import Array
 using import print
 import physfs
+
+using import ..config
+cfg := cfg-accessor 'filesystem
 
 using import ..exceptions
 

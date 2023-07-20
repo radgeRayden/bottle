@@ -1,5 +1,6 @@
 import sdl
-import .config
+using import .config
+cfg := cfg-accessor 'time
 
 global first-time-measure : f64
 global last-time-measure : f64
@@ -13,11 +14,9 @@ fn get-time ()
     (get-time-raw) - first-time-measure
 
 fn init ()
-    cfg := config.istate-cfg
-
     first-time-measure = (get-time-raw)
     last-time-measure = (get-time)
-    fixed-timestep = cfg.time.fixed-timestep
+    fixed-timestep = cfg.fixed-timestep
 
 fn get-delta-time ()
     deref delta-time

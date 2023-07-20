@@ -97,7 +97,7 @@ struct BottleConfig
             for module in (env-disabled-modules)
                 'disable-module-by-name self module
 
-global istate-cfg : BottleConfig
+global config : BottleConfig
 
 spice inline? (f)
     `[(sc_template_is_inline (sc_closure_get_template (f as Closure)))]
@@ -106,7 +106,7 @@ run-stage;
 inline if-module-enabled (name)
     inline (f)
         inline (...)
-            enabled? := getattr istate-cfg.enabled-modules name
+            enabled? := getattr config.enabled-modules name
             let f =
                 static-if (inline? f)
                     fn (...)
@@ -122,6 +122,15 @@ inline if-module-enabled (name)
             else
                 (retT)
 
+@@ memo
+inline cfg-accessor (field)
+    name := static-eval (('unique Symbol "BottleConfigAccessor") as string)
+    type (_ name)
+        inline __typeattr (cls attr)
+            getattr
+                getattr config field
+                attr
+
 do
-    let istate-cfg if-module-enabled
+    let if-module-enabled config cfg-accessor
     locals;
