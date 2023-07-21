@@ -6,7 +6,7 @@ using import print
 obj-dir := "./dist/obj"
 bin-dir := "./dist/bin"
 
-fn build-demo (name)
+inline build-demo (name use-genc?)
     module :=
         require-from module-dir name __env
 
@@ -19,7 +19,14 @@ fn build-demo (name)
 
     main := (typify (module as Closure) i32 (@ rawstring))
     obj-name := .. "obj" name ".o"
-    compile-object
+
+    let compilef =
+        static-if use-genc?
+            (import compiler.target.C) . compile-object
+        else
+            compile-object
+
+    compilef
         default-target-triple
         compiler-file-kind-object
         f"${obj-dir}/${obj-name}" as string
@@ -48,14 +55,13 @@ fn build-demo (name)
     else
         status >> 8
 
-sugar-if main-module?
-    name argc argv := (script-launch-args)
+name argc argv := (script-launch-args)
+let demo =
     if (argc > 0)
-        build-demo (string (argv @ 0))
+        string (argv @ 0)
     else
-        print "missing demo argument"
-        -1
-else
-    do
-        let build-demo
-        local-scope;
+        error "missing demo argument"
+use-genc? := (argc > 1) and (('from-rawstring String (argv @ 1)) == "-genc")
+run-stage;
+
+build-demo demo use-genc?

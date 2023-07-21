@@ -10,6 +10,8 @@ let demo =
     else
         S"gpu.hello-triangle"
 
+use-genc? := (argc > 1) and (('from-rawstring String (argv @ 1)) == "-genc")
+
 import-string := .. ".demos." demo
 cfg.filesystem.root = module-dir .. "/demos"
 
@@ -21,6 +23,12 @@ let module =
     except(ex)
         'dump ex
         error (.. "failed to load demo: " (demo as string))
+
+run-stage;
+
+static-if use-genc?
+    using import compiler.target.C
+    hook-compile-function;
 
 f := (compile (typify (module as Closure) i32 (@ rawstring))) as (@ (function i32 i32 (@ rawstring)))
 f argc argv

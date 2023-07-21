@@ -11,9 +11,8 @@ fn (cfg)
         cfg.filesystem.root = module-dir
 
 @@ 'on bottle.load
-fn ()
+fn "demo-load" ()
     renderer-info := (bottle.gpu.get-info)
-    # FIXME: using this while compiler.Printer is broken for String
     print "bottle version:" (bottle.get-version)
     print renderer-info.APIString
     print renderer-info.GPUString
