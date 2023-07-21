@@ -35,10 +35,14 @@ do
         ()
 
     fn read-bytes (handle ptr count)
-        physfs.readBytes handle (ptr as voidstar) count
+        total-read := physfs.readBytes handle (ptr as voidstar) count
+        assert (total-read != -1)
+        total-read as usize
 
     fn write-bytes (handle ptr count)
-        physfs.writeBytes handle (ptr as voidstar) count
+        total-written := physfs.writeBytes handle (ptr as voidstar) count
+        assert (total-written != -1)
+        total-written as usize
 
     fn eof? (handle)
         (physfs.eof handle) as bool
