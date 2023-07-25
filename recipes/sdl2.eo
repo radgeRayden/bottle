@@ -39,7 +39,7 @@ package sdl2
     summary SUMMARY
     version VERSION
     platform linux unknown
-    depends patchelf
+    depends patchelf ffi-helper
 
     preinstall-dir := (preinstall-dir "make")
     libpath := (patchelf "libSDL2.so" "{preinstall-dir}/lib/libSDL2.so")
@@ -52,6 +52,7 @@ package sdl2
     summary SUMMARY
     version VERSION
     platform windows-mingw
+    depends ffi-helper
 
     preinstall-dir := (preinstall-dir "mingw32-make")
     alias "/lib/SDL2.dll" "{preinstall-dir}/bin/SDL2.dll"

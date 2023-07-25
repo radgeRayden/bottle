@@ -38,6 +38,7 @@ license := (download "https://raw.githubusercontent.com/gfx-rs/wgpu-native/trunk
 package wgpu-native
     platform linux unknown
     summary SUMMARY
+    depends ffi-helper
 
     preinstall-dir := (git-release-dir "make")
     alias "/include/webgpu.h" "{preinstall-dir}/webgpu.h"
@@ -49,6 +50,7 @@ package wgpu-native
 package wgpu-native
     platform windows-mingw
     summary SUMMARY
+    depends ffi-helper
 
     preinstall-dir := (git-release-dir "mingw32-make")
     alias "/include/webgpu.h" "{preinstall-dir}/webgpu.h"

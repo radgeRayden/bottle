@@ -27,6 +27,7 @@ package fontdue-native
     platform linux unknown
     version VERSION
     summary SUMMARY
+    depends ffi-helper
 
     alias "/include/fontdue.h" "{preinstall-dir}/ffi/fontdue.h"
     alias "/lib/libfontdue_native.so" "{preinstall-dir}/target/release/libfontdue_native.so"
@@ -38,6 +39,7 @@ package fontdue-native
     platform windows-mingw
     version VERSION
     summary SUMMARY
+    depends ffi-helper
 
     alias "/include/fontdue.h" "{preinstall-dir}/ffi/fontdue.h"
     alias "/lib/fontdue_native.dll" "{preinstall-dir}/target/release/fontdue_native.dll"

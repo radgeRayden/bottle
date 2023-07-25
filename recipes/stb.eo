@@ -68,6 +68,7 @@ package stb
     summary SUMMARY
     platform linux unknown
     version VERSION
+    depends ffi-helper
 
     libname := "libstb.so"
     alias "/lib/{libname}" (shared-library libname)
@@ -94,6 +95,7 @@ package stb
     summary SUMMARY
     platform windows-mingw
     version VERSION
+    depends ffi-helper
 
     libname := "stb.dll"
     alias "/lib/{libname}" (shared-library libname)
