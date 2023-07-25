@@ -49,7 +49,7 @@ type+ FragmentStage
                 ptr count := 'data self.color-targets
                 FragmentState
                     module = self.module
-                    entryPoint = (dump self.entry-point)
+                    entryPoint = self.entry-point
                     targetCount = count as u32
                     targets = ptr as (@ wgpu.ColorTargetState)
 
