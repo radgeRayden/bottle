@@ -2,9 +2,9 @@ using import Array
 using import property
 using import struct
 using import .common
-using import .CommandEncoder
 using import ..exceptions
 using import ..helpers
+using import .types
 import .wgpu
 
 fn make-buffer (size usage-flags)
@@ -22,8 +22,6 @@ fn write-buffer (buf data-ptr offset data-size)
         offset
         data-ptr
         data-size
-
-typedef GPUBuffer <:: wgpu.Buffer
 
 @@ memo
 inline gen-buffer-type (parent-type prefix backing-type usage-flags)
@@ -111,18 +109,18 @@ inline gen-buffer-type (parent-type prefix backing-type usage-flags)
 
         unlet constructor
 
-type GenericBuffer <:: GPUBuffer
+type+ GenericBuffer
     @@ memo
     inline __typecall (cls backing-type)
         gen-buffer-type cls "GenericBuffer" backing-type
 
-type StorageBuffer <:: GPUBuffer
+type+ StorageBuffer
     @@ memo
     inline __typecall (cls backing-type)
         gen-buffer-type cls "StorageBuffer" backing-type
             wgpu.BufferUsage.Storage | wgpu.BufferUsage.CopyDst | wgpu.BufferUsage.CopySrc
 
-type IndexBuffer <:: GPUBuffer
+type+ IndexBuffer
     @@ memo
     inline __typecall (cls backing-type)
         static-if (not ((backing-type == u16) or (backing-type == u32)))
@@ -132,13 +130,10 @@ type IndexBuffer <:: GPUBuffer
         gen-buffer-type cls "IndexBuffer" backing-type
             wgpu.BufferUsage.Index | wgpu.BufferUsage.CopyDst | wgpu.BufferUsage.CopySrc
 
-type UniformBuffer <:: GPUBuffer
+type+ UniformBuffer
     @@ memo
     inline __typecall (cls backing-type)
         gen-buffer-type cls "UniformBuffer" backing-type
             wgpu.BufferUsage.Uniform | wgpu.BufferUsage.CopyDst | wgpu.BufferUsage.CopySrc
 
-do
-
-    let StorageBuffer IndexBuffer UniformBuffer GenericBuffer GPUBuffer
-    local-scope;
+()

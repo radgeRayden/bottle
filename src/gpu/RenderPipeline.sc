@@ -5,12 +5,9 @@ using import struct
 import .wgpu
 using import .common
 using import ..helpers
-using import .ShaderModule
-using import .BindGroup
+using import .types
 
-run-stage;
-
-type ColorTarget <: wgpu.ColorTargetState
+type+ ColorTarget
     inline... __typecall (cls, format : wgpu.TextureFormat)
         bitcast
             wgpu.ColorTargetState
@@ -30,37 +27,34 @@ type ColorTarget <: wgpu.ColorTargetState
                                 dstFactor = wgpu.BlendFactor.OneMinusSrcAlpha
             cls
 
-type VertexStage <: wgpu.VertexState
-    inline... __typecall (cls, shader : ShaderModule, entry-point : String)
-        bitcast
-            wgpu.VertexState
-                module = (view shader)
-                entryPoint = entry-point
-            cls
-
-    inline __imply (this other)
-        static-if (other == (superof this-type))
+    inline __imply (thisT otherT)
+        static-if (otherT == wgpu.ColorTargetState)
             inline (self)
-                bitcast self other
+                bitcast self otherT
 
-type FragmentStage <: wgpu.FragmentState
-    inline... __typecall (cls, shader : ShaderModule, entry-point : String, color-targets)
-        count ptr := array->ptr color-targets
-        bitcast
-            wgpu.FragmentState
-                module = (view shader)
-                entryPoint = entry-point
-                targetCount = count as u32
-                targets = ptr as (@ wgpu.ColorTargetState)
-            cls
+type VertexState <:: wgpu.VertexState
+type FragmentState <:: wgpu.FragmentState
+type+ VertexStage
+    inline __imply (thisT otherT)
+        static-if (otherT == VertexState)
+            inline (self)
+                VertexState
+                    module = self.module
+                    entryPoint = self.entry-point
+
+type+ FragmentStage
+    inline __imply (thisT otherT)
+        static-if (otherT == FragmentState)
+            inline (self)
+                ptr count := 'data self.color-targets
+                FragmentState
+                    module = self.module
+                    entryPoint = (dump self.entry-point)
+                    targetCount = count as u32
+                    targets = ptr as (@ wgpu.ColorTargetState)
 
     inline __toptr (self)
-        & (imply self super-type)
-
-    inline __imply (this other)
-        static-if (other == (superof this-type))
-            inline (self)
-                bitcast self other
+        & (imply self wgpu.FragmentState)
 
 fn make-pipeline-layout (count layouts)
     layouts as:= pointer (storageof wgpu.BindGroupLayout)
@@ -70,8 +64,8 @@ fn make-pipeline-layout (count layouts)
             bindGroupLayoutCount = count
             bindGroupLayouts = layouts
 
-type PipelineLayout <:: wgpu.PipelineLayout
-    inline... (cls, bind-group-layouts : (Array BindGroupLayout))
+type+ PipelineLayout
+    inline... __typecall (cls, bind-group-layouts : (Array BindGroupLayout))
         wrap-nullable-object cls
             make-pipeline-layout (countof bind-group-layouts) (imply bind-group-layouts pointer)
     case (cls, bind-group-layouts : (array BindGroupLayout))
@@ -87,7 +81,7 @@ fn make-pipeline (layout topology winding vertex-stage fragment-stage sample-cou
         &local wgpu.RenderPipelineDescriptor
             label = "Bottle Render Pipeline"
             layout = layout
-            vertex = vertex-stage
+            vertex = (dupe (bitcast (imply (move vertex-stage) VertexState) wgpu.VertexState))
             primitive =
                 wgpu.PrimitiveState
                     topology = topology
@@ -97,9 +91,9 @@ fn make-pipeline (layout topology winding vertex-stage fragment-stage sample-cou
                     count = sample-count
                     mask = ~0:u32
                     alphaToCoverageEnabled = false
-            fragment = (&local fragment-stage)
+            fragment = (&local (dupe (imply (move fragment-stage) FragmentState))) as (@ wgpu.FragmentState)
 
-type RenderPipeline <:: wgpu.RenderPipeline
+type+ RenderPipeline
     inline... __typecall (cls,
                           layout         : PipelineLayout,
                           topology       : wgpu.PrimitiveTopology,
@@ -114,10 +108,4 @@ type RenderPipeline <:: wgpu.RenderPipeline
     fn... get-bind-group-layout (self, index : u32)
         wrap-nullable-object BindGroupLayout (wgpu.RenderPipelineGetBindGroupLayout (view self) index)
 
-do
-    let ColorTarget
-        PipelineLayout
-        RenderPipeline
-        FragmentStage
-        VertexStage
-    local-scope;
+()

@@ -1,12 +1,12 @@
-using import .common
+using import .common .types
 import .wgpu
 
-type CommandBuffer <:: wgpu.CommandBuffer
+type+ CommandBuffer
     fn submit (self)
         local self = (storagecast self)
         wgpu.QueueSubmit istate.queue 1 &self
 
-type CommandEncoder <:: wgpu.CommandEncoder
+type+ CommandEncoder
     inline __typecall (cls)
         wrap-nullable-object cls
             wgpu.DeviceCreateCommandEncoder istate.device (&local wgpu.CommandEncoderDescriptor)
@@ -17,6 +17,4 @@ type CommandEncoder <:: wgpu.CommandEncoder
         lose self
         imply cmd-buf CommandBuffer
 
-do
-    let CommandBuffer CommandEncoder
-    local-scope;
+()

@@ -7,17 +7,21 @@ import sdl
 import .wgpu
 import .types
 
+# imports necessary to augment all types with their implementation
+import .BindGroup .CommandEncoder .GPUBuffer .RenderPass .RenderPipeline .Sampler .ShaderModule .Texture
+
 using import .common
 using import ..config
 using import ..exceptions
 using import ..helpers
+using import .RendererBackendInfo
 
 cfg := cfg-accessor 'gpu
 
 import ..window
 
 fn get-info ()
-    types.RendererBackendInfo;
+    RendererBackendInfo;
 
 fn create-surface ()
     static-match operating-system
@@ -104,8 +108,8 @@ fn init ()
     # FIXME: check for status code!
     wgpu.InstanceRequestAdapter istate.instance
         &local wgpu.RequestAdapterOptions
-            compatibleSurface = istate.surface
-            powerPreference = cfg.power-preference
+            compatibleSurface = ('rawptr istate.surface)
+            powerPreference = copy cfg.power-preference
         fn (status result msg userdata)
             istate.adapter = result
             ;

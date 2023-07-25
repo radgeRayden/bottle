@@ -7,6 +7,7 @@ using import struct
 using import ..exceptions
 
 import .wgpu
+import .types
 
 struct GfxState
     instance    : wgpu.Instance
@@ -15,9 +16,9 @@ struct GfxState
     device      : wgpu.Device
     swapchain   : wgpu.SwapChain
     queue       : wgpu.Queue
-    cmd-encoder : (Option wgpu.CommandEncoder)
-    swapchain-image : (Option wgpu.TextureView)
-    swapchain-resolve-source : (Option wgpu.TextureView)
+    cmd-encoder : (Option types.CommandEncoder)
+    swapchain-image : (Option types.TextureView)
+    swapchain-resolve-source : (Option types.TextureView)
     limits      : wgpu.Limits
 
     clear-color = (vec4 0.017 0.017 0.017 1.0)

@@ -1,16 +1,12 @@
 using import enum
 using import struct
-using import ..helpers
 using import .common
+using import ..helpers
+using import .types
 
 import .wgpu
-using import .GPUBuffer
-using import .Texture
-using import .Sampler
 
-type BindGroupLayout <:: wgpu.BindGroupLayout
-
-type BindGroup <:: wgpu.BindGroup
+type+ BindGroup
     inline __typecall (cls layout entries...)
         local entries =
             arrayof wgpu.BindGroupEntry
@@ -24,7 +20,7 @@ type BindGroup <:: wgpu.BindGroup
                                 size = ('get-byte-size entry) as u64
                         case (entry : TextureView)
                             _
-                                textureView = (imply (view entry) wgpu.TextureView)
+                                textureView = ('rawptr entry)
                         case (entry : Sampler)
                             _
                                 sampler = entry
@@ -42,6 +38,4 @@ type BindGroup <:: wgpu.BindGroup
                     entryCount = (countof entries) as u32
                     entries = &entries
 
-do
-    let BindGroupLayout BindGroup
-    local-scope;
+()

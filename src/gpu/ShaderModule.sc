@@ -5,12 +5,8 @@ using import struct
 
 using import .common
 using import ..helpers
+using import .types
 import .wgpu
-
-enum ShaderLanguage plain
-    WGSL
-    GLSL
-    SPIRV
 
 fn shader-module-from-SPIRV (code)
     local desc : wgpu.ShaderModuleSPIRVDescriptor
@@ -18,7 +14,7 @@ fn shader-module-from-SPIRV (code)
             wgpu.ChainedStruct
                 sType = wgpu.SType.ShaderModuleSPIRVDescriptor
         codeSize = ((countof code) // 4) as u32
-        code = (code as rawstring as (@ u32))
+        code = (dupe (code as rawstring as (@ u32)))
 
     let module =
         wgpu.DeviceCreateShaderModule
@@ -63,7 +59,7 @@ fn shader-module-from-GLSL (code stage)
                 nextInChain = (&desc as (mutable@ wgpu.ChainedStruct))
     module
 
-type ShaderModule <:: wgpu.ShaderModule
+type+ ShaderModule
     inline... __typecall (cls, source : String, source-language : ShaderLanguage, ...)
         stage := ...
         let module =
@@ -110,7 +106,4 @@ type ShaderModule <:: wgpu.ShaderModule
             assert false "invalid shader source type, only SPIRV and GLSL allowed"
 
         this-function cls code source-language stage
-
-do
-    let ShaderLanguage ShaderModule
-    locals;
+()

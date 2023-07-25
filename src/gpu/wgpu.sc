@@ -12,19 +12,20 @@ inline wrap-constructor (f T)
             T
 
 inline define-object (name super release reference)
-    type (_ name) < Struct :: super
+    type (_ name) <<:: super
         inline __typecall (cls)
             bitcast null cls
 
         inline __drop (self)
             if ((storagecast self) != null)
-                release (bitcast self super)
+                release ('rawptr self)
 
         inline __rimply (otherT thisT)
             static-if (otherT == super)
                 inline (incoming)
-                    bitcast incoming thisT
-            elseif (otherT == (superof thisT))
+                    (dupe incoming) as thisT
+            # for handles that descend from this
+            elseif ((unqualified otherT) == (superof thisT))
                 inline (incoming)
                     bitcast incoming thisT
             elseif (otherT == Nothing)
@@ -32,15 +33,17 @@ inline define-object (name super release reference)
                     nullof thisT
 
         inline __imply (thisT otherT)
-            static-if (otherT == super)
+            static-if ((unqualified otherT) == super)
                 inline (self)
-                    bitcast self otherT
-            elseif (otherT == (superof thisT))
-                inline (incoming)
-                    bitcast incoming thisT
+                    dupe (self as otherT)
+
+        inline __== (thisT otherT)
+            static-if (imply? thisT otherT)
+                inline (a b)
+                    ('rawptr a) == ('rawptr b)
 
         inline __hash (self)
-            hash (storagecast (view self))
+            hash ('rawptr (view self))
 
         inline get-id (self)
             ptrtoint (storagecast (view self)) u64
@@ -51,6 +54,9 @@ inline define-object (name super release reference)
                 reference ptr
 
             imply (copy ptr) (typeof self)
+
+        inline rawptr (self)
+            dupe (storagecast self)
 
 inline define-flags (enumT)
     inline __typecall (cls flags...)
@@ -87,7 +93,7 @@ fn CEnum->String (T)
                 else
                     name
 
-            t.name = name
+            t.name = (copy name)
 
             _ value name
 

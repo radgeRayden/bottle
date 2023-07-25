@@ -49,15 +49,15 @@ struct GeometryBatch
                 winding = FrontFace.CCW
                 vertex-stage =
                     VertexStage
-                        shader = vert
-                        entry-point = S"main"
+                        module = vert
+                        entry-point = "main"
                 fragment-stage =
                     FragmentStage
-                        shader = frag
-                        entry-point = S"main"
+                        module = frag
+                        entry-point = "main"
                         color-targets =
-                            arrayof ColorTarget
-                                typeinit
+                            typeinit
+                                ColorTarget
                                     format = TextureFormat.BGRA8UnormSrgb
                 msaa-samples = (gpu.get-msaa-sample-count)
 

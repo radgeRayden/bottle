@@ -7,9 +7,10 @@ using import ..helpers
 using import ..asset.ImageData
 using import ..exceptions
 using import .texture-format
+using import .types
 import .wgpu
 
-type Texture <:: wgpu.Texture
+type+ Texture
     inline... __typecall (cls,
                           width : u32,
                           height : u32,
@@ -98,7 +99,7 @@ type Texture <:: wgpu.Texture
                 rowsPerImage = iheight
             &local wgpu.Extent3D iwidth iheight islices
 
-type TextureView <:: wgpu.TextureView
+type+ TextureView
     inline... __typecall (cls, source-texture : Texture)
         wrap-nullable-object cls
             wgpu.TextureCreateView source-texture null # TODO: allow configuration via descriptor

@@ -5,13 +5,10 @@ using import struct
 using import .common
 using import ..exceptions
 using import ..helpers
-using import .BindGroup
-using import .GPUBuffer
-from (import .Texture) let TextureView
-using import .RenderPipeline
+using import .types
 import .wgpu
 
-type ColorAttachment <: wgpu.RenderPassColorAttachment
+type+ ColorAttachment
     inline... __typecall (cls, view : TextureView, resolve-target : TextureView = null, clear? = true, clear-color = (vec4))
         let attachment =
             wgpu.RenderPassColorAttachment
@@ -22,7 +19,7 @@ type ColorAttachment <: wgpu.RenderPassColorAttachment
                 clearValue = wgpu.Color (unpack clear-color)
         bitcast attachment cls
 
-type RenderPass <:: wgpu.RenderPassEncoder
+type+ RenderPass
     inline... __typecall (cls, cmd-encoder, color-attachments)
         vvv bind color-attachments count
         static-match (typeof color-attachments)
@@ -91,6 +88,4 @@ type RenderPass <:: wgpu.RenderPassEncoder
         self ... := *...
         wgpu.RenderPassEncoderDrawIndexed (view self) ...
 
-do
-    let ColorAttachment RenderPass
-    local-scope;
+()
