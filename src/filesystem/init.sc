@@ -29,10 +29,15 @@ fn init ()
     assert (physfs.init null) (get-error)
     assert (physfs.mount cfg.root "/" true) (get-error)
 
-fn mount (dir mount-point)
+fn mount (path mount-point allow-writing?)
     check-error
-        physfs.mount dir mount-point true
+        if allow-writing?
+            physfs.mountRW path mount-point true
+        else
+            physfs.mount path mount-point true
 
+fn unmount (path)
+    physfs.unmount path
 
 fn realpath (path)
     viewing path
@@ -47,5 +52,5 @@ fn shutdown ()
     physfs.deinit;
 
 do
-    let init mount shutdown realpath
+    let init mount unmount shutdown realpath
     local-scope;
