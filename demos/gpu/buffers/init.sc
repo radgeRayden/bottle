@@ -67,15 +67,15 @@ fn ()
                 winding = FrontFace.CCW
                 vertex-stage =
                     VertexStage
-                        shader = vert
+                        module = vert
                         entry-point = "main"
                 fragment-stage =
                     FragmentStage
-                        shader = frag
+                        module = frag
                         entry-point = S"main"
                         color-targets =
-                            arrayof ColorTarget
-                                typeinit
+                            typeinit
+                                ColorTarget
                                     format = (bottle.gpu.get-preferred-surface-format)
 
         # TODO: change to map on create

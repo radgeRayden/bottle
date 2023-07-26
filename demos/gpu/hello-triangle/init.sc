@@ -65,15 +65,15 @@ fn ()
                 winding = FrontFace.CCW
                 vertex-stage =
                     VertexStage
-                        shader = vert
+                        module = vert
                         "main"
                 fragment-stage =
                     FragmentStage
-                        shader = frag
+                        module = frag
                         "main"
                         color-targets =
-                            arrayof ColorTarget
-                                typeinit
+                            typeinit
+                                ColorTarget
                                     format = (bottle.gpu.get-preferred-surface-format)
                 msaa-samples = (bottle.gpu.get-msaa-sample-count)
         render-state =
