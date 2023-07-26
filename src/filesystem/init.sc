@@ -1,6 +1,7 @@
 using import String
 using import Array
 using import print
+using import Option
 import physfs
 
 using import ..config
@@ -36,11 +37,11 @@ fn mount (dir mount-point)
 fn realpath (path)
     viewing path
     dir := physfs.getRealDir path
-
-    if (dir == null)
-        raise FilesystemError.GenericError
-
-    .. ('from-rawstring String dir) path
+    if (dir != null)
+        (Option String)
+            .. ('from-rawstring String dir) path
+    else
+        ((Option String))
 
 fn shutdown ()
     physfs.deinit;

@@ -10,7 +10,7 @@ fn init ()
     assert (result == ma.MA_SUCCESS)
 
 fn play-one-shot (name)
-    try (ma.engine_play_sound &engine (filesystem.realpath name) null) ()
+    try (ma.engine_play_sound &engine ('unwrap (filesystem.realpath name)) null) ()
     else ()
 
 fn shutdown ()
