@@ -10,7 +10,7 @@ inline build-demo (name use-genc?)
     module :=
         require-from module-dir name 
             'bind-symbols __env
-                running-from-runner? = false
+                use-hardcoded-root? = false
 
     local name : String = name as String
     for c in name

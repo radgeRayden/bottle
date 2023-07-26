@@ -19,7 +19,7 @@ let module =
     try
         require-from module-dir import-string
             'bind-symbols __env
-                running-with-runner? = true
+                use-hardcoded-root? = false
     except(ex)
         'dump ex
         error (.. "failed to load demo: " (demo as string))

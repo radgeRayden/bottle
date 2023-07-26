@@ -7,7 +7,7 @@ import bottle
 
 @@ 'on bottle.configure
 fn (cfg)
-    static-if (not __env.running-from-runner?)
+    static-if __env.use-hardcoded-root?
         cfg.filesystem.root = module-dir
 
 @@ 'on bottle.load
