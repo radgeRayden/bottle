@@ -177,7 +177,10 @@ fn update-snake ()
 @@ 'on bottle.load
 fn ()
     try
-        font-data := bottle.filesystem.load-file "assets/monogram.ttf"
+        using bottle.types
+        using bottle.enums
+
+        font-data := 'read-all-bytes (FileStream "assets/monogram.ttf" FileMode.Read)
         font := bottle.font.Font font-data 39
 
         resources =

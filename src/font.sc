@@ -14,10 +14,9 @@ struct Font
     char-width : u32
 
     inline... __typecall (cls data font-size)
+        ptr count := 'data data
         let font =
-            fontdue.font_new_from_bytes
-                (imply data pointer) as (mutable@ u8)
-                countof data
+            fontdue.font_new_from_bytes ptr count
                 fontdue.FontSettings
                     collection_index = 0
                     scale = font-size
@@ -50,10 +49,11 @@ struct Font
         len := metrics.width * metrics.height
         'resize buffer len
 
+        ptr := 'data buffer
         local bitmap =
             fontdue.GlyphBitmap
                 metrics = metrics
-                data = ((imply buffer pointer) as (mutable@ u8))
+                data = dupe ptr
                 data_length = len
 
         fontdue.font_rasterize self.font c self.font-size &bitmap
