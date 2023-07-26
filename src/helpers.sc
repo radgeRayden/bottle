@@ -48,8 +48,7 @@ inline match-string-enum (enum-type value cases...)
         switcher sw
             va-map
                 inline (k)
-                    kname := static-tostring k
-                    case (static-hash (static-tolower kname))
+                    case (static-eval (hash (tolower (k as string))))
                         getattr enum-type k
                 cases...
             default
