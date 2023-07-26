@@ -12,5 +12,6 @@ do
     from (import .keyconstants) let KeyboardKey
     from (import .mousebuttons) let MouseButton
     from (import .controllerconstants) let ControllerAxis ControllerButton
+    from (import ..filesystem.FileStream) let FileMode
 
     locals;

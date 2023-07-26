@@ -32,13 +32,6 @@ fn mount (dir mount-point)
     check-error
         physfs.mount dir mount-point true
 
-fn load-file (filename)
-    handle := check-error (physfs.openRead filename)
-    local buf : (Array u8)
-    len := check-error (physfs.fileLength handle) -1
-    'resize buf len
-    check-error (physfs.readBytes handle ((imply buf pointer) as voidstar) (len as u64)) -1
-    buf
 
 fn realpath (path)
     viewing path
@@ -53,5 +46,5 @@ fn shutdown ()
     physfs.deinit;
 
 do
-    let init mount shutdown load-file realpath
+    let init mount shutdown realpath
     local-scope;

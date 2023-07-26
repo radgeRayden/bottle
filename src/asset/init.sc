@@ -2,6 +2,7 @@ using import Buffer
 stbi := import stb.image
 
 import ..filesystem
+using import ..filesystem.FileStream
 using import .ImageData
 using import ..gpu.types
 
@@ -10,8 +11,11 @@ fn load-image (filename)
     local h : i32
     local channels : i32
 
-    filedata := filesystem.load-file filename
-    data := stbi.load_from_memory filedata ((countof filedata) as i32) &w &h &channels 4
+
+    file := FileStream filename FileMode.Read
+    filedata := 'read-all-bytes file
+    ptr count := 'data filedata
+    data := stbi.load_from_memory ptr (count as i32) &w &h &channels 4
 
     # TODO: raise error
     assert (data != null)
