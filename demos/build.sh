@@ -26,5 +26,5 @@ if [ "$(expr substr $(uname -s) 1 10)" == "MINGW64_NT" ]; then
     cp /mingw64/bin/libwinpthread-1.dll ./bottle-demos/
 fi
 
-zip bottle-demos.zip ./bottle-demos/*
+zip -r bottle-demos.zip ./bottle-demos/*
 rm -r dist
