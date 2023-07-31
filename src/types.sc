@@ -1,3 +1,4 @@
-from (import .asset.ImageData) let ImageData
-from (import .filesystem.FileStream) let FileStream
-local-scope;
+..
+    import .asset.ImageData
+    import .gpu.types
+    import .filesystem.FileStream

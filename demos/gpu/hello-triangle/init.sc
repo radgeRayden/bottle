@@ -37,7 +37,7 @@ fn shaderf-frag ()
         location = 0
     fcolor = vcolor
 
-using bottle.gpu.types
+using bottle.types
 using bottle.enums
 
 struct RendererState
