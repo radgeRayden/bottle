@@ -12,9 +12,10 @@ fn vert ()
     out vcolor : vec4
         location = 0
 
-    buffer input-data :
-        struct QuadArray plain
-            data : (array Quad)
+    struct QuadArray plain
+        data : (array Quad)
+
+    buffer input-data : QuadArray readonly
         set = 0
         binding = 0
 

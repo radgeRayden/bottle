@@ -21,7 +21,7 @@ inline vertex-shader (uniformT bindings...)
                 va-map
                     inline (i)
                         binding := i + 1
-                        buffer input-data : (make-buffer-type (va@ i bindings...))
+                        buffer input-data : (make-buffer-type (va@ i bindings...)) readonly
                             set = 0
                             binding = binding
                         input-data.data
