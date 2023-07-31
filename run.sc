@@ -13,13 +13,10 @@ let demo =
 use-genc? := (argc > 1) and (('from-rawstring String (argv @ 1)) == "-genc")
 
 import-string := .. ".demos." demo
-cfg.filesystem.root = module-dir .. "/demos"
 
 let module =
     try
-        require-from module-dir import-string
-            'bind-symbols __env
-                use-hardcoded-root? = false
+        require-from module-dir import-string __env
     except(ex)
         'dump ex
         error (.. "failed to load demo: " (demo as string))

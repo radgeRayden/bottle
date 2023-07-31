@@ -5,4 +5,4 @@
                 module-dir .. "/src/?/init.sc"
                 module-dir .. "/src/?.sc"
             __env.module-search-path
-    running-from-runner? = false
+    use-hardcoded-root? = true
