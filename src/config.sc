@@ -64,6 +64,7 @@ struct BottleConfig
     filesystem :
         struct FilesystemConfig
             root : (Option String)
+            save-directory : (Option String)
     gpu :
         struct GPUConfig
             power-preference = PowerPreference.HighPerformance

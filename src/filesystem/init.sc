@@ -34,6 +34,11 @@ fn init ()
 
     assert (physfs.mount root "/" true) (get-error)
 
+    try
+        save-dir := 'unwrap cfg.save-directory
+        assert (physfs.mountRW save-dir "save-directory" true)
+    else ()
+
 fn mount (path mount-point allow-writing?)
     check-error
         if allow-writing?
