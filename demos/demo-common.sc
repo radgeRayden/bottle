@@ -8,7 +8,7 @@ import bottle
 @@ 'on bottle.configure
 fn (cfg)
     static-if __env.use-hardcoded-root?
-        cfg.filesystem.root = module-dir
+        cfg.filesystem.root = String module-dir
 
 @@ 'on bottle.load
 fn "demo-load" ()

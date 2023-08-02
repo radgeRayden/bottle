@@ -1,8 +1,5 @@
-using import String
-using import Array
-using import print
-using import Option
-import physfs
+using import Array Buffer Option slice String print
+import C.stdlib physfs
 
 using import ..config
 cfg := cfg-accessor 'filesystem
@@ -27,7 +24,15 @@ fn... check-error (result, failure-code = 0)
 
 fn init ()
     assert (physfs.init null) (get-error)
-    assert (physfs.mount cfg.root "/" true) (get-error)
+
+    let root =
+        try (copy ('unwrap cfg.root))
+        else
+            buf := stringbuffer i8 260
+            assert ((C.stdlib.getcwd ('data buf)) != null)
+            String ('data buf)
+
+    assert (physfs.mount root "/" true) (get-error)
 
 fn mount (path mount-point allow-writing?)
     check-error

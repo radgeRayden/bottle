@@ -70,14 +70,12 @@ global resources : (Option GameResources)
 global game-state : GameState
 global rng : bottle.random.RNG 0
 
-global root-dir : String
 @@ 'on bottle.configure
 fn (cfg)
     cfg.window.title = "snake"
     cfg.window.width = SCREEN-WIDTH
     cfg.window.height = SCREEN-HEIGHT
     cfg.window.resizable? = false
-    root-dir = copy cfg.filesystem.root
 
 fn play-sfx (name)
     audio.play-one-shot (.. "/assets/" name ".wav")

@@ -1,8 +1,4 @@
-using import Array
-using import Option
-using import print
-using import String
-using import struct
+using import Array C.stdlib Option print String struct
 
 using import .enums
 wgpu := import .gpu.wgpu
@@ -67,7 +63,7 @@ struct BottleConfig
             fixed-timestep : f64 = (1 / 60)
     filesystem :
         struct FilesystemConfig
-            root = S"."
+            root : (Option String)
     gpu :
         struct GPUConfig
             power-preference = PowerPreference.HighPerformance
