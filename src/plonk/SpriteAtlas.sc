@@ -22,7 +22,7 @@ struct SpriteAtlas
             columns = columns
             rows = rows
 
-    fn... get-quad (self, frame)
+    fn... get-quad (self, frame : i32)
         rows columns := self.rows, self.columns
         frame-count := rows * columns
         idx := frame % frame-count
@@ -37,7 +37,16 @@ struct SpriteAtlas
         Quad
             start = vec2 x y
             extent = vec2 w h
+    case (self, column : i32, row : i32)
+        Quad
+            start = vec2 (column / self.columns, row / self.rows)
+            extent = vec2 (1 / self.columns, 1 / self.rows)
 
+    fn get-quad-size (self)
+        tw th := 'get-size self.texture
+        vec2
+            (1 / self.columns) * (tw as f32)
+            (1 / self.rows) * (th as f32)
 do
     let SpriteAtlas
     local-scope;
