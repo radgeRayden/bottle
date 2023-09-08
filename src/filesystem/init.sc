@@ -1,5 +1,5 @@
 using import Array Buffer Option slice String print
-import C.stdlib physfs
+import C.bindings physfs
 
 using import ..config
 cfg := cfg-accessor 'filesystem
@@ -29,7 +29,7 @@ fn init ()
         try (copy ('unwrap cfg.root))
         else
             buf := stringbuffer i8 260
-            assert ((C.stdlib.getcwd ('data buf)) != null)
+            assert ((C.bindings.extern.getcwd ('data buf)) != null)
             String ('data buf)
 
     assert (physfs.mount root "/" true) (get-error)
