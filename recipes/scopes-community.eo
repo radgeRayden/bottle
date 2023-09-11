@@ -7,10 +7,12 @@ package scopes-community
 package ffi-helper
     summary "Helper file for C binding namespacing and filtering"
     alias "/lib/scopes/packages/ffi-helper.sc" (download "https://raw.githubusercontent.com/ScopesCommunity/eo-packages/main/ffi-helper.sc")
+    version "0"
 
 fn pkg (name)
     shortcut "{name}" "https://raw.githubusercontent.com/ScopesCommunity/eo-packages/main/recipes/{name}.eo"
 
+pkg "cjson"
 pkg "fontdue"
 pkg "glad"
 pkg "glfw"

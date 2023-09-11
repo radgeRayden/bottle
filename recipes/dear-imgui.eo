@@ -18,7 +18,6 @@ fn imgui-git (platform wgpu-lib sdl-lib)
         imgui-wgpu := "{project-path}/src/imgui"
         backend-dir := "{build-path}/imgui/backends"
 
-        cmd "cp {imgui-wgpu}/imgui_impl_wgpu.cpp {backend-dir}/"
         cmd "cp {imgui-wgpu}/build_{platform}.sh ./"
         cmd "mkdir lib"
         cmd "cp {project-path}/lib/{wgpu-lib} ./lib"
