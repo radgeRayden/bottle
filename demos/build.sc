@@ -22,11 +22,11 @@ inline build-demo (name use-genc?)
     main := (typify (module as Closure) i32 (@ rawstring))
     obj-name := .. "obj" name ".o"
 
-    let compilef =
-        static-if use-genc?
-            (import compiler.target.C) . compile-object
-        else
-            compile-object
+    let compilef = compile-object
+        # static-if use-genc?
+        #     (import compiler.target.C) . compile-object
+        # else
+        #     compile-object
 
     compilef
         default-target-triple

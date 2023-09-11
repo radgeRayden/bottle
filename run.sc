@@ -23,7 +23,7 @@ let module =
 
 run-stage;
 
-static-if use-genc?
+sugar-if use-genc?
     using import compiler.target.C
     hook-compile-function;
 
