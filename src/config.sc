@@ -79,7 +79,7 @@ struct BottleConfig
 
     fn disable-module-by-name (self name)
         inline may-disable-module (k)
-            if (name == (static-tostring k))
+            if (name == (k as zarray))
                 (getattr self.enabled-modules k) = false
 
         may-disable-module 'plonk
