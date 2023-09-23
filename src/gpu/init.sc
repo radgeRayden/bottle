@@ -163,9 +163,16 @@ fn init ()
     istate.limits = device-limits.limits
 
     wgpu.DeviceSetUncapturedErrorCallback istate.device
-        fn (errtype msg userdata)
+        fn (error-type msg userdata)
             raising noreturn
             print ('from-rawstring String msg)
+
+            ET := wgpu.ErrorType
+
+            switch error-type
+            case ET.Validation
+                assert false
+            default ()
             ;
         null
 
