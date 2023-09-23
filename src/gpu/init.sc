@@ -124,11 +124,12 @@ fn init ()
                 &local wgpu.RequiredLimits
                     limits =
                         wgpu.Limits
-                            maxBindGroups = wgpu.WGPU_LIMIT_U32_UNDEFINED
                             maxTextureDimension1D = wgpu.WGPU_LIMIT_U32_UNDEFINED
                             maxTextureDimension2D = wgpu.WGPU_LIMIT_U32_UNDEFINED
                             maxTextureDimension3D = wgpu.WGPU_LIMIT_U32_UNDEFINED
                             maxTextureArrayLayers = wgpu.WGPU_LIMIT_U32_UNDEFINED
+                            maxBindGroups = wgpu.WGPU_LIMIT_U32_UNDEFINED
+                            maxBindingsPerBindGroup = wgpu.WGPU_LIMIT_U32_UNDEFINED
                             maxDynamicUniformBuffersPerPipelineLayout = wgpu.WGPU_LIMIT_U32_UNDEFINED
                             maxDynamicStorageBuffersPerPipelineLayout = wgpu.WGPU_LIMIT_U32_UNDEFINED
                             maxSampledTexturesPerShaderStage = wgpu.WGPU_LIMIT_U32_UNDEFINED
@@ -145,6 +146,9 @@ fn init ()
                             maxVertexAttributes = wgpu.WGPU_LIMIT_U32_UNDEFINED
                             maxVertexBufferArrayStride = wgpu.WGPU_LIMIT_U32_UNDEFINED
                             maxInterStageShaderComponents = wgpu.WGPU_LIMIT_U32_UNDEFINED
+                            maxInterStageShaderVariables = wgpu.WGPU_LIMIT_U32_UNDEFINED
+                            maxColorAttachments = wgpu.WGPU_LIMIT_U32_UNDEFINED
+                            maxColorAttachmentBytesPerSample = wgpu.WGPU_LIMIT_U32_UNDEFINED
                             maxComputeWorkgroupStorageSize = wgpu.WGPU_LIMIT_U32_UNDEFINED
                             maxComputeInvocationsPerWorkgroup = wgpu.WGPU_LIMIT_U32_UNDEFINED
                             maxComputeWorkgroupSizeX = wgpu.WGPU_LIMIT_U32_UNDEFINED
