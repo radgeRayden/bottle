@@ -59,8 +59,8 @@ fn render ()
         ig.ImplWGPU_RenderDrawData (ig.GetDrawData) render-pass
         'finish render-pass
     else
-        ig.ImplWGPU_CreateDeviceObjects;
         ig.ImplWGPU_InvalidateDeviceObjects;
+        ig.ImplWGPU_CreateDeviceObjects;
         reset = false
 
 @@ if-module-enabled 'imgui
