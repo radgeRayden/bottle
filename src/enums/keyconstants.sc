@@ -17,14 +17,14 @@ enum KeyboardKey plain
     Comma = sdl.SDLK_COMMA
     Period = sdl.SDLK_PERIOD
 
-    tag '% Nothing sdl.SDLK_PERCENT
-    tag '$ Nothing sdl.SDLK_DOLLAR
-    tag '& Nothing sdl.SDLK_AMPERSAND
-    tag '* Nothing sdl.SDLK_ASTERISK
-    tag '! Nothing sdl.SDLK_EXCLAIM
-    tag '- Nothing sdl.SDLK_MINUS
-    tag '+ Nothing sdl.SDLK_PLUS
-    tag '/ Nothing sdl.SDLK_SLASH
+    Percent = sdl.SDLK_PERCENT
+    Dollar = sdl.SDLK_DOLLAR
+    Ampersand = sdl.SDLK_AMPERSAND
+    Asterisk = sdl.SDLK_ASTERISK
+    Exclaim = sdl.SDLK_EXCLAIM
+    Minus = sdl.SDLK_MINUS
+    Plus = sdl.SDLK_PLUS
+    Slash = sdl.SDLK_SLASH
 
     tag (Symbol "0") Nothing sdl.SDLK_0
     tag (Symbol "1") Nothing sdl.SDLK_1
@@ -37,20 +37,20 @@ enum KeyboardKey plain
     tag (Symbol "8") Nothing sdl.SDLK_8
     tag (Symbol "9") Nothing sdl.SDLK_9
 
-    tag ': Nothing sdl.SDLK_COLON
-    tag '< Nothing sdl.SDLK_LESS
-    tag '= Nothing sdl.SDLK_EQUALS
-    tag '> Nothing sdl.SDLK_GREATER
-    tag '? Nothing sdl.SDLK_QUESTION
-    tag '@ Nothing sdl.SDLK_AT
+    Colon = sdl.SDLK_COLON
+    Less = sdl.SDLK_LESS
+    Equals = sdl.SDLK_EQUALS
+    Greater = sdl.SDLK_GREATER
+    Question = sdl.SDLK_QUESTION
+    At = sdl.SDLK_AT
 
     Semicolon = sdl.SDLK_SEMICOLON
     LeftBracket = sdl.SDLK_LEFTBRACKET
     RightBracket = sdl.SDLK_RIGHTBRACKET
     Backslash = sdl.SDLK_BACKSLASH
 
-    tag '^ Nothing sdl.SDLK_CARET
-    tag '_ Nothing sdl.SDLK_UNDERSCORE
+    Caret = sdl.SDLK_CARET
+    Underscore = sdl.SDLK_UNDERSCORE
 
     Backquote = sdl.SDLK_BACKQUOTE
 
@@ -129,10 +129,10 @@ enum KeyboardKey plain
     KpPeriod = sdl.SDLK_KP_PERIOD
     KpComma = sdl.SDLK_KP_COMMA
     KpEqualsAs400 = sdl.SDLK_KP_EQUALSAS400
+    KpEquals = sdl.SDLK_KP_EQUALS
 
     Application = sdl.SDLK_APPLICATION
     Power = sdl.SDLK_POWER
-    Equals = sdl.SDLK_KP_EQUALS
     F13 = sdl.SDLK_F13
     F14 = sdl.SDLK_F14
     F15 = sdl.SDLK_F15
