@@ -29,6 +29,9 @@ fn step ()
     delta-time = (now - last-time-measure)
     last-time-measure = now
 
+fn sleep (milliseconds)
+    sdl.Delay (milliseconds as u32)
+
 do
-    let init get-delta-time step get-time
+    let init get-delta-time get-fixed-timestep get-time step sleep
     locals;

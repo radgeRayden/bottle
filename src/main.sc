@@ -74,6 +74,8 @@ fn run ()
                 callbacks.invalidate-frame;
             default ()
 
+        time.sleep 1
+
     imgui.shutdown;
     window.shutdown;
     filesystem.shutdown;
