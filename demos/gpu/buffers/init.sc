@@ -103,6 +103,12 @@ global time-offset : f64
 fn (key)
     if (key == KeyboardKey.Space)
         time-offset = (bottle.time.get-time)
+    if (key == KeyboardKey.Minus)
+        bottle.time.set-global-time-scale
+            (bottle.time.get-global-time-scale) - 0.1
+    if (key == KeyboardKey.Equals)
+        bottle.time.set-global-time-scale
+            (bottle.time.get-global-time-scale) + 0.1
 
 @@ 'on bottle.render
 fn ()
