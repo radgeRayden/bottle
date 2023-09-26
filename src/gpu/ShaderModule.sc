@@ -28,7 +28,7 @@ fn shader-module-from-WGSL (code)
         chain =
             wgpu.ChainedStruct
                 sType = wgpu.SType.ShaderModuleWGSLDescriptor
-        code = (code as rawstring)
+        code = (dupe (code as rawstring))
 
     let module =
         wgpu.DeviceCreateShaderModule
@@ -48,7 +48,7 @@ fn shader-module-from-GLSL (code stage)
             wgpu.ChainedStruct
                 sType = bitcast wgpu.NativeSType.ShaderModuleGLSLDescriptor wgpu.SType
         stage = stage
-        code = (code as rawstring)
+        code = (dupe (code as rawstring))
         defineCount = (countof defines)
         defines = &defines
 
