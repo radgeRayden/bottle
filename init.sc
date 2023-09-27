@@ -17,23 +17,7 @@ let sysevents = (import .src.sysevents)
 let time = (import .src.time)
 let types = (import .src.types)
 let window = (import .src.window)
-
-VERSION :=
-    label get-version
-        try
-            using import radl.IO.FileStream
-            version-file := FileStream (module-dir .. "/BOTTLE_VERSION") FileMode.Read
-            merge get-version ('read-all-string version-file)
-        else ()
-
-        using import radl.version-string
-        git-version;
-
-VERSION as:= string
-run-stage;
-
-fn get-version ()
-    VERSION
+let version = (import .src.version)
 
 vvv bind bottle
 ..
@@ -59,7 +43,7 @@ vvv bind bottle
             window
 
         let quit! = sysevents.quit
-        let get-version
+        let get-version = version.get-version
 
         locals;
 
