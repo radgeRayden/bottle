@@ -30,7 +30,7 @@ fn get-native-info ()
     case 'windows
         _ info.win.hinstance info.win.window
     default
-        error "OS not supported"
+        static-error "OS not supported"
 
 fn get-size ()
     local w : i32
