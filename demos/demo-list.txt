@@ -5,3 +5,4 @@ plonk.sprites
 plonk.shapes
 plonk.line-benchmark
 snake
+font
