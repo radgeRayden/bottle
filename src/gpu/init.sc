@@ -118,8 +118,20 @@ fn init ()
     local adapter-limits : wgpu.SupportedLimits
     wgpu.AdapterGetLimits istate.adapter &adapter-limits
 
+    feature-count := wgpu.AdapterEnumerateFeatures istate.adapter null
+
+    # TODO: add functions for querying supported features and enable the ones we want conditionally.
+    supported-features := alloca-array wgpu.FeatureName feature-count
+    wgpu.AdapterEnumerateFeatures istate.adapter supported-features
+
+    local required-features =
+        arrayof wgpu.FeatureName
+            'Depth32FloatStencil8
+
     wgpu.AdapterRequestDevice istate.adapter
         &local wgpu.DeviceDescriptor
+            requiredFeaturesCount = (countof required-features)
+            requiredFeatures = &required-features
             requiredLimits =
                 &local wgpu.RequiredLimits
                     limits =
