@@ -20,7 +20,7 @@ type+ ColorAttachment
         bitcast attachment cls
 
 type+ RenderPass
-    inline... __typecall (cls, cmd-encoder, color-attachments)
+    inline __typecall (cls cmd-encoder color-attachments depth-stencil-texture-view)
         vvv bind color-attachments count
         static-match (typeof color-attachments)
         case (Array ColorAttachment)
@@ -40,12 +40,29 @@ type+ RenderPass
         default
             static-error "wrong type for color-attachments"
 
+        let depth-stencil-attachment =
+            static-if (none? depth-stencil-texture-view)
+                null
+            else
+                local attachment : wgpu.RenderPassDepthStencilAttachment
+                    view = depth-stencil-texture-view
+                    depthLoadOp = 'Clear
+                    depthStoreOp = 'Store
+                    depthClearValue = 1.0
+                    depthReadOnly = false
+                    stencilLoadOp = 'Clear
+                    stencilStoreOp = 'Store
+                    stencilClearValue = 0
+                    stencilReadOnly = false
+                &attachment
+
         let handle =
             wgpu.CommandEncoderBeginRenderPass cmd-encoder
                 &local wgpu.RenderPassDescriptor
                     label = "Bottle Render Pass"
                     colorAttachmentCount = count
                     colorAttachments = color-attachments as (@ wgpu.RenderPassColorAttachment)
+                    depthStencilAttachment = depth-stencil-attachment
 
         wrap-nullable-object cls handle
 

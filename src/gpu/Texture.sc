@@ -8,6 +8,7 @@ using import ..asset.ImageData
 using import ..exceptions
 using import .texture-format
 using import .types
+using import radl.strfmt
 import .wgpu
 
 type+ Texture
@@ -36,7 +37,7 @@ type+ Texture
         handle :=
             wgpu.DeviceCreateTexture istate.device
                 &local wgpu.TextureDescriptor
-                    label = "Bottle Texture"
+                    label = dupe (f"Bottle Texture ${format}" as rawstring)
                     usage = usage
                     dimension = dimension
                     size = (wgpu.Extent3D width height slices)

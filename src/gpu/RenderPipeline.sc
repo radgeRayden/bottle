@@ -76,7 +76,31 @@ type+ PipelineLayout
         wrap-nullable-object cls
             make-pipeline-layout 0:u32 null
 
-fn make-pipeline (layout topology winding vertex-stage fragment-stage sample-count)
+fn make-pipeline (layout topology winding vertex-stage fragment-stage sample-count depth-testing?)
+    let depth-stencil-state =
+        if depth-testing?
+            local state : wgpu.DepthStencilState
+                # FIXME: allow a configurable depth format
+                format = 'Depth32FloatStencil8
+                depthWriteEnabled = true
+                depthCompare = 'Less
+                # FIXME: configurable stencil state
+                stencilFront =
+                    typeinit
+                        compare = 'Always
+                        failOp = 'Zero
+                        depthFailOp = 'Zero
+                        passOp = 'Zero
+                stencilBack =
+                    typeinit
+                        compare = 'Always
+                        failOp = 'Zero
+                        depthFailOp = 'Zero
+                        passOp = 'Zero
+                # FIXME: depth bias stuff missing
+            print state
+            &state
+        else null
     wgpu.DeviceCreateRenderPipeline istate.device
         &local wgpu.RenderPipelineDescriptor
             label = "Bottle Render Pipeline"
@@ -92,6 +116,7 @@ fn make-pipeline (layout topology winding vertex-stage fragment-stage sample-cou
                     mask = ~0:u32
                     alphaToCoverageEnabled = false
             fragment = (&local (dupe (imply (move fragment-stage) FragmentState))) as (@ wgpu.FragmentState)
+            depthStencil = depth-stencil-state
 
 type+ RenderPipeline
     inline... __typecall (cls,
@@ -100,7 +125,8 @@ type+ RenderPipeline
                           winding        : wgpu.FrontFace,
                           vertex-stage   : VertexStage,
                           fragment-stage : FragmentStage,
-                          msaa-samples : u32 = 1:u32)
+                          msaa-samples : u32 = 1:u32,
+                          depth-testing? : bool = false) # TODO: make this configurable
 
         cls ... := *...
         wrap-nullable-object cls (make-pipeline ...)
