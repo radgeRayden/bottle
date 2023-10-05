@@ -32,10 +32,10 @@ fn display-fps ()
     ig := import ..src.imgui
     using import glm
     flags := ig.GuiWindowFlags
-    ig.SetNextWindowPos (ig.Vec2 10 10) ig.ImGuiCond_Always (ig.Vec2 0 0)
-    ig.SetNextWindowSize (ig.Vec2 245 80) ig.ImGuiCond_Always
+    ig.SetNextWindowPos (ig.Vec2 10 10) ig.GuiCond.Always (ig.Vec2 0 0)
+    ig.SetNextWindowSize (ig.Vec2 245 80) ig.GuiCond.Always
     ig.Begin "fps" null
-        i32 ig.ImGuiWindowFlags_NoDecoration
+        i32 ig.GuiWindowFlags.NoDecoration
     ig.SetWindowFontScale 2
     ig.Text "FPS: %d" (bottle.time.get-fps)
     ig.Text "Time Scale: %.2f" (bottle.time.get-global-time-scale)

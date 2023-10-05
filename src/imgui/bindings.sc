@@ -6,7 +6,7 @@ case 'windows
 default
     error "Unsupported OS"
 
-using import slice
+using import Array slice
 
 inline filter-scope (scope pattern)
     pattern as:= string
@@ -25,12 +25,37 @@ header :=
 
 let imgui-extern = (filter-scope header.extern "^(ig|Im)")
 let imgui-typedef = (filter-scope header.typedef "^Im")
-let imgui-const = (filter-scope header.const "^(?=Im)")
+run-stage;
+
+vvv bind imgui-typedef
+fold (scope = imgui-typedef) for k v in imgui-typedef
+    local old-symbols : (Array Symbol)
+    T := (v as type)
+    if (T < CEnum)
+        for k v in ('symbols T)
+            original-symbol  := k as Symbol
+            original-name    := original-symbol as string
+            match? start end := 'match? str"^ImGui.+?_" original-name
+
+            if match?
+                field := (Symbol (rslice original-name end))
+                'set-symbol T field v
+                'append old-symbols original-symbol
+
+        for sym in old-symbols
+            sc_type_del_symbol T sym
+
+    name := (k as Symbol as string)
+    if ('match? str".+_$" name)
+        trimmed-name := lslice name ((countof name) - 1)
+        'bind scope (Symbol trimmed-name) v
+    else
+        scope
 run-stage;
 
 wgpu := import wgpu
 import sdl
-.. imgui-extern imgui-typedef imgui-const
+.. imgui-extern imgui-typedef
     do
         # bool ImGui_ImplWGPU_Init(WGPUDevice device, int num_frames_in_flight, WGPUTextureFormat rt_format, WGPUTextureFormat depth_format = WGPUTextureFormat_Undefined);
         ImplWGPU_Init := extern 'ImGui_ImplWGPU_Init (function bool wgpu.Device i32 wgpu.TextureFormat wgpu.TextureFormat)
