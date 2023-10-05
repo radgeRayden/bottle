@@ -98,7 +98,6 @@ fn make-pipeline (layout topology winding vertex-stage fragment-stage sample-cou
                         depthFailOp = 'Zero
                         passOp = 'Zero
                 # FIXME: depth bias stuff missing
-            print state
             &state
         else null
     wgpu.DeviceCreateRenderPipeline istate.device
