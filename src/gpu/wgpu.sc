@@ -53,7 +53,7 @@ inline define-object (name super release reference)
             if (ptr != null)
                 reference ptr
 
-            imply (copy ptr) (typeof self)
+            imply (dupe ptr) (typeof self)
 
         inline rawptr (self)
             dupe (storagecast self)
