@@ -6,6 +6,27 @@ cfg := cfg-accessor 'filesystem
 
 using import ..exceptions
 
+for k v in physfs
+    if (('typeof v) != type)
+        continue;
+
+    local old-symbols : (Array Symbol)
+    T := (v as type)
+    if (T < CEnum)
+        for k v in ('symbols T)
+            original-symbol  := k as Symbol
+            original-name    := original-symbol as string
+            match? start end := 'match? str"^PHYSFS_" original-name
+
+            if match?
+                field := (Symbol (rslice original-name end))
+                'set-symbol T field v
+                'append old-symbols original-symbol
+
+        for sym in old-symbols
+            sc_type_del_symbol T sym
+run-stage;
+
 fn get-error ()
     err := (physfs.getLastErrorCode)
     msg := (physfs.getErrorByCode err)
@@ -58,9 +79,30 @@ fn realpath (path)
     else
         ((Option String))
 
+fn... get-directory-items (dir : String)
+    local result : (Array String)
+    file-list := physfs.enumerateFiles dir
+    if (file-list != null)
+        loop (next = file-list)
+            this := @next
+            if (this == null)
+                break;
+
+            'append result ('from-rawstring String this)
+            & (next @ 1)
+    result
+
+fn is-directory? (path)
+    local stat : physfs.Stat
+    result := physfs.stat path &stat
+    if (not result)
+        false
+    else
+        stat.filetype == physfs.FileType.FILETYPE_DIRECTORY
+
 fn shutdown ()
     physfs.deinit;
 
 do
-    let init mount unmount shutdown realpath
+    let init mount unmount get-directory-items is-directory? shutdown realpath
     local-scope;
