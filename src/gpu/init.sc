@@ -206,6 +206,9 @@ fn get-cmd-encoder ()
     cmd-encoder := 'force-unwrap istate.cmd-encoder
     imply cmd-encoder CommandEncoder
 
+fn get-device ()
+    deref istate.device
+
 fn get-swapchain-image ()
     using types
     imply (view (deref ('force-unwrap istate.swapchain-image))) TextureView
@@ -255,7 +258,7 @@ fn present ()
 
 do
     let init update-render-area set-clear-color begin-frame present \
-        get-info get-preferred-surface-format get-cmd-encoder \
+        get-info get-preferred-surface-format get-cmd-encoder get-device \
         get-swapchain-image get-swapchain-resolve-source \
         get-msaa-sample-count msaa-enabled? \
 
