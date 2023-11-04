@@ -2,6 +2,7 @@ import C.stdlib
 using import print
 using import String
 using import struct
+using import radl.strfmt
 
 import sdl
 import .wgpu
@@ -105,12 +106,14 @@ fn init ()
 
     istate.surface = (create-surface)
 
-    # FIXME: check for status code!
     wgpu.InstanceRequestAdapter istate.instance
         &local wgpu.RequestAdapterOptions
             compatibleSurface = ('rawptr istate.surface)
             powerPreference = copy cfg.power-preference
         fn (status result msg userdata)
+            # FIXME: specify backend in error message
+            assert (status == wgpu.RequestAdapterStatus.Success)
+                f"${msg} Request for the graphics adapter failed. Verify you have the necessary drivers installed."
             istate.adapter = result
             ;
         null
