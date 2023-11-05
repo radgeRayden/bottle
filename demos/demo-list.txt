@@ -1,10 +1,11 @@
 gpu.hello-triangle
 gpu.buffers
 gpu.textures
+input.tester
+input.virtual-controller
 plonk.sprites
 plonk.shapes
 plonk.line-benchmark
-input.tester
 snake
 font
 imgui
