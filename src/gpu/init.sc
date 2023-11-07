@@ -7,6 +7,7 @@ using import radl.strfmt
 import sdl
 import .wgpu
 import .types
+import ..logger
 
 # imports necessary to augment all types with their implementation
 import .BindGroup .CommandEncoder .GPUBuffer .RenderPass .RenderPipeline .Sampler .ShaderModule .Texture
@@ -112,8 +113,12 @@ fn init ()
             powerPreference = copy cfg.power-preference
         fn (status result msg userdata)
             # FIXME: specify backend in error message
-            assert (status == wgpu.RequestAdapterStatus.Success)
-                f"${msg} Request for the graphics adapter failed. Verify you have the necessary drivers installed."
+            if (status != wgpu.RequestAdapterStatus.Success)
+                logger.write-fatal "Request for the graphics adapter failed. Verify you have the necessary drivers installed."
+                print2 "WebGPU says:"
+                print2 ('from-rawstring String msg)
+                abort;
+
             istate.adapter = result
             ;
         null
