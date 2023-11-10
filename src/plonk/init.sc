@@ -65,7 +65,7 @@ fn begin-frame ()
         if (not (gpu.msaa-enabled?))
             RenderPass cmd-encoder (ColorAttachment surface-texture none false)
         else
-            resolve-source := (gpu.get-surface-texture)
+            resolve-source := (gpu.get-msaa-resolve-source)
             RenderPass cmd-encoder (ColorAttachment resolve-source surface-texture false)
     'set-bind-group rp 1 ctx.default-texture-binding
 
