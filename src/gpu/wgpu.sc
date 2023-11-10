@@ -145,13 +145,11 @@ do
     Sampler := define-object "WGPUSampler" wgpu.Sampler wgpu.SamplerRelease wgpu.SamplerReference
     ShaderModule := define-object "WGPUShaderModule" wgpu.ShaderModule wgpu.ShaderModuleRelease wgpu.ShaderModuleReference
     Surface := define-object "WGPUSurface" wgpu.Surface wgpu.SurfaceRelease wgpu.SurfaceReference
-    SwapChain := define-object "WGPUSwapChain" wgpu.SwapChain wgpu.SwapChainRelease wgpu.SwapChainReference
     Texture := define-object "WGPUTexture" wgpu.Texture wgpu.TextureRelease wgpu.TextureReference
     TextureView := define-object "WGPUTextureView" wgpu.TextureView wgpu.TextureViewRelease wgpu.TextureViewReference
 
     TextureCreateView := wrap-constructor wgpu.TextureCreateView TextureView
     DeviceCreateTexture := wrap-constructor wgpu.DeviceCreateTexture Texture
-    DeviceCreateSwapChain := wrap-constructor wgpu.DeviceCreateSwapChain SwapChain
     InstanceCreateSurface := wrap-constructor wgpu.InstanceCreateSurface Surface
     DeviceCreateShaderModule := wrap-constructor wgpu.DeviceCreateShaderModule ShaderModule
     DeviceCreateSampler := wrap-constructor wgpu.DeviceCreateSampler Sampler

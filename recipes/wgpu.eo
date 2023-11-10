@@ -1,5 +1,5 @@
 VERSION := "trunk"
-TAG := "v0.17.0.2"
+TAG := "v0.18.0.2"
 SUMMARY := "Native WebGPU implementation based on wgpu-core "
 
 update-url "https://raw.githubusercontent.com/ScopesCommunity/eo-packages/main/recipes/wgpu.eo"

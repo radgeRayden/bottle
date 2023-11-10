@@ -59,14 +59,14 @@ fn begin-frame ()
     'set-projection ctx.geometry-batch mvp
 
     cmd-encoder := (gpu.get-cmd-encoder)
-    swapchain-image := (gpu.get-swapchain-image)
+    surface-texture := (gpu.get-surface-texture)
     ctx.last-texture = 0
     let rp =
         if (not (gpu.msaa-enabled?))
-            RenderPass cmd-encoder (ColorAttachment swapchain-image none false)
+            RenderPass cmd-encoder (ColorAttachment surface-texture none false)
         else
-            resolve-source := (gpu.get-swapchain-resolve-source)
-            RenderPass cmd-encoder (ColorAttachment resolve-source swapchain-image false)
+            resolve-source := (gpu.get-surface-texture)
+            RenderPass cmd-encoder (ColorAttachment resolve-source surface-texture false)
     'set-bind-group rp 1 ctx.default-texture-binding
 
     ctx.render-pass = rp

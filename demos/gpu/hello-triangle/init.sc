@@ -48,7 +48,7 @@ global render-state : (Option RendererState)
 @@ 'on bottle.configure
 fn (cfg)
     cfg.window.title = "hello, triangle!"
-    cfg.gpu.msaa-samples = 4
+    # cfg.gpu.msaa-samples = 4
     cfg.enabled-modules.plonk = false
     ;
 
@@ -88,8 +88,8 @@ fn ()
 
     rp :=
         RenderPass (bottle.gpu.get-cmd-encoder)
-            ColorAttachment (bottle.gpu.get-swapchain-resolve-source)
-                resolve-target = (bottle.gpu.get-swapchain-image)
+            ColorAttachment (bottle.gpu.get-surface-texture)
+                # resolve-target = (bottle.gpu.get-swapchain-image)
                 clear? = false
     'set-pipeline rp ctx.pipeline
     'draw rp 3

@@ -14,11 +14,11 @@ struct GfxState
     surface     : wgpu.Surface
     adapter     : wgpu.Adapter
     device      : wgpu.Device
-    swapchain   : wgpu.SwapChain
     queue       : wgpu.Queue
     cmd-encoder : (Option types.CommandEncoder)
-    swapchain-image : (Option types.TextureView)
-    swapchain-resolve-source : (Option types.TextureView)
+    surface-texture : (Option types.Texture)
+    surface-texture-view : (Option types.TextureView)
+    msaa-resolve-source : (Option types.TextureView)
     limits      : wgpu.Limits
 
     clear-color = (vec4 0.017 0.017 0.017 1.0)

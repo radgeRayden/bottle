@@ -38,7 +38,7 @@ fn create-surface ()
                                 wgpu.ChainedStruct
                                     sType = wgpu.SType.SurfaceDescriptorFromXlibWindow
                             display = (x11-display as voidstar)
-                            window = (x11-window as u32)
+                            window = typeinit x11-window
                         mutable@ wgpu.ChainedStruct
     case 'windows
         let hinstance hwnd = (window.get-native-info)
@@ -56,17 +56,18 @@ fn create-surface ()
     default
         error "OS not supported"
 
-fn create-swapchain (width height)
-    wgpu.DeviceCreateSwapChain istate.device istate.surface
-        &local wgpu.SwapChainDescriptor
-            label = "swapchain"
+fn configure-surface ()
+    width height := (window.get-size)
+    wgpu.SurfaceConfigure istate.surface
+        &local wgpu.SurfaceConfiguration
+            device = istate.device
             usage = wgpu.TextureUsage.RenderAttachment
             format = (get-preferred-surface-format)
             width = (width as u32)
             height = (height as u32)
             presentMode = wgpu.PresentMode.Fifo
 
-fn create-swapchain-resolve-source (width height)
+fn create-msaa-resolve-source (width height)
     using types
     try
         TextureView
@@ -80,10 +81,10 @@ fn msaa-enabled? ()
     cfg.msaa-samples > 1
 
 fn update-render-area ()
-    istate.swapchain = create-swapchain (window.get-drawable-size)
+    configure-surface;
     if (msaa-enabled?)
         istate.swapchain-resolve-source =
-            create-swapchain-resolve-source (window.get-drawable-size)
+            create-msaa-resolve-source (window.get-drawable-size)
 
 fn init ()
     raising noreturn
@@ -138,7 +139,7 @@ fn init ()
 
     wgpu.AdapterRequestDevice istate.adapter
         &local wgpu.DeviceDescriptor
-            requiredFeaturesCount = (countof required-features)
+            requiredFeatureCount = (countof required-features)
             requiredFeatures = &required-features
             requiredLimits =
                 &local wgpu.RequiredLimits
@@ -200,8 +201,10 @@ fn init ()
             ;
         null
 
-    istate.swapchain = (create-swapchain (window.get-drawable-size))
-    istate.swapchain-resolve-source = (create-swapchain-resolve-source (window.get-drawable-size))
+    configure-surface;
+    if (msaa-enabled?)
+        istate.msaa-resolve-source = (create-msaa-resolve-source (window.get-drawable-size))
+
     istate.queue = (wgpu.DeviceGetQueue istate.device)
     ;
 
@@ -217,42 +220,65 @@ fn get-cmd-encoder ()
 fn get-device ()
     deref istate.device
 
-fn get-swapchain-image ()
+fn get-surface-texture ()
     using types
-    imply (view (deref ('force-unwrap istate.swapchain-image))) TextureView
+    imply (view (deref ('force-unwrap istate.surface-texture-view))) TextureView
 
-fn get-swapchain-resolve-source ()
+fn get-msaa-resolve-source ()
     using types
     try
         imply
-            view (deref ('unwrap istate.swapchain-resolve-source))
+            view (deref ('unwrap istate.msaa-resolve-source))
             TextureView
     else (view (nullof TextureView))
 
 fn get-msaa-sample-count ()
     deref cfg.msaa-samples
 
+fn acquire-surface-texture ()
+    using types
+
+    local surface-texture : wgpu.SurfaceTexture
+    wgpu.SurfaceGetCurrentTexture istate.surface &surface-texture
+
+    if (surface-texture.status != 'Success)
+        logger.write-debug f"The request for the surface texture was unsuccessful: ${surface-texture.status}"
+
+    switch surface-texture.status
+    case 'Success
+        imply surface-texture.texture Texture
+    pass 'Timeout
+    pass 'Outdated
+    pass 'Lost
+    do
+        if (surface-texture.texture != null)
+            wgpu.TextureRelease (report surface-texture.texture)
+        configure-surface;
+
+        # TODO: rename this exception
+        raise GPUError.OutdatedSwapchain
+    default
+        logger.write-fatal "Could not acquire surface texture: ${surface-texture.status}"
+        abort;
+
 fn begin-frame ()
     using types
 
-    if (window.minimized?)
-        raise GPUError.OutdatedSwapchain
-
-    swapchain-image := (wgpu.SwapChainGetCurrentTextureView istate.swapchain)
-    if (swapchain-image == null)
-        raise GPUError.OutdatedSwapchain
-
     cmd-encoder := (wgpu.DeviceCreateCommandEncoder istate.device (&local wgpu.CommandEncoderDescriptor))
+
+    surface-texture := (acquire-surface-texture)
+    surface-texture-view := (TextureView surface-texture)
 
     # clear
     if (not (msaa-enabled?))
         'finish
-            RenderPass cmd-encoder (ColorAttachment (view swapchain-image) none true istate.clear-color)
+            RenderPass cmd-encoder (ColorAttachment (view surface-texture-view) none true istate.clear-color)
     else
         'finish
-            RenderPass cmd-encoder (ColorAttachment (get-swapchain-resolve-source) (view swapchain-image) true istate.clear-color)
+            RenderPass cmd-encoder (ColorAttachment (get-msaa-resolve-source) (view surface-texture-view) true istate.clear-color)
 
-    istate.swapchain-image = swapchain-image
+    istate.surface-texture = surface-texture
+    istate.surface-texture-view = surface-texture-view
     istate.cmd-encoder = cmd-encoder
 
 fn present ()
@@ -260,14 +286,15 @@ fn present ()
 
     cmd-encoder := imply ('force-unwrap ('swap istate.cmd-encoder none)) CommandEncoder
     'submit ('finish cmd-encoder)
-    wgpu.SwapChainPresent istate.swapchain
-    'swap istate.swapchain-image none
-    ;
+    wgpu.SurfacePresent istate.surface
+    istate.surface-texture-view = none
+    istate.surface-texture = none
+    ()
 
 do
     let init update-render-area set-clear-color begin-frame present \
         get-info get-preferred-surface-format get-cmd-encoder get-device \
-        get-swapchain-image get-swapchain-resolve-source \
+        get-surface-texture get-msaa-resolve-source \
         get-msaa-sample-count msaa-enabled? \
 
     let types

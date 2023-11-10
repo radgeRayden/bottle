@@ -57,7 +57,7 @@ fn ()
 @@ 'on bottle.render
 fn ()
     ctx := 'force-unwrap render-state
-    rp := RenderPass (bottle.gpu.get-cmd-encoder) (ColorAttachment (bottle.gpu.get-swapchain-image) (clear? = false))
+    rp := RenderPass (bottle.gpu.get-cmd-encoder) (ColorAttachment (bottle.gpu.get-surface-texture) (clear? = false))
 
     'set-pipeline rp ctx.pipeline
     'set-bind-group rp 0 ctx.bind-group

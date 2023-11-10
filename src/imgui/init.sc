@@ -54,7 +54,7 @@ fn render ()
 
     ig.Render;
     if (not reset)
-        render-pass := RenderPass (gpu.get-cmd-encoder) (ColorAttachment (gpu.get-swapchain-image) (clear? = false))
+        render-pass := RenderPass (gpu.get-cmd-encoder) (ColorAttachment (gpu.get-surface-texture) (clear? = false))
         ig.ImplWGPU_RenderDrawData (ig.GetDrawData) render-pass
         'finish render-pass
     else
