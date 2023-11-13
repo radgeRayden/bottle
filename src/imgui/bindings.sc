@@ -24,7 +24,7 @@ header :=
         options "-DCIMGUI_DEFINE_ENUMS_AND_STRUCTS"
 
 let imgui-extern = (filter-scope header.extern "^(ig|Im)")
-let imgui-typedef = (filter-scope header.typedef "^Im")
+let imgui-typedef = (filter-scope header.typedef "^Im(Gui)?")
 run-stage;
 
 vvv bind imgui-typedef

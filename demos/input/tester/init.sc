@@ -27,11 +27,11 @@ fn (id)
 
 fn render-UI ()
     ig := bottle.imgui
-    WF := ig.GuiWindowFlags
+    WF := ig.WindowFlags
     ww wh := (bottle.window.get-size)
 
-    ig.SetNextWindowSize (ig.Vec2 210 (f32 wh)) ig.GuiCond.Always
-    ig.SetNextWindowPos (ig.Vec2) ig.GuiCond.Always (ig.Vec2)
+    ig.SetNextWindowSize (ig.Vec2 210 (f32 wh)) ig.Cond.Always
+    ig.SetNextWindowPos (ig.Vec2) ig.Cond.Always (ig.Vec2)
     ig.Begin "Controller Selector" null
         | WF.NoResize WF.NoScrollbar WF.NoCollapse WF.NoTitleBar
     ig.Text "Controller"
@@ -87,7 +87,6 @@ fn ()
         plonk.circle-line (btn-center + (vec2 0 50)) 15 (vec4 0.97 0.93 0.07 1)
         if (button-down? 'Y)
             plonk.circle (btn-center + (vec2 0 50)) 15 (vec4 0.97 0.93 0.07 1)
-        print f"${(sdl.GetError)}"
 
     render-UI;
 
