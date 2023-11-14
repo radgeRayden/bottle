@@ -1,5 +1,6 @@
 gpu.hello-triangle
 gpu.buffers
+gpu.presentation
 gpu.textures
 input.tester
 input.virtual-controller
