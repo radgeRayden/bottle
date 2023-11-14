@@ -67,9 +67,10 @@ struct BottleConfig
             save-directory : (Option String)
     gpu :
         struct GPUConfig
-            power-preference = PowerPreference.HighPerformance
             # FIXME: validate this
             msaa-samples = 1:u8
+            power-preference = PowerPreference.HighPerformance
+            present-mode = wgpu.PresentMode.Fifo
             wgpu-low-level-api = wgpu.InstanceBackend.Primary
             wgpu-log-level = wgpu.LogLevel.Error
     enabled-modules :

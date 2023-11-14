@@ -65,7 +65,7 @@ fn configure-surface ()
             format = (get-preferred-surface-format)
             width = (width as u32)
             height = (height as u32)
-            presentMode = wgpu.PresentMode.Fifo
+            presentMode = istate.present-mode
 
 fn create-msaa-resolve-source (width height)
     using types
@@ -201,6 +201,7 @@ fn init ()
             ;
         null
 
+    istate.present-mode = cfg.present-mode
     configure-surface;
     if (msaa-enabled?)
         istate.msaa-resolve-source = (create-msaa-resolve-source (window.get-drawable-size))
@@ -235,6 +236,13 @@ fn get-msaa-resolve-source ()
 fn get-msaa-sample-count ()
     deref cfg.msaa-samples
 
+fn get-present-mode ()
+    deref istate.present-mode
+
+fn... set-present-mode (present-mode : wgpu.PresentMode)
+    istate.present-mode = present-mode
+    istate.reconfigure-surface? = true
+
 fn acquire-surface-texture ()
     using types
 
@@ -263,6 +271,11 @@ fn acquire-surface-texture ()
 
 fn begin-frame ()
     using types
+
+    if istate.reconfigure-surface?
+        configure-surface;
+        istate.reconfigure-surface? = false
+        raise GPUError.OutdatedSwapchain
 
     cmd-encoder := (wgpu.DeviceCreateCommandEncoder istate.device (&local wgpu.CommandEncoderDescriptor))
 
@@ -296,6 +309,7 @@ do
         get-info get-preferred-surface-format get-cmd-encoder get-device \
         get-surface-texture get-msaa-resolve-source \
         get-msaa-sample-count msaa-enabled? \
+        get-present-mode set-present-mode
 
     let types
 

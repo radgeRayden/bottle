@@ -22,6 +22,8 @@ struct GfxState
     limits      : wgpu.Limits
 
     clear-color = (vec4 0.017 0.017 0.017 1.0)
+    present-mode : wgpu.PresentMode
+    reconfigure-surface? : bool
 
 global istate : GfxState
 

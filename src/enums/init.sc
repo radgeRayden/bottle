@@ -4,6 +4,7 @@ do
     FilterMode := wgpu.FilterMode
     FrontFace := wgpu.FrontFace
     PowerPreference := wgpu.PowerPreference
+    PresentMode := wgpu.PresentMode
     PrimitiveTopology := wgpu.PrimitiveTopology
     ShaderStage   := wgpu.ShaderStage
     TextureFormat := wgpu.TextureFormat
