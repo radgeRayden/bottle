@@ -260,7 +260,7 @@ fn acquire-surface-texture ()
     pass 'Lost
     do
         if (surface-texture.texture != null)
-            wgpu.TextureRelease (report surface-texture.texture)
+            wgpu.TextureRelease surface-texture.texture
         configure-surface;
 
         # TODO: rename this exception
