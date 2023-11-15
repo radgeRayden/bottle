@@ -90,7 +90,7 @@ fn... sprite (atlas : SpriteAtlas, ...)
     set-texture ctx ('force-unwrap atlas.bind-group) atlas.texture-view
     'add-quad ctx.geometry-batch ...
 
-fn... rectangle (position, size, rotation = 0:f32, color = (vec4 1))
+fn... rectangle (position : vec2, size : vec2, rotation : f32 = 0, color : vec4 = (vec4 1))
     ctx := 'force-unwrap context
     set-texture ctx ctx.default-texture-binding ctx.default-texture
     'add-quad ctx.geometry-batch position size rotation (color = color)
