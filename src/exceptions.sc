@@ -1,7 +1,7 @@
 using import enum
 
 enum GPUError plain
-    OutdatedSwapchain
+    DiscardedFrame
     ObjectCreationFailed
     InvalidOperation
     InvalidInput

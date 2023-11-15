@@ -263,8 +263,7 @@ fn acquire-surface-texture ()
             wgpu.TextureRelease surface-texture.texture
         configure-surface;
 
-        # TODO: rename this exception
-        raise GPUError.OutdatedSwapchain
+        raise GPUError.DiscardedFrame
     default
         logger.write-fatal "Could not acquire surface texture: ${surface-texture.status}"
         abort;
@@ -275,7 +274,7 @@ fn begin-frame ()
     if istate.reconfigure-surface?
         configure-surface;
         istate.reconfigure-surface? = false
-        raise GPUError.OutdatedSwapchain
+        raise GPUError.DiscardedFrame
 
     cmd-encoder := (wgpu.DeviceCreateCommandEncoder istate.device (&local wgpu.CommandEncoderDescriptor))
 

@@ -67,10 +67,11 @@ fn run ()
             gpu.present;
         except (ex)
             using import .exceptions
-            match ex
-            case GPUError.ObjectCreationFailed
+
+            switch ex
+            case 'ObjectCreationFailed
                 assert false "unhandled GPU Object creation failure"
-            case GPUError.OutdatedSwapchain
+            case 'DiscardedFrame
                 callbacks.invalidate-frame;
             default ()
 
