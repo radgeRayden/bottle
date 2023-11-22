@@ -86,6 +86,65 @@ fn update-render-area ()
         istate.swapchain-resolve-source =
             create-msaa-resolve-source (window.get-drawable-size)
 
+fn set-clear-color (color)
+    istate.clear-color = color
+
+fn get-cmd-encoder ()
+    using types
+
+    cmd-encoder := 'force-unwrap istate.cmd-encoder
+    imply cmd-encoder CommandEncoder
+
+fn get-device ()
+    deref istate.device
+
+fn get-surface-texture ()
+    using types
+    imply (view (deref ('force-unwrap istate.surface-texture-view))) TextureView
+
+fn get-msaa-resolve-source ()
+    using types
+    try
+        imply
+            view (deref ('unwrap istate.msaa-resolve-source))
+            TextureView
+    else (view (nullof TextureView))
+
+fn get-msaa-sample-count ()
+    deref cfg.msaa-samples
+
+fn get-present-mode ()
+    deref istate.present-mode
+
+fn... set-present-mode (present-mode : wgpu.PresentMode)
+    istate.present-mode = present-mode
+    istate.reconfigure-surface? = true
+
+fn acquire-surface-texture ()
+    using types
+
+    local surface-texture : wgpu.SurfaceTexture
+    wgpu.SurfaceGetCurrentTexture istate.surface &surface-texture
+
+    if (surface-texture.status != 'Success)
+        logger.write-debug f"The request for the surface texture was unsuccessful: ${surface-texture.status}"
+
+    switch surface-texture.status
+    case 'Success
+        imply surface-texture.texture Texture
+    pass 'Timeout
+    pass 'Outdated
+    pass 'Lost
+    do
+        if (surface-texture.texture != null)
+            wgpu.TextureRelease surface-texture.texture
+        configure-surface;
+
+        raise GPUError.DiscardedFrame
+    default
+        logger.write-fatal "Could not acquire surface texture: ${surface-texture.status}"
+        abort;
+
 fn init ()
     raising noreturn
 
@@ -208,65 +267,6 @@ fn init ()
 
     istate.queue = (wgpu.DeviceGetQueue istate.device)
     ;
-
-fn set-clear-color (color)
-    istate.clear-color = color
-
-fn get-cmd-encoder ()
-    using types
-
-    cmd-encoder := 'force-unwrap istate.cmd-encoder
-    imply cmd-encoder CommandEncoder
-
-fn get-device ()
-    deref istate.device
-
-fn get-surface-texture ()
-    using types
-    imply (view (deref ('force-unwrap istate.surface-texture-view))) TextureView
-
-fn get-msaa-resolve-source ()
-    using types
-    try
-        imply
-            view (deref ('unwrap istate.msaa-resolve-source))
-            TextureView
-    else (view (nullof TextureView))
-
-fn get-msaa-sample-count ()
-    deref cfg.msaa-samples
-
-fn get-present-mode ()
-    deref istate.present-mode
-
-fn... set-present-mode (present-mode : wgpu.PresentMode)
-    istate.present-mode = present-mode
-    istate.reconfigure-surface? = true
-
-fn acquire-surface-texture ()
-    using types
-
-    local surface-texture : wgpu.SurfaceTexture
-    wgpu.SurfaceGetCurrentTexture istate.surface &surface-texture
-
-    if (surface-texture.status != 'Success)
-        logger.write-debug f"The request for the surface texture was unsuccessful: ${surface-texture.status}"
-
-    switch surface-texture.status
-    case 'Success
-        imply surface-texture.texture Texture
-    pass 'Timeout
-    pass 'Outdated
-    pass 'Lost
-    do
-        if (surface-texture.texture != null)
-            wgpu.TextureRelease surface-texture.texture
-        configure-surface;
-
-        raise GPUError.DiscardedFrame
-    default
-        logger.write-fatal "Could not acquire surface texture: ${surface-texture.status}"
-        abort;
 
 fn begin-frame ()
     using types
