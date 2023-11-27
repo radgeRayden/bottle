@@ -26,9 +26,8 @@ fn get-info ()
     RendererBackendInfo;
 
 fn create-surface ()
-    static-match operating-system
-    case 'linux
-        let x11-display x11-window = (window.get-native-info)
+    dispatch (window.get-native-info)
+    case X11 (display window)
         wgpu.InstanceCreateSurface istate.instance
             &local wgpu.SurfaceDescriptor
                 nextInChain =
@@ -37,11 +36,22 @@ fn create-surface ()
                             chain =
                                 wgpu.ChainedStruct
                                     sType = wgpu.SType.SurfaceDescriptorFromXlibWindow
-                            display = (x11-display as voidstar)
-                            window = typeinit x11-window
+                            display = display
+                            window = typeinit window
                         mutable@ wgpu.ChainedStruct
-    case 'windows
-        let hinstance hwnd = (window.get-native-info)
+    case Wayland (display surface)
+        wgpu.InstanceCreateSurface istate.instance
+            &local wgpu.SurfaceDescriptor
+                nextInChain =
+                    as
+                        &local wgpu.SurfaceDescriptorFromWaylandSurface
+                            chain =
+                                wgpu.ChainedStruct
+                                    sType = wgpu.SType.SurfaceDescriptorFromWaylandSurface
+                            display = display
+                            surface = surface
+                        mutable@ wgpu.ChainedStruct
+    case Windows (hinstance hwnd)
         wgpu.InstanceCreateSurface istate.instance
             &local wgpu.SurfaceDescriptor
                 nextInChain =
@@ -54,7 +64,7 @@ fn create-surface ()
                             hwnd = hwnd
                         mutable@ wgpu.ChainedStruct
     default
-        error "OS not supported"
+        abort;
 
 fn configure-surface ()
     width height := (window.get-size)

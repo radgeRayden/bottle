@@ -1,7 +1,5 @@
-using import print
-using import String
-using import struct
-import sdl
+using import enum print radl.strfmt String struct
+import .logger sdl
 
 using import .config
 cfg := cfg-accessor 'window
@@ -15,20 +13,31 @@ global istate : BottleWindowState
 inline get-handle ()
     istate.handle
 
+enum WindowNativeInfo
+    Windows : (hinstance = voidstar) (hwnd = voidstar)
+    X11 : (display = voidstar) (window = u64)
+    Wayland : (display = voidstar) (surface = voidstar)
+
 fn get-native-info ()
-    local info : sdl.SysWMinfo
-    sdl.SDL_VERSION &info.version
+    local wminfo : sdl.SysWMinfo
+    sdl.SDL_VERSION &wminfo.version
 
-    assert (storagecast (sdl.GetWindowWMInfo (get-handle) &info))
+    assert (storagecast (sdl.GetWindowWMInfo (get-handle) &wminfo))
+    info subsystem := wminfo.info, wminfo.subsystem
 
-    let info = info.info
-
-    # FIXME: use the window subsystem enum properly
     static-match operating-system
     case 'linux
-        _ info.x11.display info.x11.window
+        switch subsystem
+        case 'SDL_SYSWM_X11
+            WindowNativeInfo.X11 info.x11.display info.x11.window
+        case 'SDL_SYSWM_WAYLAND
+            WindowNativeInfo.Wayland info.wl.display info.wl.surface
+        default
+            logger.write-fatal f"Unsupported windowing system: ${subsystem}"
+            abort;
     case 'windows
-        _ info.win.hinstance info.win.window
+        assert (subsystem == 'SDL_SYSWM_WINDOWS)
+        WindowNativeInfo.Windows info.win.hinstance info.win.window
     default
         static-error "OS not supported"
 
@@ -170,4 +179,7 @@ do
         get-title
         minimized?
         shutdown
+
+    let WindowNativeInfo
+
     locals;
