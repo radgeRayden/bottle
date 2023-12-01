@@ -14,7 +14,7 @@ fn (cfg)
 fn "demo-load" ()
     renderer-info := (bottle.gpu.get-info)
     print "bottle version:" (bottle.get-version)
-    print renderer-info.APIString
+    print renderer-info.BackendString
     print renderer-info.GPUString
     ()
 

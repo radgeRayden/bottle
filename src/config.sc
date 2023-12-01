@@ -29,7 +29,7 @@ fn env-wgpu-backend (value)
     match-string-enum wgpu.InstanceBackend value
         _ 'Vulkan 'DX12 'Metal 'GL 'DX11
 
-@@ from-environment "BOTTLE_WGPU_LOG_LEVEL" wgpu.LogLevel.Error
+@@ from-environment "BOTTLE_WGPU_LOG_LEVEL" wgpu.LogLevel.Warn
 fn env-wgpu-log-level (value)
     match-string-enum wgpu.LogLevel value
         _ 'Off 'Error 'Warn 'Info 'Debug 'Trace
@@ -69,10 +69,10 @@ struct BottleConfig
         struct GPUConfig
             # FIXME: validate this
             msaa-samples = 1:u8
-            power-preference = PowerPreference.HighPerformance
-            present-mode = wgpu.PresentMode.Fifo
-            wgpu-low-level-api = wgpu.InstanceBackend.Primary
-            wgpu-log-level = wgpu.LogLevel.Error
+            power-preference : wgpu.PowerPreference = 'HighPerformance
+            present-mode : wgpu.PresentMode = 'Fifo
+            wgpu-low-level-backend : wgpu.InstanceBackend = 'Primary
+            wgpu-log-level : wgpu.LogLevel = 'Warn
     enabled-modules :
         struct BottleEnabledModules plain
             plonk = true
@@ -88,8 +88,8 @@ struct BottleConfig
 
     fn apply-env-overrides (self)
         if (not self.ignore-environment-variables?)
-            self.gpu.wgpu-low-level-api = (env-wgpu-backend)
-            self.gpu.wgpu-log-level     = (env-wgpu-log-level)
+            self.gpu.wgpu-low-level-backend = (env-wgpu-backend)
+            self.gpu.wgpu-log-level         = (env-wgpu-log-level)
 
             disabled-modules := (env-disabled-modules)
             for module in (env-disabled-modules)

@@ -25,44 +25,44 @@ import ..window
 fn get-info ()
     RendererBackendInfo;
 
+inline typeinit@ (...)
+    implies (T)
+        static-assert (T < pointer)
+        imply (& (local (elementof T) ...)) T
+
+inline chained@ (K ...)
+    using wgpu
+    chaintypename := K
+    K := getattr wgpu K
+    chaintype := static-try (getattr SType chaintypename)
+    else
+        (getattr NativeSType chaintypename) as (storageof SType) as SType
+    typeinit@
+        nextInChain = as
+            &
+                local K
+                    chain = typeinit
+                        sType = chaintype
+                    ...
+            mutable@ ChainedStruct
+
 fn create-surface ()
     dispatch (window.get-native-info)
     case X11 (display window)
         wgpu.InstanceCreateSurface istate.instance
-            &local wgpu.SurfaceDescriptor
-                nextInChain =
-                    as
-                        &local wgpu.SurfaceDescriptorFromXlibWindow
-                            chain =
-                                wgpu.ChainedStruct
-                                    sType = wgpu.SType.SurfaceDescriptorFromXlibWindow
-                            display = display
-                            window = typeinit window
-                        mutable@ wgpu.ChainedStruct
+            chained@ 'SurfaceDescriptorFromXlibWindow
+                display = display
+                window = typeinit window
     case Wayland (display surface)
         wgpu.InstanceCreateSurface istate.instance
-            &local wgpu.SurfaceDescriptor
-                nextInChain =
-                    as
-                        &local wgpu.SurfaceDescriptorFromWaylandSurface
-                            chain =
-                                wgpu.ChainedStruct
-                                    sType = wgpu.SType.SurfaceDescriptorFromWaylandSurface
-                            display = display
-                            surface = surface
-                        mutable@ wgpu.ChainedStruct
+            chained@ 'SurfaceDescriptorFromWaylandSurface
+                display = display
+                surface = surface
     case Windows (hinstance hwnd)
         wgpu.InstanceCreateSurface istate.instance
-            &local wgpu.SurfaceDescriptor
-                nextInChain =
-                    as
-                        &local wgpu.SurfaceDescriptorFromWindowsHWND
-                            chain =
-                                wgpu.ChainedStruct
-                                    sType = wgpu.SType.SurfaceDescriptorFromWindowsHWND
-                            hinstance = hinstance
-                            hwnd = hwnd
-                        mutable@ wgpu.ChainedStruct
+            chained@ 'SurfaceDescriptorFromWindowsHWND
+                hinstance = hinstance
+                hwnd = hwnd
     default
         abort;
 
@@ -168,7 +168,7 @@ fn init ()
         chain =
             wgpu.ChainedStruct
                 sType = (bitcast wgpu.NativeSType.InstanceExtras wgpu.SType)
-        backends = cfg.wgpu-low-level-api
+        backends = wgpu.InstanceBackend.All
 
     istate.instance =
         wgpu.CreateInstance

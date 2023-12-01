@@ -30,13 +30,13 @@ struct RendererBackendInfo
     device : String
     driver : String
     adapter : wgpu.AdapterType
-    low-level-api : wgpu.BackendType
+    low-level-backend : wgpu.BackendType
 
-    APIString :=
+    BackendString :=
         property
             inline "getter" (self)
                 s := self
-                f"WebGPU ${s.version} over ${s.low-level-api}"
+                f"WebGPU ${s.version} over ${s.low-level-backend}"
     GPUString :=
         property
             inline "getter" (self)
@@ -54,7 +54,7 @@ struct RendererBackendInfo
             device = 'from-rawstring String p.name
             driver = 'from-rawstring String p.driverDescription
             adapter = p.adapterType
-            low-level-api = p.backendType
+            low-level-backend = p.backendType
 
 do
     let RendererBackendInfo
