@@ -24,7 +24,7 @@ amalgamated-source :=
             #include "stb_image_write.h"
 
             #define STB_IMAGE_RESIZE_IMPLEMENTATION
-            #include "stb_image_resize.h"
+            #include "stb_image_resize2.h"
 
             #define STB_SPRINTF_IMPLEMENTATION
             #include "stb_sprintf.h"
@@ -78,7 +78,7 @@ package stb
     alias "/include/stb_rect_pack.h" "{source-path}/stb_rect_pack.h"
     alias "/include/stb_truetype.h" "{source-path}/stb_truetype.h"
     alias "/include/stb_image_write.h" "{source-path}/stb_image_write.h"
-    alias "/include/stb_image_resize.h" "{source-path}/deprecated/stb_image_resize.h"
+    alias "/include/stb_image_resize2.h" "{source-path}/stb_image_resize2.h"
     alias "/include/stb_sprintf.h" "{source-path}/stb_sprintf.h"
     alias "/include/stb_voxel_render.h" "{source-path}/stb_voxel_render.h"
     alias "/include/stb_dxt.h" "{source-path}/stb_dxt.h"
@@ -105,7 +105,7 @@ package stb
     alias "/include/stb_rect_pack.h" "{source-path}/stb_rect_pack.h"
     alias "/include/stb_truetype.h" "{source-path}/stb_truetype.h"
     alias "/include/stb_image_write.h" "{source-path}/stb_image_write.h"
-    alias "/include/stb_image_resize.h" "{source-path}/deprecated/stb_image_resize.h"
+    alias "/include/stb_image_resize2.h" "{source-path}/stb_image_resize2.h"
     alias "/include/stb_sprintf.h" "{source-path}/stb_sprintf.h"
     alias "/include/stb_voxel_render.h" "{source-path}/stb_voxel_render.h"
     alias "/include/stb_dxt.h" "{source-path}/stb_dxt.h"

@@ -12,6 +12,7 @@ package ffi-helper
 fn pkg (name)
     shortcut "{name}" "https://raw.githubusercontent.com/ScopesCommunity/eo-packages/main/recipes/{name}.eo"
 
+pkg "assimp"
 pkg "cjson"
 pkg "fontdue"
 pkg "glad"
