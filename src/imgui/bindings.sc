@@ -6,7 +6,7 @@ case 'windows
 default
     error "Unsupported OS"
 
-using import Array slice
+using import Array slice struct
 
 inline filter-scope (scope pattern)
     pattern as:= string
@@ -57,8 +57,34 @@ wgpu := import wgpu
 import sdl
 .. imgui-extern imgui-typedef
     do
-        # bool ImGui_ImplWGPU_Init(WGPUDevice device, int num_frames_in_flight, WGPUTextureFormat rt_format, WGPUTextureFormat depth_format = WGPUTextureFormat_Undefined);
-        ImplWGPU_Init := extern 'ImGui_ImplWGPU_Init (function bool wgpu.Device i32 wgpu.TextureFormat wgpu.TextureFormat)
+        #   struct ImGui_ImplWGPU_InitInfo
+            {
+                WGPUDevice              Device;
+                int                     NumFramesInFlight = 3;
+                WGPUTextureFormat       RenderTargetFormat = WGPUTextureFormat_Undefined;
+                WGPUTextureFormat       DepthStencilFormat = WGPUTextureFormat_Undefined;
+                WGPUMultisampleState    PipelineMultisampleState = {};
+
+                ImGui_ImplWGPU_InitInfo()
+                {
+                    PipelineMultisampleState.count = 1;
+                    PipelineMultisampleState.mask = -1u;
+                    PipelineMultisampleState.alphaToCoverageEnabled = false;
+                }
+            };
+        struct ImGui_ImplWGPU_InitInfo plain
+            device : wgpu.Device
+            NumFramesInFlight = 3:i32
+            RenderTargetFormat = wgpu.TextureFormat.Undefined
+            DepthStencilFormat = wgpu.TextureFormat.Undefined
+            PipelineMultisampleState =
+                wgpu.MultisampleState
+                    count = 1
+                    mask = -1:u32
+                    alphaToCoverageEnabled = false
+
+        # bool ImGui_ImplWGPU_Init(ImGui_ImplWGPU_InitInfo* init_info);
+        ImplWGPU_Init := extern 'ImGui_ImplWGPU_Init (function bool (mutable@ ImGui_ImplWGPU_InitInfo))
         # void ImGui_ImplWGPU_Shutdown();
         ImplWGPU_Shutdown := extern 'ImGui_ImplWGPU_Shutdown (function void)
         # void ImGui_ImplWGPU_NewFrame();

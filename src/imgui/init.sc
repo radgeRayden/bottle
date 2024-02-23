@@ -14,7 +14,11 @@ fn init ()
     assert
         ig.ImplSDL2_InitForVulkan (window.get-handle)
     assert
-        ig.ImplWGPU_Init istate.device 3 (get-preferred-surface-format) wgpu.TextureFormat.Undefined
+        do
+            local info : ig.ImGui_ImplWGPU_InitInfo
+                istate.device
+                RenderTargetFormat = (get-preferred-surface-format)
+            ig.ImplWGPU_Init &info
 
     io := (ig.GetIO)
     ()
