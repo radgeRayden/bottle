@@ -1,4 +1,5 @@
-using import Array hash String wgpu
+using import Array hash String
+import wgpu
 
 inline wrap-constructor (f T)
     inline (...)
