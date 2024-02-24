@@ -11,5 +11,6 @@ do
     fnchain render
     fnchain end-frame
     fnchain invalidate-frame
+    fnchain log-write
 
     local-scope;

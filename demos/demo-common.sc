@@ -42,5 +42,9 @@ fn display-fps ()
     ig.End;
     ()
 
+@@ 'on bottle.log-write
+fn (lineinfo prefix args...)
+    print lineinfo prefix args...
+
 do
     local-scope;
