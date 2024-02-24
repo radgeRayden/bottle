@@ -1,15 +1,4 @@
-using import FunctionChain
-
-import .audio
-import .callbacks
-import .config
-import .filesystem
-import .gpu
-import .imgui
-import .plonk
-import .sysevents
-import .time
-import .window
+import .audio .callbacks .config .filesystem .gpu .imgui .plonk .sysevents .time .window
 
 inline chain-callback (cb f...)
     cb := getattr callbacks cb
