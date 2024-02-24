@@ -7,35 +7,21 @@ using import .common
 using import ..helpers
 using import .types
 import .wgpu
+from wgpu let typeinit@ chained@
+
 
 fn shader-module-from-SPIRV (code)
-    local desc : wgpu.ShaderModuleSPIRVDescriptor
-        chain =
-            wgpu.ChainedStruct
-                sType = wgpu.SType.ShaderModuleSPIRVDescriptor
-        codeSize = ((countof code) // 4) as u32
-        code = (dupe (code as rawstring as (@ u32)))
-
-    let module =
-        wgpu.DeviceCreateShaderModule
-            istate.device
-            &local wgpu.ShaderModuleDescriptor
-                nextInChain = (&desc as (mutable@ wgpu.ChainedStruct))
-    module
+    wgpu.DeviceCreateShaderModule
+        istate.device
+        chained@ 'ShaderModuleSPIRVDescriptor
+            codeSize = ((countof code) // 4) as u32
+            code = (dupe (code as rawstring as (@ u32)))
 
 fn shader-module-from-WGSL (code)
-    local desc : wgpu.ShaderModuleWGSLDescriptor
-        chain =
-            wgpu.ChainedStruct
-                sType = wgpu.SType.ShaderModuleWGSLDescriptor
-        code = (dupe (code as rawstring))
-
-    let module =
-        wgpu.DeviceCreateShaderModule
-            istate.device
-            &local wgpu.ShaderModuleDescriptor
-                nextInChain = (&desc as (mutable@ wgpu.ChainedStruct))
-    module
+    wgpu.DeviceCreateShaderModule
+        istate.device
+        chained@ 'ShaderModuleWGSLDescriptor
+            code = (dupe (code as rawstring))
 
 fn shader-module-from-GLSL (code stage)
     local defines =
@@ -43,21 +29,13 @@ fn shader-module-from-GLSL (code stage)
             typeinit "gl_VertexID" "gl_VertexIndex"
             typeinit "gl_InstanceID" "gl_InstanceIndex"
 
-    local desc : wgpu.ShaderModuleGLSLDescriptor
-        chain =
-            wgpu.ChainedStruct
-                sType = bitcast wgpu.NativeSType.ShaderModuleGLSLDescriptor wgpu.SType
-        stage = stage
-        code = (dupe (code as rawstring))
-        defineCount = (countof defines)
-        defines = &defines
-
-    let module =
-        wgpu.DeviceCreateShaderModule
-            istate.device
-            &local wgpu.ShaderModuleDescriptor
-                nextInChain = (&desc as (mutable@ wgpu.ChainedStruct))
-    module
+    wgpu.DeviceCreateShaderModule
+        istate.device
+        chained@ 'ShaderModuleGLSLDescriptor
+            stage = stage
+            code = (dupe (code as rawstring))
+            defineCount = (countof defines)
+            defines = &defines
 
 type+ ShaderModule
     inline... __typecall (cls, source : String, source-language : ShaderLanguage, ...)
