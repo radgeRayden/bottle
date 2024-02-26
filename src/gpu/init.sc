@@ -45,18 +45,6 @@ fn create-surface ()
     default
         abort;
 
-fn configure-surface ()
-    width height := (window.get-size)
-    ctx.surface-size = ivec2 width height
-    wgpu.SurfaceConfigure ctx.surface
-        typeinit@
-            device = ctx.device
-            usage = wgpu.TextureUsage.RenderAttachment
-            format = (get-preferred-surface-format)
-            width = (width as u32)
-            height = (height as u32)
-            presentMode = ctx.present-mode
-
 fn create-msaa-resolve-source (width height)
     using types
     try
@@ -68,11 +56,20 @@ fn create-msaa-resolve-source (width height)
         logger.write-fatal "could not create MSAA resolve source"
         abort;
 
-fn update-render-area ()
-    configure-surface;
+fn configure-surface ()
+    width height := (window.get-size)
+    ctx.surface-size = ivec2 width height
+    wgpu.SurfaceConfigure ctx.surface
+        typeinit@
+            device = ctx.device
+            usage = wgpu.TextureUsage.RenderAttachment
+            format = (get-preferred-surface-format)
+            width = (width as u32)
+            height = (height as u32)
+            presentMode = ctx.present-mode
     if ctx.msaa?
-        ctx.swapchain-resolve-source =
-            create-msaa-resolve-source (window.get-drawable-size)
+        ctx.msaa-resolve-source =
+            create-msaa-resolve-source width height
 
 fn set-clear-color (color)
     ctx.clear-color = color
@@ -258,7 +255,7 @@ fn present ()
     ()
 
 do
-    let init update-render-area set-clear-color begin-frame present \
+    let init set-clear-color begin-frame present \
         get-preferred-surface-format get-cmd-encoder get-device \
         get-surface-texture get-msaa-resolve-source \
         msaa-enabled? get-present-mode set-present-mode

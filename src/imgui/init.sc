@@ -1,12 +1,13 @@
 import sdl
 import ..gpu
 import ..window
-using import ..gpu.common ..context
+using import ..gpu.common ..context radl.shorthands
 
 wgpu := import ..gpu.wgpu
 ig   := import .bindings
 
 wgpu-device := context-accessor 'gpu 'device
+surface-size := context-accessor 'gpu 'surface-size
 
 @@ if-module-enabled 'imgui
 fn init ()
@@ -59,7 +60,9 @@ fn render ()
     ig.Render;
     if (not reset)
         render-pass := RenderPass (gpu.get-cmd-encoder) (ColorAttachment (gpu.get-surface-texture) (clear? = false))
-        ig.ImplWGPU_RenderDrawData (ig.GetDrawData) render-pass
+        draw-data := (ig.GetDrawData)
+        draw-data.DisplaySize = ig.Vec2 (|> f32 (unpack (surface-size)))
+        ig.ImplWGPU_RenderDrawData draw-data render-pass
         'finish render-pass
     else
         ig.ImplWGPU_InvalidateDeviceObjects;
