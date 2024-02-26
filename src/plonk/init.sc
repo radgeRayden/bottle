@@ -1,20 +1,7 @@
-using import enum
-using import glm
-using import Option
-using import String
-using import struct
+using import enum glm Option String struct
 
-using import .common
-using import ..gpu.types
-using import ..enums
-using import .SpriteAtlas
-using import .GeometryBatch
-import ..asset
-import ..gpu
-import ..math
-import ..window
-import .shaders
-from (import ..config) let if-module-enabled
+using import .common ..context ..gpu.types ..enums .SpriteAtlas .GeometryBatch
+import ..asset ..gpu ..math ..window .shaders
 
 struct PlonkState
     sampler : Sampler

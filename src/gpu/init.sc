@@ -168,7 +168,6 @@ fn init ()
             powerPreference = cfg.power-preference
         fn (status adapter message userdata)
             if (status == 'Success)
-                print adapter
                 ctx.adapter = adapter
             else
                 logger.write-fatal

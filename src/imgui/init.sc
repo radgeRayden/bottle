@@ -2,7 +2,6 @@ import sdl
 import ..gpu
 import ..window
 using import ..gpu.common ..context
-from (import ..config) let if-module-enabled
 
 wgpu := import ..gpu.wgpu
 ig   := import .bindings

@@ -1,7 +1,7 @@
 import C.stdio
 using import print
 using import String
-from (import ..src.config) let if-module-enabled
+from (import ..src.context) let if-module-enabled
 
 import bottle
 

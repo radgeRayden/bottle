@@ -19,6 +19,10 @@ spice collect-enum-fields (ET)
         inline (i)
             arg := args @ i
             `arg
+
+spice inline? (f)
+    `[(sc_template_is_inline (sc_closure_get_template (f as Closure)))]
+
 run-stage;
 
 @@ memo
@@ -39,9 +43,6 @@ inline match-string-enum (ET value)
             default
                 raise;
         hash (tolower value)
-
-spice inline? (f)
-    `[(sc_template_is_inline (sc_closure_get_template (f as Closure)))]
 
 # STARTUP CONFIGURATION
 # =====================
