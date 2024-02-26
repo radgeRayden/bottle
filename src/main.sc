@@ -1,4 +1,5 @@
-import .audio .callbacks .config .filesystem .gpu .imgui .plonk .sysevents .time .window
+import .audio .callbacks .filesystem .gpu .imgui .plonk .sysevents .time .window
+using import .context
 
 inline chain-callback (cb f...)
     cb := getattr callbacks cb
@@ -17,7 +18,8 @@ chain-callback 'invalidate-frame imgui.reset-gpu-state imgui.end-frame
 fn run ()
     raising noreturn
 
-    cfg := config.config
+    cfg := ((context-accessor 'config))
+
     callbacks.configure cfg
     'apply-env-overrides cfg
 

@@ -1,8 +1,8 @@
 using import Array Buffer Option slice String print
 import C.bindings physfs
 
-using import ..config
-cfg := cfg-accessor 'filesystem
+using import ..context
+cfg := context-accessor 'config 'filesystem
 
 using import ..exceptions
 

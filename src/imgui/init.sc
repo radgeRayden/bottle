@@ -1,22 +1,23 @@
 import sdl
 import ..gpu
 import ..window
+using import ..gpu.common ..context
 from (import ..config) let if-module-enabled
 
 wgpu := import ..gpu.wgpu
 ig   := import .bindings
 
+wgpu-device := context-accessor 'gpu 'device
+
 @@ if-module-enabled 'imgui
 fn init ()
-    using import ..gpu.common
-
     ig.CreateContext null
     assert
         ig.ImplSDL2_InitForVulkan (window.get-handle)
     assert
         do
             local info : ig.ImGui_ImplWGPU_InitInfo
-                istate.device
+                (wgpu-device)
                 RenderTargetFormat = (get-preferred-surface-format)
             ig.ImplWGPU_Init &info
 

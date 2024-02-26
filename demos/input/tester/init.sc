@@ -4,7 +4,7 @@ using import print
 
 @@ 'on bottle.configure
 fn (cfg)
-    cfg.gpu.msaa-samples = 4
+    cfg.gpu.msaa? = true
     cfg.window.width = 1600
     cfg.window.height = 900
 

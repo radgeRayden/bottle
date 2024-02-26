@@ -1,6 +1,6 @@
 import sdl
-using import .config
-cfg := cfg-accessor 'time
+using import .context
+cfg := context-accessor 'config 'time
 
 global first-time-measure : f64
 global last-time-measure : f64

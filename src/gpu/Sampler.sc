@@ -1,10 +1,10 @@
 import .wgpu
-using import .common
-using import .types
+using import .common ..context .types
+
+ctx := context-accessor 'gpu
 
 type+ Sampler
     inline __typecall (cls)
         wrap-nullable-object cls
-            wgpu.DeviceCreateSampler istate.device null # TODO: configuration
-
+            wgpu.DeviceCreateSampler ctx.device null # TODO: configuration
 ()

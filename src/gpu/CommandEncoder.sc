@@ -1,15 +1,18 @@
-using import .common .types
+using import ..context .types
 import .wgpu
+
+ctx := context-accessor 'gpu
 
 type+ CommandBuffer
     fn submit (self)
         local self = (storagecast self)
-        wgpu.QueueSubmit istate.queue 1 &self
+        wgpu.QueueSubmit ctx.queue 1 &self
 
 type+ CommandEncoder
     inline __typecall (cls)
+        using import .common
         wrap-nullable-object cls
-            wgpu.DeviceCreateCommandEncoder istate.device (&local wgpu.CommandEncoderDescriptor)
+            wgpu.DeviceCreateCommandEncoder ctx.device (&local wgpu.CommandEncoderDescriptor)
 
     fn finish (self)
         cmd-buf := wgpu.CommandEncoderFinish (view self) null

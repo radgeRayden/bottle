@@ -1,25 +1,21 @@
-using import compiler.target.SPIR-V
-using import enum
-using import String
-using import struct
+using import compiler.target.SPIR-V enum String struct
+using import .common ..context ..helpers ..logger .types
 
-using import .common
-using import ..helpers
-using import .types
 import .wgpu
 from wgpu let typeinit@ chained@
 
+ctx := context-accessor 'gpu
 
 fn shader-module-from-SPIRV (code)
     wgpu.DeviceCreateShaderModule
-        istate.device
+        ctx.device
         chained@ 'ShaderModuleSPIRVDescriptor
             codeSize = ((countof code) // 4) as u32
             code = (dupe (code as rawstring as (@ u32)))
 
 fn shader-module-from-WGSL (code)
     wgpu.DeviceCreateShaderModule
-        istate.device
+        ctx.device
         chained@ 'ShaderModuleWGSLDescriptor
             code = (dupe (code as rawstring))
 
@@ -30,7 +26,7 @@ fn shader-module-from-GLSL (code stage)
             typeinit "gl_InstanceID" "gl_InstanceIndex"
 
     wgpu.DeviceCreateShaderModule
-        istate.device
+        ctx.device
         chained@ 'ShaderModuleGLSLDescriptor
             stage = stage
             code = (dupe (code as rawstring))
@@ -52,7 +48,7 @@ type+ ShaderModule
             case ShaderLanguage.SPIRV
                 shader-module-from-SPIRV source
             default
-                assert false "invalid shader source type"
+                static-error "invalid shader source type"
 
         wrap-nullable-object cls module
 
@@ -70,7 +66,7 @@ type+ ShaderModule
         case wgpu.ShaderStage.Compute
             'compute
         default
-            assert false "invalid shader stage"
+            static-error "invalid shader stage"
 
         vvv bind code
         static-match source-language
@@ -81,7 +77,7 @@ type+ ShaderModule
             String
                 static-compile-spirv SPV_ENV_VULKAN_1_1_SPIRV_1_4 target (static-typify f)
         default
-            assert false "invalid shader source type, only SPIRV and GLSL allowed"
+            static-error "invalid shader source type, only SPIRV and GLSL allowed"
 
         this-function cls code source-language stage
 ()

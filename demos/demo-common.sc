@@ -12,10 +12,10 @@ fn (cfg)
 
 @@ 'on bottle.load
 fn "demo-load" ()
-    renderer-info := (bottle.gpu.get-info)
-    print "bottle version:" (bottle.get-version)
-    print renderer-info.BackendString
-    print renderer-info.GPUString
+    # renderer-info := (bottle.gpu.get-info)
+    # print "bottle version:" (bottle.get-version)
+    # print renderer-info.BackendString
+    # print renderer-info.GPUString
     ()
 
 @@ 'on bottle.key-released

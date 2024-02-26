@@ -2,14 +2,13 @@ using import Array
 using import String
 using import struct
 
-using import .common
-using import ..helpers
-using import ..asset.ImageData
-using import ..exceptions
-using import .texture-format
-using import .types
-using import radl.strfmt
+using import .common ..context ..helpers ..asset.ImageData ..exceptions \
+    .texture-format .types radl.strfmt
+
 import .wgpu
+from wgpu let typeinit@ chained@
+
+ctx := context-accessor 'gpu
 
 type+ Texture
     inline... __typecall (cls,
@@ -35,7 +34,7 @@ type+ Texture
             else format
 
         handle :=
-            wgpu.DeviceCreateTexture istate.device
+            wgpu.DeviceCreateTexture ctx.device
                 &local wgpu.TextureDescriptor
                     label = dupe (f"Bottle Texture ${format}" as rawstring)
                     usage = usage
@@ -86,7 +85,7 @@ type+ Texture
         if (data-size > (texture-size-bytes - buffer-offset))
             raise GPUError.InvalidInput #S"Writing image data at offset exceeds texture bounds"
 
-        wgpu.QueueWriteTexture istate.queue
+        wgpu.QueueWriteTexture ctx.queue
             &local wgpu.ImageCopyTexture
                 texture = self
                 mipLevel = mip-level

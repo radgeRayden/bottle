@@ -7,7 +7,7 @@ import bottle
 fn (cfg)
     cfg.window.title = "geometric shapes"
     cfg.window.fullscreen? = false
-    cfg.gpu.msaa-samples = 4
+    cfg.gpu.msaa? = true
 
 global rotation : f32
 global line-width : f32

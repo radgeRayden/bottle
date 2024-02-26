@@ -1,15 +1,13 @@
-using import Array
-using import property
-using import struct
-using import .common
-using import ..exceptions
-using import ..helpers
-using import .types
+using import Array property struct ..context ..exceptions ..helpers .types
+
 import .wgpu
+from wgpu let typeinit@ chained@
+
+ctx := context-accessor 'gpu
 
 fn make-buffer (size usage-flags)
     let handle =
-        wgpu.DeviceCreateBuffer istate.device
+        wgpu.DeviceCreateBuffer ctx.device
             &local wgpu.BufferDescriptor
                 label = "Bottle buffer"
                 usage = usage-flags
@@ -17,7 +15,7 @@ fn make-buffer (size usage-flags)
     handle
 
 fn write-buffer (buf data-ptr offset data-size)
-    wgpu.QueueWriteBuffer istate.queue
+    wgpu.QueueWriteBuffer ctx.queue
         buf
         offset
         data-ptr
@@ -39,6 +37,7 @@ inline gen-buffer-type (parent-type prefix backing-type usage-flags)
             size   := max-elements * (sizeof BackingType)
             handle := make-buffer size usage-flags
 
+            using import .common
             bitcast
                 wrap-nullable-object wgpu.Buffer handle
                 cls
@@ -88,7 +87,7 @@ inline gen-buffer-type (parent-type prefix backing-type usage-flags)
 
         fn... clone (self, new-capacity : usize, copy-count : (param? usize) = none)
             new-buffer := (typeof self) new-capacity (wgpu.BufferGetUsage (view self))
-            cmd-encoder := imply ('force-unwrap istate.cmd-encoder) CommandEncoder
+            cmd-encoder := imply ('force-unwrap ctx.cmd-encoder) CommandEncoder
 
             src-capacity := imply self.Capacity usize
             let copy-count =

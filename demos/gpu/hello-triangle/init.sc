@@ -48,7 +48,7 @@ global render-state : (Option RendererState)
 @@ 'on bottle.configure
 fn (cfg)
     cfg.window.title = "hello, triangle!"
-    cfg.gpu.msaa-samples = 4
+    cfg.gpu.msaa? = true
     cfg.enabled-modules.plonk = false
     ;
 
@@ -75,7 +75,7 @@ fn ()
                             typeinit
                                 ColorTarget
                                     format = (bottle.gpu.get-preferred-surface-format)
-                msaa-samples = (bottle.gpu.get-msaa-sample-count)
+                msaa-samples = (bottle.gpu.msaa-enabled?) 4:u32 1:u32
         render-state =
             RendererState
                 pipeline = pipeline

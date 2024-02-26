@@ -4,38 +4,22 @@ using import Option
 using import print
 using import String
 using import struct
-using import ..exceptions
+using import ..context ..exceptions
+
+ctx := context-accessor 'gpu
 
 import .wgpu
 import .types
 
-struct GfxState
-    instance    : wgpu.Instance
-    surface     : wgpu.Surface
-    adapter     : wgpu.Adapter
-    device      : wgpu.Device
-    queue       : wgpu.Queue
-    cmd-encoder : (Option types.CommandEncoder)
-    surface-texture : (Option types.Texture)
-    surface-texture-view : (Option types.TextureView)
-    msaa-resolve-source : (Option types.TextureView)
-    limits      : wgpu.Limits
-
-    clear-color = (vec4 0.017 0.017 0.017 1.0)
-    present-mode : wgpu.PresentMode
-    reconfigure-surface? : bool
-
-global istate : GfxState
-
 # TODO: fill the capability struct in as part of initialization and then have different functions querying this info
 fn get-preferred-surface-format ()
     local capabilities : wgpu.SurfaceCapabilities
-    wgpu.SurfaceGetCapabilities istate.surface istate.adapter &capabilities
+    wgpu.SurfaceGetCapabilities ctx.surface ctx.adapter &capabilities
     capabilities.formats = alloca-array wgpu.TextureFormat capabilities.formatCount
     capabilities.presentModes = alloca-array wgpu.PresentMode capabilities.presentModeCount
     capabilities.alphaModes = alloca-array wgpu.CompositeAlphaMode capabilities.alphaModeCount
 
-    wgpu.SurfaceGetCapabilities istate.surface istate.adapter &capabilities
+    wgpu.SurfaceGetCapabilities ctx.surface ctx.adapter &capabilities
 
     let selected-format =
         fold (selected-format = wgpu.TextureFormat.Undefined) for i in (range capabilities.formatCount)
@@ -59,5 +43,5 @@ spice wrap-nullable-object (cls object)
             imply object cls
 
 do
-    let istate get-preferred-surface-format wrap-nullable-object
+    let get-preferred-surface-format wrap-nullable-object
     locals;

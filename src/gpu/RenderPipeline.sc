@@ -1,11 +1,10 @@
-using import Array
-using import String
-using import struct
+using import Array String struct
+using import .common ..context .types
 
 import .wgpu
-using import .common
-using import ..helpers
-using import .types
+from wgpu let typeinit@ chained@
+
+ctx := context-accessor 'gpu
 
 type+ ColorTarget
     inline... __typecall (cls, format : wgpu.TextureFormat)
@@ -14,17 +13,17 @@ type+ ColorTarget
                 format = format
                 writeMask = wgpu.ColorWriteMask.All
                 blend =
-                    &local wgpu.BlendState
+                    typeinit@
                         color =
                             wgpu.BlendComponent
-                                operation = wgpu.BlendOperation.Add
-                                srcFactor = wgpu.BlendFactor.SrcAlpha
-                                dstFactor = wgpu.BlendFactor.OneMinusSrcAlpha
+                                operation = 'Add
+                                srcFactor = 'SrcAlpha
+                                dstFactor = 'OneMinusSrcAlpha
                         alpha =
                             wgpu.BlendComponent
-                                operation = wgpu.BlendOperation.Add
-                                srcFactor = wgpu.BlendFactor.One
-                                dstFactor = wgpu.BlendFactor.OneMinusSrcAlpha
+                                operation = 'Add
+                                srcFactor = 'One
+                                dstFactor = 'OneMinusSrcAlpha
             cls
 
     inline __imply (thisT otherT)
@@ -58,8 +57,8 @@ type+ FragmentStage
 
 fn make-pipeline-layout (count layouts)
     layouts as:= pointer (storageof wgpu.BindGroupLayout)
-    wgpu.DeviceCreatePipelineLayout istate.device
-        &local wgpu.PipelineLayoutDescriptor
+    wgpu.DeviceCreatePipelineLayout ctx.device
+        typeinit@
             label = "Bottle Pipeline Layout"
             bindGroupLayoutCount = count
             bindGroupLayouts = layouts
@@ -100,8 +99,10 @@ fn make-pipeline (layout topology winding vertex-stage fragment-stage sample-cou
                 # FIXME: depth bias stuff missing
             &state
         else null
-    wgpu.DeviceCreateRenderPipeline istate.device
-        &local wgpu.RenderPipelineDescriptor
+
+    local fragment-state = dupe (imply (move fragment-stage) FragmentState)
+    wgpu.DeviceCreateRenderPipeline ctx.device
+        typeinit@
             label = "Bottle Render Pipeline"
             layout = layout
             vertex = (dupe (bitcast (imply (move vertex-stage) VertexState) wgpu.VertexState))
@@ -114,7 +115,7 @@ fn make-pipeline (layout topology winding vertex-stage fragment-stage sample-cou
                     count = sample-count
                     mask = ~0:u32
                     alphaToCoverageEnabled = false
-            fragment = (&local (dupe (imply (move fragment-stage) FragmentState))) as (@ wgpu.FragmentState)
+            fragment = &fragment-state as (@ wgpu.FragmentState)
             depthStencil = depth-stencil-state
 
 type+ RenderPipeline

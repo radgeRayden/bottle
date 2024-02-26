@@ -1,65 +1,44 @@
 import C.stdlib
-using import print
-using import String
-using import struct
-using import radl.strfmt
+using import Array glm print radl.strfmt String struct
+import ..logger sdl .types .wgpu ..window
 
-import sdl
-import .wgpu
-import .types
-import ..logger
+from wgpu let typeinit@ chained@
 
 # imports necessary to augment all types with their implementation
 import .BindGroup .CommandEncoder .GPUBuffer .RenderPass .RenderPipeline .Sampler .ShaderModule .Texture
 
 using import .common
-using import ..config
-using import ..exceptions
-using import ..helpers
-using import .RendererBackendInfo
+using import ..context ..exceptions
 
-cfg := cfg-accessor 'gpu
+cfg := context-accessor 'config 'gpu
+ctx := context-accessor 'gpu
 
-import ..window
+inline wgpu-array-query (f args...)
+    T@ := elementof (typeof f) (va-countof args...)
+    T := elementof T@ 0
 
-fn get-info ()
-    RendererBackendInfo;
+    local result : (Array T)
+    count := f ((va-join args...) null)
+    'resize result count
 
-inline typeinit@ (...)
-    implies (T)
-        static-assert (T < pointer)
-        imply (& (local (elementof T) ...)) T
-
-inline chained@ (K ...)
-    using wgpu
-    chaintypename := K
-    K := getattr wgpu K
-    chaintype := static-try (getattr SType chaintypename)
-    else
-        (getattr NativeSType chaintypename) as (storageof SType) as SType
-    typeinit@
-        nextInChain = as
-            &
-                local K
-                    chain = typeinit
-                        sType = chaintype
-                    ...
-            mutable@ ChainedStruct
+    ptr := 'data result
+    f ((va-join args...) ptr)
+    result
 
 fn create-surface ()
     dispatch (window.get-native-info)
     case X11 (display window)
-        wgpu.InstanceCreateSurface istate.instance
+        wgpu.InstanceCreateSurface ctx.instance
             chained@ 'SurfaceDescriptorFromXlibWindow
                 display = display
                 window = typeinit window
     case Wayland (display surface)
-        wgpu.InstanceCreateSurface istate.instance
+        wgpu.InstanceCreateSurface ctx.instance
             chained@ 'SurfaceDescriptorFromWaylandSurface
                 display = display
                 surface = surface
     case Windows (hinstance hwnd)
-        wgpu.InstanceCreateSurface istate.instance
+        wgpu.InstanceCreateSurface ctx.instance
             chained@ 'SurfaceDescriptorFromWindowsHWND
                 hinstance = hinstance
                 hwnd = hwnd
@@ -68,14 +47,15 @@ fn create-surface ()
 
 fn configure-surface ()
     width height := (window.get-size)
-    wgpu.SurfaceConfigure istate.surface
-        &local wgpu.SurfaceConfiguration
-            device = istate.device
+    ctx.surface-size = ivec2 width height
+    wgpu.SurfaceConfigure ctx.surface
+        typeinit@
+            device = ctx.device
             usage = wgpu.TextureUsage.RenderAttachment
             format = (get-preferred-surface-format)
             width = (width as u32)
             height = (height as u32)
-            presentMode = istate.present-mode
+            presentMode = ctx.present-mode
 
 fn create-msaa-resolve-source (width height)
     using types
@@ -83,58 +63,56 @@ fn create-msaa-resolve-source (width height)
         TextureView
             Texture (u32 width) (u32 height) (get-preferred-surface-format) none
                 render-target? = true
-                sample-count = cfg.msaa-samples
-    # FIXME: better way of handling or reporting this kind of error?
-    else (assert false "FATAL ERROR: could not create MSAA resolve source")
-
-fn msaa-enabled? ()
-    cfg.msaa-samples > 1
+                sample-count = ctx.msaa? 4:u32 1:u32
+    else
+        logger.write-fatal "could not create MSAA resolve source"
+        abort;
 
 fn update-render-area ()
     configure-surface;
-    if (msaa-enabled?)
-        istate.swapchain-resolve-source =
+    if ctx.msaa?
+        ctx.swapchain-resolve-source =
             create-msaa-resolve-source (window.get-drawable-size)
 
 fn set-clear-color (color)
-    istate.clear-color = color
+    ctx.clear-color = color
 
 fn get-cmd-encoder ()
     using types
 
-    cmd-encoder := 'force-unwrap istate.cmd-encoder
+    cmd-encoder := 'force-unwrap ctx.cmd-encoder
     imply cmd-encoder CommandEncoder
 
 fn get-device ()
-    deref istate.device
+    deref ctx.device
 
 fn get-surface-texture ()
     using types
-    imply (view (deref ('force-unwrap istate.surface-texture-view))) TextureView
+    imply (view (deref ('force-unwrap ctx.surface-texture-view))) TextureView
 
 fn get-msaa-resolve-source ()
     using types
     try
         imply
-            view (deref ('unwrap istate.msaa-resolve-source))
+            view (deref ('unwrap ctx.msaa-resolve-source))
             TextureView
     else (view (nullof TextureView))
 
-fn get-msaa-sample-count ()
-    deref cfg.msaa-samples
-
 fn get-present-mode ()
-    deref istate.present-mode
+    deref ctx.present-mode
 
 fn... set-present-mode (present-mode : wgpu.PresentMode)
-    istate.present-mode = present-mode
-    istate.reconfigure-surface? = true
+    ctx.present-mode = present-mode
+    ctx.outdated-surface? = true
+
+fn msaa-enabled? ()
+    deref ctx.msaa?
 
 fn acquire-surface-texture ()
     using types
 
     local surface-texture : wgpu.SurfaceTexture
-    wgpu.SurfaceGetCurrentTexture istate.surface &surface-texture
+    wgpu.SurfaceGetCurrentTexture ctx.surface &surface-texture
 
     if (surface-texture.status != 'Success)
         logger.write-debug f"The request for the surface texture was unsuccessful: ${surface-texture.status}"
@@ -159,166 +137,132 @@ fn init ()
     raising noreturn
 
     wgpu.SetLogCallback
-        fn (log-level message userdata)
-            print ('from-rawstring String message)
+        fn (level message userdata)
+            message := 'from-rawstring String message
+            switch level
+            case 'Error
+                logger.write-fatal message
+            case 'Warn
+                logger.write-warning message
+            case 'Info
+                logger.write-info message
+            case 'Debug
+                logger.write-debug message
+            case 'Trace
+                print message
+            default ()
         null
     wgpu.SetLogLevel cfg.wgpu-log-level
 
-    local instance-extras : wgpu.InstanceExtras
-        chain =
-            wgpu.ChainedStruct
-                sType = (bitcast wgpu.NativeSType.InstanceExtras wgpu.SType)
-        backends = wgpu.InstanceBackend.All
-
-    istate.instance =
+    ctx.instance =
         wgpu.CreateInstance
-            &local wgpu.InstanceDescriptor
-                nextInChain = &instance-extras as (mutable@ wgpu.ChainedStruct)
+            chained@ 'InstanceExtras
+                backends = wgpu.InstanceBackend.All
+                flags = wgpu.InstanceFlag.Debug
 
-    istate.surface = (create-surface)
+    ctx.surface = (create-surface)
 
-    wgpu.InstanceRequestAdapter istate.instance
-        &local wgpu.RequestAdapterOptions
-            compatibleSurface = ('rawptr istate.surface)
-            powerPreference = copy cfg.power-preference
-        fn (status result msg userdata)
-            # FIXME: specify backend in error message
-            if (status != wgpu.RequestAdapterStatus.Success)
-                logger.write-fatal "Request for the graphics adapter failed. Verify you have the necessary drivers installed."
-                print2 "WebGPU says:"
-                print2 ('from-rawstring String msg)
+    wgpu.InstanceRequestAdapter ctx.instance
+        typeinit@
+            compatibleSurface = ('rawptr ctx.surface)
+            powerPreference = cfg.power-preference
+        fn (status adapter message userdata)
+            if (status == 'Success)
+                print adapter
+                ctx.adapter = adapter
+            else
+                logger.write-fatal
+                    "Request for the graphics adapter failed. Verify you have the necessary drivers installed.\n"
+                    f"Could not create adapter. ${message}"
                 abort;
-
-            istate.adapter = result
-            ;
         null
-
-    local adapter-limits : wgpu.SupportedLimits
-    wgpu.AdapterGetLimits istate.adapter &adapter-limits
-
-    feature-count := wgpu.AdapterEnumerateFeatures istate.adapter null
-
-    # TODO: add functions for querying supported features and enable the ones we want conditionally.
-    supported-features := alloca-array wgpu.FeatureName feature-count
-    wgpu.AdapterEnumerateFeatures istate.adapter supported-features
 
     local required-features =
         arrayof wgpu.FeatureName
             'Depth32FloatStencil8
 
-    wgpu.AdapterRequestDevice istate.adapter
-        &local wgpu.DeviceDescriptor
+    wgpu.AdapterRequestDevice ctx.adapter
+        typeinit@
             requiredFeatureCount = (countof required-features)
             requiredFeatures = &required-features
-            requiredLimits =
-                &local wgpu.RequiredLimits
-                    limits =
-                        wgpu.Limits
-                            maxTextureDimension1D = wgpu.WGPU_LIMIT_U32_UNDEFINED
-                            maxTextureDimension2D = wgpu.WGPU_LIMIT_U32_UNDEFINED
-                            maxTextureDimension3D = wgpu.WGPU_LIMIT_U32_UNDEFINED
-                            maxTextureArrayLayers = wgpu.WGPU_LIMIT_U32_UNDEFINED
-                            maxBindGroups = wgpu.WGPU_LIMIT_U32_UNDEFINED
-                            maxBindingsPerBindGroup = wgpu.WGPU_LIMIT_U32_UNDEFINED
-                            maxDynamicUniformBuffersPerPipelineLayout = wgpu.WGPU_LIMIT_U32_UNDEFINED
-                            maxDynamicStorageBuffersPerPipelineLayout = wgpu.WGPU_LIMIT_U32_UNDEFINED
-                            maxSampledTexturesPerShaderStage = wgpu.WGPU_LIMIT_U32_UNDEFINED
-                            maxSamplersPerShaderStage = wgpu.WGPU_LIMIT_U32_UNDEFINED
-                            maxStorageBuffersPerShaderStage = wgpu.WGPU_LIMIT_U32_UNDEFINED
-                            maxStorageTexturesPerShaderStage = wgpu.WGPU_LIMIT_U32_UNDEFINED
-                            maxUniformBuffersPerShaderStage = wgpu.WGPU_LIMIT_U32_UNDEFINED
-                            maxUniformBufferBindingSize = wgpu.WGPU_LIMIT_U64_UNDEFINED
-                            maxStorageBufferBindingSize = wgpu.WGPU_LIMIT_U64_UNDEFINED
-                            minUniformBufferOffsetAlignment = wgpu.WGPU_LIMIT_U32_UNDEFINED
-                            minStorageBufferOffsetAlignment = wgpu.WGPU_LIMIT_U32_UNDEFINED
-                            maxVertexBuffers = wgpu.WGPU_LIMIT_U32_UNDEFINED
-                            maxBufferSize = wgpu.WGPU_LIMIT_U64_UNDEFINED
-                            maxVertexAttributes = wgpu.WGPU_LIMIT_U32_UNDEFINED
-                            maxVertexBufferArrayStride = wgpu.WGPU_LIMIT_U32_UNDEFINED
-                            maxInterStageShaderComponents = wgpu.WGPU_LIMIT_U32_UNDEFINED
-                            maxInterStageShaderVariables = wgpu.WGPU_LIMIT_U32_UNDEFINED
-                            maxColorAttachments = wgpu.WGPU_LIMIT_U32_UNDEFINED
-                            maxColorAttachmentBytesPerSample = wgpu.WGPU_LIMIT_U32_UNDEFINED
-                            maxComputeWorkgroupStorageSize = wgpu.WGPU_LIMIT_U32_UNDEFINED
-                            maxComputeInvocationsPerWorkgroup = wgpu.WGPU_LIMIT_U32_UNDEFINED
-                            maxComputeWorkgroupSizeX = wgpu.WGPU_LIMIT_U32_UNDEFINED
-                            maxComputeWorkgroupSizeY = wgpu.WGPU_LIMIT_U32_UNDEFINED
-                            maxComputeWorkgroupSizeZ = wgpu.WGPU_LIMIT_U32_UNDEFINED
-                            maxComputeWorkgroupsPerDimension = wgpu.WGPU_LIMIT_U32_UNDEFINED
         fn (status result msg userdata)
             if (status != wgpu.RequestDeviceStatus.Success)
                 print ('from-rawstring String msg)
-            istate.device = result
+            ctx.device = result
             ;
         null
 
     local device-limits : wgpu.SupportedLimits
-    wgpu.DeviceGetLimits istate.device &device-limits
-    istate.limits = device-limits.limits
+    wgpu.DeviceGetLimits ctx.device &device-limits
+    ctx.limits = device-limits.limits
 
-    wgpu.DeviceSetUncapturedErrorCallback istate.device
-        fn (error-type msg userdata)
-            raising noreturn
-            print ('from-rawstring String msg)
+    wgpu.DeviceSetUncapturedErrorCallback ctx.device
+        fn (err message userdata)
+            msgstr := () -> ('from-rawstring String message)
 
-            ET := wgpu.ErrorType
-
-            switch error-type
-            case ET.Validation
-                assert false
-            default ()
-            ;
+            switch err
+            pass 'Validation
+            pass 'OutOfMemory
+            pass 'Internal
+            pass 'Unknown
+            pass 'DeviceLost
+            do
+                logger.write-fatal "\n" (msgstr)
+                abort;
+            default
+                ()
         null
 
-    istate.present-mode = cfg.present-mode
+    ctx.present-mode = cfg.present-mode
+    ctx.msaa? = cfg.msaa?
     configure-surface;
-    if (msaa-enabled?)
-        istate.msaa-resolve-source = (create-msaa-resolve-source (window.get-drawable-size))
 
-    istate.queue = (wgpu.DeviceGetQueue istate.device)
+    if ctx.msaa?
+        ctx.msaa-resolve-source = (create-msaa-resolve-source (window.get-drawable-size))
+
+    ctx.queue = (wgpu.DeviceGetQueue ctx.device)
     ;
 
 fn begin-frame ()
     using types
 
-    if istate.reconfigure-surface?
+    if ctx.outdated-surface?
         configure-surface;
-        istate.reconfigure-surface? = false
+        ctx.outdated-surface? = false
         raise GPUError.DiscardedFrame
 
-    cmd-encoder := (wgpu.DeviceCreateCommandEncoder istate.device (&local wgpu.CommandEncoderDescriptor))
+    cmd-encoder := (wgpu.DeviceCreateCommandEncoder ctx.device (typeinit@))
 
     surface-texture := (acquire-surface-texture)
     surface-texture-view := (TextureView surface-texture)
 
     # clear
-    if (not (msaa-enabled?))
+    if (not ctx.msaa?)
         'finish
-            RenderPass cmd-encoder (ColorAttachment (view surface-texture-view) none true istate.clear-color)
+            RenderPass cmd-encoder (ColorAttachment (view surface-texture-view) none true ctx.clear-color)
     else
         'finish
-            RenderPass cmd-encoder (ColorAttachment (get-msaa-resolve-source) (view surface-texture-view) true istate.clear-color)
+            RenderPass cmd-encoder (ColorAttachment (get-msaa-resolve-source) (view surface-texture-view) true ctx.clear-color)
 
-    istate.surface-texture = surface-texture
-    istate.surface-texture-view = surface-texture-view
-    istate.cmd-encoder = cmd-encoder
+    ctx.surface-texture = surface-texture
+    ctx.surface-texture-view = surface-texture-view
+    ctx.cmd-encoder = cmd-encoder
 
 fn present ()
     using types
 
-    cmd-encoder := imply ('force-unwrap ('swap istate.cmd-encoder none)) CommandEncoder
+    cmd-encoder := imply ('force-unwrap ('swap ctx.cmd-encoder none)) CommandEncoder
     'submit ('finish cmd-encoder)
-    wgpu.SurfacePresent istate.surface
-    istate.surface-texture-view = none
-    istate.surface-texture = none
+    wgpu.SurfacePresent ctx.surface
+    ctx.surface-texture-view = none
+    ctx.surface-texture = none
     ()
 
 do
     let init update-render-area set-clear-color begin-frame present \
-        get-info get-preferred-surface-format get-cmd-encoder get-device \
+        get-preferred-surface-format get-cmd-encoder get-device \
         get-surface-texture get-msaa-resolve-source \
-        get-msaa-sample-count msaa-enabled? \
-        get-present-mode set-present-mode
+        msaa-enabled? get-present-mode set-present-mode
 
     let types
 

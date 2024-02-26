@@ -1,8 +1,8 @@
 using import enum print radl.strfmt String struct
 import .logger sdl
 
-using import .config
-cfg := cfg-accessor 'window
+using import .context
+cfg := context-accessor 'config 'window
 
 struct BottleWindowState plain
     handle : (mutable@ sdl.Window)

@@ -1,10 +1,10 @@
-using import enum
-using import struct
-using import .common
-using import ..helpers
-using import .types
+using import enum struct
+using import ..context ..helpers .types
 
 import .wgpu
+from wgpu let typeinit@ chained@
+
+ctx := context-accessor 'gpu
 
 type+ BindGroup
     inline __typecall (cls layout entries...)
@@ -30,8 +30,9 @@ type+ BindGroup
 
                     va-range (va-countof entries...)
 
+        using import .common
         wrap-nullable-object cls
-            wgpu.DeviceCreateBindGroup istate.device
+            wgpu.DeviceCreateBindGroup ctx.device
                 &local wgpu.BindGroupDescriptor
                     label = "bottle bind group"
                     layout = layout
