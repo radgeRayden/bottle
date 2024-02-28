@@ -1,0 +1,48 @@
+VERSION := "master"
+SUMMARY := "💠 Single-file glTF 2.0 loader and writer written in C99"
+
+update-url "https://raw.githubusercontent.com/ScopesCommunity/eo-packages/main/recipes/cgltf.eo"
+
+source-file :=
+    tempfile
+        """"#define CGLTF_IMPLEMENTATION
+            #define CGLTF_WRITE_IMPLEMENTATION
+            #include "cgltf_write.h"
+
+archive := (download "https://github.com/jkuhlmann/cgltf/archive/{VERSION}.tar.gz")
+source-path := (commonpath (extract archive))
+
+fn shared-library (libname)
+    then
+        bindir := (mkdir "{source-path}/build")
+        cmd := (shell bindir)
+        cmd "gcc -shared -fPIC -O2 -o {libname} -I.. -x c {source-file}"
+        "{bindir}/{libname}"
+
+bindings :=
+    download "https://raw.githubusercontent.com/ScopesCommunity/eo-packages/main/bindings/cgltf.sc"
+license := (download "https://raw.githubusercontent.com/jkuhlmann/cgltf/master/LICENSE")
+
+package cgltf
+    summary SUMMARY
+    version VERSION
+    platform linux unknown
+
+    libname := "libcgltf.so"
+    alias "/lib/{libname}" (shared-library libname)
+
+    alias "/include/cgltf.h" "{source-path}/cgltf.h"
+    alias "/include/cgltf_write.h" "{source-path}/cgltf_write.h"
+    alias "/lib/scopes/packages/cgltf.sc" bindings
+
+package cgltf
+    summary SUMMARY
+    version VERSION
+    platform windows-mingw
+
+    libname := "cgltf.dll"
+    alias "/lib/{libname}" (shared-library libname)
+
+    alias "/include/cgltf.h" "{source-path}/cgltf.h"
+    alias "/include/cgltf_write.h" "{source-path}/cgltf_write.h"
+    alias "/lib/scopes/packages/cgltf.sc" bindings
