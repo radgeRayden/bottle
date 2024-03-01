@@ -1,6 +1,5 @@
 import C.stdio
-using import print
-using import String
+using import print radl.ext String
 from (import ..src.context) let if-module-enabled
 
 import bottle
@@ -30,13 +29,12 @@ fn (key)
 @@ if-module-enabled 'imgui
 fn display-fps ()
     ig := import ..src.imgui
-    using import glm
-    flags := ig.WindowFlags
     ig.SetNextWindowPos (ig.Vec2 10 10) ig.Cond.Always (ig.Vec2 0 0)
     ig.SetNextWindowSize (ig.Vec2 245 80) ig.Cond.Always
     ig.Begin "fps" null
-        i32 ig.WindowFlags.NoDecoration
-    ig.SetWindowFontScale 2
+        enum-bitfield ig.WindowFlags i32
+            'NoDecoration
+            'NoBackground
     ig.Text "FPS: %d" (bottle.time.get-fps)
     ig.Text "Time Scale: %.2f" (bottle.time.get-global-time-scale)
     ig.End;

@@ -1,7 +1,7 @@
 import sdl
 import ..gpu
 import ..window
-using import ..gpu.common ..context radl.shorthands
+using import ..gpu.common ..context radl.ext
 
 wgpu := import ..gpu.wgpu
 ig   := import .bindings
@@ -21,7 +21,6 @@ fn init ()
                 RenderTargetFormat = (get-preferred-surface-format)
             ig.ImplWGPU_Init &info
 
-    io := (ig.GetIO)
     ()
 
 @@ if-module-enabled 'imgui
