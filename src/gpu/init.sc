@@ -163,7 +163,7 @@ fn init ()
     ctx.instance =
         wgpu.CreateInstance
             chained@ 'InstanceExtras
-                backends = wgpu.InstanceBackend.All
+                backends = cfg.wgpu-low-level-backend
                 flags = instance-flags
 
     ctx.surface = (create-surface)
