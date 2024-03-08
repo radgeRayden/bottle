@@ -1,4 +1,4 @@
-using import Array glm hash Option String struct
+using import Array glm hash Option print String struct
 import .gpu.wgpu .types
 
 wgpu := gpu.wgpu
