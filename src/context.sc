@@ -111,6 +111,7 @@ struct BottleConfig
             present-mode : wgpu.PresentMode = 'Fifo
             wgpu-low-level-backend : wgpu.InstanceBackend = 'Primary
             wgpu-log-level : wgpu.LogLevel = 'Warn
+            enable-validation? : bool = true
     enabled-modules :
         struct BottleEnabledModules plain
             plonk = true

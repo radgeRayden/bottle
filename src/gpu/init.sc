@@ -1,5 +1,5 @@
 import C.stdlib
-using import Array glm print radl.strfmt String struct
+using import Array glm print radl.ext radl.strfmt String struct
 import ..logger sdl .types .wgpu ..window
 
 from wgpu let typeinit@ chained@
@@ -153,11 +153,18 @@ fn init ()
         null
     wgpu.SetLogLevel cfg.wgpu-log-level
 
+    let instance-flags =
+        if cfg.enable-validation?
+            enum-bitfield wgpu.InstanceFlag u32
+                'Debug
+                'Validation
+        else 0:u32
+
     ctx.instance =
         wgpu.CreateInstance
             chained@ 'InstanceExtras
                 backends = wgpu.InstanceBackend.All
-                flags = wgpu.InstanceFlag.Debug
+                flags = instance-flags
 
     ctx.surface = (create-surface)
 
