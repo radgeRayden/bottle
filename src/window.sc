@@ -1,4 +1,4 @@
-using import enum print radl.strfmt String struct
+using import enum logger print radl.strfmt String struct
 import .logger sdl
 
 using import .context
@@ -120,7 +120,8 @@ fn init ()
 
     if (status < 0)
         msg := (sdl.GetError)
-        print "SDL initialization failed:" ('from-rawstring String msg)
+        logger.write-fatal f"SDL initialization failed: ${msg}"
+        abort;
 
     relative-width relative-height := (get-relative-size 0 cfg.relative-width cfg.relative-height)
     let width =
@@ -160,7 +161,8 @@ fn init ()
     if (handle == null)
         # TODO: unify error handling
         msg := (sdl.GetError)
-        assert false (.. "Error while creating window:" ('from-rawstring String msg))
+        logger.write-fatal f"Error while creating window: ${msg}"
+        abort;
 
     istate =
         typeinit
