@@ -48,8 +48,8 @@ global render-state : (Option RendererState)
 @@ 'on bottle.configure
 fn (cfg)
     cfg.window.title = "hello, triangle!"
-    cfg.gpu.msaa? = true
     cfg.enabled-modules.plonk = false
+    cfg.gpu.msaa? = false
     ;
 
 @@ 'on bottle.load
@@ -86,11 +86,16 @@ fn ()
 fn ()
     ctx := 'force-unwrap render-state
 
-    rp :=
-        RenderPass (bottle.gpu.get-cmd-encoder)
-            ColorAttachment (bottle.gpu.get-msaa-resolve-source)
-                resolve-target = (bottle.gpu.get-surface-texture)
-                clear? = false
+    let rp =
+        if (bottle.gpu.msaa-enabled?)
+            RenderPass (bottle.gpu.get-cmd-encoder)
+                ColorAttachment (bottle.gpu.get-msaa-resolve-source)
+                    resolve-target = (bottle.gpu.get-surface-texture)
+                    clear? = false
+        else
+            RenderPass (bottle.gpu.get-cmd-encoder)
+                ColorAttachment (bottle.gpu.get-surface-texture)
+                    clear? = false
     'set-pipeline rp ctx.pipeline
     'draw rp 3
     'finish rp
