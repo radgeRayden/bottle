@@ -67,12 +67,11 @@ inline dispatch (handler)
 
         case sdl.SDL_WINDOWEVENT
             switch event.window.event
-            case sdl.SDL_WINDOWEVENT_RESIZED
-                # gpu.update-render-area;
-                # imgui.reset-gpu-state;
-            case sdl.SDL_WINDOWEVENT_RESTORED
-                # gpu.update-render-area;
-                # imgui.reset-gpu-state;
+            pass sdl.SDL_WINDOWEVENT_RESIZED
+            pass sdl.SDL_WINDOWEVENT_SIZE_CHANGED
+            pass sdl.SDL_WINDOWEVENT_RESTORED
+            do
+                gpu.flag-surface-outdated;
             default
                 ;
 

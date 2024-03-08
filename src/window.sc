@@ -3,6 +3,7 @@ import .logger sdl
 
 using import .context
 cfg := context-accessor 'config 'window
+platform-cfg := context-accessor 'config 'platform
 
 struct BottleWindowState plain
     handle : (mutable@ sdl.Window)
@@ -102,9 +103,16 @@ fn toggle-fullscreen ()
     set-fullscreen (not (fullscreen?))
 
 fn init ()
-    if (operating-system == 'windows)
+    static-match operating-system
+    case 'windows
         sdl.SetHint sdl.SDL_HINT_WINDOWS_DPI_AWARENESS "permonitorv2"
         sdl.SetHint sdl.SDL_HINT_WINDOWS_DPI_SCALING "0"
+    case 'linux
+        if platform-cfg.force-x11?
+            sdl.SetHint sdl.SDL_HINT_VIDEODRIVER "x11"
+        else
+            sdl.SetHint sdl.SDL_HINT_VIDEODRIVER "wayland,x11"
+    default ()
 
     status :=
         sdl.Init
@@ -139,14 +147,15 @@ fn init ()
             sdl.SDL_WINDOWPOS_UNDEFINED
             width
             height
-            window-flags
-                fullscreen? = sdl.SDL_WINDOW_FULLSCREEN_DESKTOP
-                hidden? = sdl.SDL_WINDOW_HIDDEN
-                borderless? = sdl.SDL_WINDOW_BORDERLESS
-                resizable? = sdl.SDL_WINDOW_RESIZABLE
-                minimized? = sdl.SDL_WINDOW_MINIMIZED
-                maximized? = sdl.SDL_WINDOW_MAXIMIZED
-                always-on-top? = sdl.SDL_WINDOW_ALWAYS_ON_TOP
+            | sdl.SDL_WINDOW_ALLOW_HIGHDPI
+                window-flags
+                    fullscreen? = sdl.SDL_WINDOW_FULLSCREEN_DESKTOP
+                    hidden? = sdl.SDL_WINDOW_HIDDEN
+                    borderless? = sdl.SDL_WINDOW_BORDERLESS
+                    resizable? = sdl.SDL_WINDOW_RESIZABLE
+                    minimized? = sdl.SDL_WINDOW_MINIMIZED
+                    maximized? = sdl.SDL_WINDOW_MAXIMIZED
+                    always-on-top? = sdl.SDL_WINDOW_ALWAYS_ON_TOP
 
     if (handle == null)
         # TODO: unify error handling

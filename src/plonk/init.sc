@@ -38,7 +38,7 @@ fn begin-frame ()
     ctx := 'force-unwrap context
     'begin-frame ctx.geometry-batch
 
-    w h := (window.get-size)
+    w h := (window.get-drawable-size)
     mvp :=
         *
             math.orthographic-projection w h

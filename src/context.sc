@@ -115,6 +115,9 @@ struct BottleConfig
         struct BottleEnabledModules plain
             plonk = true
             imgui = true
+    platform :
+        struct PlatformConfig
+            force-x11? : bool
 
     fn disable-module-by-name (self name)
         inline may-disable-module (k)
@@ -151,6 +154,7 @@ struct BottleGPUState
     queue    : wgpu.Queue
 
     surface-size : ivec2
+    scaled-surface-size : ivec2
     cmd-encoder : (Option types.CommandEncoder)
     surface-texture : (Option types.Texture)
     surface-texture-view : (Option types.TextureView)

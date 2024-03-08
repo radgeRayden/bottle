@@ -57,8 +57,9 @@ fn create-msaa-resolve-source (width height)
         abort;
 
 fn configure-surface ()
-    width height := (window.get-size)
+    width height := (window.get-drawable-size)
     ctx.surface-size = ivec2 width height
+    ctx.scaled-surface-size = ivec2 (window.get-size)
     wgpu.SurfaceConfigure ctx.surface
         typeinit@
             device = ctx.device
@@ -70,6 +71,7 @@ fn configure-surface ()
     if ctx.msaa?
         ctx.msaa-resolve-source =
             create-msaa-resolve-source width height
+    ctx.outdated-surface? = false
 
 fn set-clear-color (color)
     ctx.clear-color = color
@@ -224,7 +226,6 @@ fn begin-frame ()
 
     if ctx.outdated-surface?
         configure-surface;
-        ctx.outdated-surface? = false
         raise GPUError.DiscardedFrame
 
     cmd-encoder := (wgpu.DeviceCreateCommandEncoder ctx.device (typeinit@))
@@ -254,11 +255,15 @@ fn present ()
     ctx.surface-texture = none
     ()
 
+fn flag-surface-outdated ()
+    ctx.outdated-surface? = true
+
 do
     let init set-clear-color begin-frame present \
         get-preferred-surface-format get-cmd-encoder get-device \
         get-surface-texture get-msaa-resolve-source \
         msaa-enabled? get-present-mode set-present-mode
+    let flag-surface-outdated
 
     let types
 
