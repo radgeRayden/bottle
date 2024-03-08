@@ -192,7 +192,8 @@ fn init ()
             requiredFeatures = &required-features
         fn (status result msg userdata)
             if (status != wgpu.RequestDeviceStatus.Success)
-                print ('from-rawstring String msg)
+                logger.write-fatal ('from-rawstring String msg)
+                abort;
             ctx.device = result
             ;
         null
