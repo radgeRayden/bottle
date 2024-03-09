@@ -24,7 +24,7 @@ using import struct
 import .enums
 import .mouse
 import .keyboard
-import sdl
+sdl := import sdl3
 
 using enums
 
@@ -169,7 +169,7 @@ struct InputLayer
                 vvv bind result
                 dispatch binding
                 case Button (button)
-                    bool (sdl.GameControllerGetButton (get-controller 0) button)
+                    bool (sdl.GamepadGetButton (get-controller 0) button)
                 case Key (key)
                     keyboard.down? key
                 case Click (button)
@@ -177,7 +177,7 @@ struct InputLayer
                 case Axis (axis threshold)
                     axis :=
                         normalize-axis
-                            sdl.GameControllerGetAxis (get-controller 0) axis
+                            sdl.GamepadGetAxis (get-controller 0) axis
 
                     let result =
                         if (threshold > 0)
@@ -207,10 +207,10 @@ struct InputLayer
                 case Axis (axis)
                     axis :=
                         normalize-axis
-                            sdl.GameControllerGetAxis (get-controller 0) axis
+                            sdl.GamepadGetAxis (get-controller 0) axis
                 case Button (button value)
                     down? :=
-                        bool (sdl.GameControllerGetButton (get-controller 0) button)
+                        bool (sdl.GamepadGetButton (get-controller 0) button)
                     ? down? value 0.0
                 case Key (key value)
                     down? := (keyboard.down? key)
@@ -294,7 +294,7 @@ struct InputLayer
         else ()
 
 struct InputState
-    controllers : (Map i32 (mutable@ sdl.GameController))
+    controllers : (Map u32 (mutable@ sdl.Gamepad))
     active-layers : (Array (Rc InputLayer))
 
 global istate : InputState
@@ -305,7 +305,7 @@ fn new-layer ()
     layer
 
 fn get-controller (id)
-    'getdefault istate.controllers id (nullof (mutable@ sdl.GameController))
+    'getdefault istate.controllers id (nullof (mutable@ sdl.Gamepad))
 
 # HOOKS
 # ================================================================================
@@ -313,11 +313,11 @@ let cb = (import .sysevents.callbacks)
 
 @@ 'on cb.controller-added
 fn (id)
-    'set istate.controllers id (sdl.GameControllerOpen id)
+    'set istate.controllers id (sdl.OpenGamepad id)
 
 @@ 'on cb.controller-removed
 fn (id)
-    sdl.GameControllerClose ('getdefault istate.controllers id (nullof (mutable@ sdl.GameController)))
+    sdl.CloseGamepad ('getdefault istate.controllers id (nullof (mutable@ sdl.Gamepad)))
     'discard istate.controllers id
 
 @@ 'on cb.controller-button-pressed

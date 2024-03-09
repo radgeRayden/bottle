@@ -7,7 +7,7 @@ let filesystem = (import .src.filesystem)
 let font = (import .src.font)
 let gpu = (import .src.gpu)
 let imgui = (import .src.imgui)
-let input = (import .src.input)
+# let input = (import .src.input)
 let keyboard = (import .src.keyboard)
 let main = (import .src.main)
 let math = (import .src.math)
@@ -34,7 +34,7 @@ vvv bind bottle
             font
             gpu
             imgui
-            input
+            # input
             keyboard
             math
             mouse

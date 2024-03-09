@@ -14,8 +14,7 @@ using bottle.enums
 @@ 'on bottle.configure
 fn (cfg)
     cfg.window.title = "storage and uniform buffers"
-    cfg.window.relative-width = 1
-    cfg.window.relative-height = 1
+    cfg.window.fullscreen? = true
     ;
 
 struct RendererState

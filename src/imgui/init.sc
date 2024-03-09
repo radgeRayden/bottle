@@ -13,19 +13,18 @@ scaled-surface-size := context-accessor 'gpu 'scaled-surface-size
 fn init ()
     ig.CreateContext null
     assert
-        ig.ImplSDL2_InitForVulkan (window.get-handle)
+        ig.ImplSDL3_InitForVulkan (window.get-handle)
     assert
         do
             local info : ig.ImGui_ImplWGPU_InitInfo
                 (wgpu-device)
                 RenderTargetFormat = (get-preferred-surface-format)
             ig.ImplWGPU_Init &info
-
     ()
 
 @@ if-module-enabled 'imgui
 fn begin-frame ()
-    ig.ImplSDL2_NewFrame;
+    ig.ImplSDL3_NewFrame;
     ig.ImplWGPU_NewFrame;
     ig.NewFrame;
 
@@ -37,7 +36,7 @@ fn reset-gpu-state ()
 
 @@ if-module-enabled 'imgui
 fn process-event (event)
-    result := ig.ImplSDL2_ProcessEvent event # do we even use this result for anything?
+    result := ig.ImplSDL3_ProcessEvent event # do we even use this result for anything?
     io := (ig.GetIO)
 
     switch event.type
@@ -70,7 +69,7 @@ fn render ()
 
 @@ if-module-enabled 'imgui
 fn shutdown ()
-    ig.ImplSDL2_Shutdown;
+    ig.ImplSDL3_Shutdown;
     ig.ImplWGPU_Shutdown;
     ig.Shutdown;
 

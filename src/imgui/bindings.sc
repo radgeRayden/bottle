@@ -6,7 +6,7 @@ case 'windows
 default
     error "Unsupported OS"
 
-using import Array slice struct
+using import Array enum slice struct
 
 inline filter-scope (scope pattern)
     pattern as:= string
@@ -54,7 +54,7 @@ fold (scope = imgui-typedef) for k v in imgui-typedef
 run-stage;
 
 wgpu := import wgpu
-import sdl
+sdl  := import sdl3
 .. imgui-extern imgui-typedef
     do
         #   struct ImGui_ImplWGPU_InitInfo
@@ -96,14 +96,23 @@ import sdl
         # bool ImGui_ImplWGPU_CreateDeviceObjects();
         ImplWGPU_CreateDeviceObjects := extern 'ImGui_ImplWGPU_CreateDeviceObjects (function bool)
 
-        # bool ImGui_ImplSDL2_InitForVulkan(SDL_Window* window);
+        # bool ImGui_ImplSDL3_InitForVulkan(SDL_Window* window);
         # I'm pretty sure it doesn't actually care about the backend at all
-        ImplSDL2_InitForVulkan := extern 'ImGui_ImplSDL2_InitForVulkan (function bool (mutable@ sdl.Window))
-        # void ImGui_ImplSDL2_Shutdown();
-        ImplSDL2_Shutdown := extern 'ImGui_ImplSDL2_Shutdown (function void)
-        # void ImGui_ImplSDL2_NewFrame();
-        ImplSDL2_NewFrame := extern 'ImGui_ImplSDL2_NewFrame (function void)
-        # bool ImGui_ImplSDL2_ProcessEvent(const SDL_Event* event);
-        ImplSDL2_ProcessEvent := extern 'ImGui_ImplSDL2_ProcessEvent (function bool (@ sdl.Event))
+        ImplSDL3_InitForVulkan := extern 'ImGui_ImplSDL3_InitForVulkan (function bool (mutable@ sdl.Window))
+        # void ImGui_ImplSDL3_Shutdown();
+        ImplSDL3_Shutdown := extern 'ImGui_ImplSDL3_Shutdown (function void)
+        # void ImGui_ImplSDL3_NewFrame();
+        ImplSDL3_NewFrame := extern 'ImGui_ImplSDL3_NewFrame (function void)
+        # bool ImGui_ImplSDL3_ProcessEvent(const SDL_Event* event);
+        ImplSDL3_ProcessEvent := extern 'ImGui_ImplSDL3_ProcessEvent (function bool (@ sdl.Event))
+        # enum ImGui_ImplSDL3_GamepadMode { ImGui_ImplSDL3_GamepadMode_AutoFirst, ImGui_ImplSDL3_GamepadMode_AutoAll, ImGui_ImplSDL3_GamepadMode_Manual };
+        enum ImplSDL3_GamepadMode plain
+            AutoFirst
+            AutoAll
+            Manual
+        # IMGUI_IMPL_API void     ImGui_ImplSDL3_SetGamepadMode(ImGui_ImplSDL3_GamepadMode mode, SDL_Gamepad** manual_gamepads_array = NULL, int manual_gamepads_count = -1);
+        ImplSDL3_SetGamepadMode := extern 'ImGui_ImplSDL3_SetGamepadMode (function void ImplSDL3_GamepadMode (@ (@ sdl.Gamepad)) i32)
+        inline... ImplSDL3_SetGamepadMode (mode : ImplSDL3_GamepadMode, manual-gamepads-array : (@ (@ sdl.Gamepad)) = null, manual-gamepads-count : i32 = -1)
+            ImplSDL3_SetGamepadMode *...
 
         local-scope;

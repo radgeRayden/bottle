@@ -118,7 +118,7 @@ struct BottleConfig
             imgui = true
     platform :
         struct PlatformConfig
-            force-x11? : bool = true
+            force-x11? : bool = false
 
     fn disable-module-by-name (self name)
         inline may-disable-module (k)

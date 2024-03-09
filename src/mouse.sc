@@ -1,5 +1,5 @@
-import sdl
 using import .enums
+sdl := import sdl3
 
 fn down? (button)
     state := (sdl.GetMouseState null null)

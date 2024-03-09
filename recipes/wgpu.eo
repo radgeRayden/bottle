@@ -1,13 +1,13 @@
 VERSION := "trunk"
-TAG := "v0.19.1.1"
-SUMMARY := "Native WebGPU implementation based on wgpu-core "
+TAG := "v0.19.3.1"
+SUMMARY := "Native WebGPU implementation based on wgpu-core"
 
 update-url "https://raw.githubusercontent.com/ScopesCommunity/eo-packages/main/recipes/wgpu.eo"
 
 LIBNAME := "wgpu_native"
 
 # Build from source
-fn git-release-dir (make)
+git-release-dir :=
     then
         build-path := (tempdir)
         cmd :=
@@ -20,7 +20,7 @@ fn git-release-dir (make)
             shell build-path
                 dict
                     WGPU_NATIVE_VERSION = tag
-        cmd "{make} package -j {cpu-core-count}"
+        cmd "make package -j {cpu-core-count}"
         commonpath (extract "{build-path}/dist/wgpu--release.zip")
 
 # Pre-built binaries
@@ -40,7 +40,7 @@ package wgpu-native
     summary SUMMARY
     depends ffi-helper
 
-    preinstall-dir := (git-release-dir "make")
+    preinstall-dir := git-release-dir
     alias "/include/webgpu.h" "{preinstall-dir}/webgpu.h"
     alias "/include/wgpu.h" "{preinstall-dir}/wgpu.h"
     alias "/lib/lib{LIBNAME}.so" "{preinstall-dir}/lib{LIBNAME}.so"
@@ -52,7 +52,7 @@ package wgpu-native
     summary SUMMARY
     depends ffi-helper
 
-    preinstall-dir := (git-release-dir "mingw32-make")
+    preinstall-dir := (git-release-dir)
     alias "/include/webgpu.h" "{preinstall-dir}/webgpu.h"
     alias "/include/wgpu.h" "{preinstall-dir}/wgpu.h"
     alias "/lib/{LIBNAME}.dll" "{preinstall-dir}/{LIBNAME}.dll"

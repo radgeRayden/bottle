@@ -1,6 +1,6 @@
 using import enum
 
-import sdl
+sdl := import sdl3
 
 enum KeyboardKey plain
     Unknown = sdl.SDLK_UNKNOWN

@@ -13,7 +13,7 @@ inline chain-callback (cb f...)
 chain-callback 'load imgui.init plonk.init
 chain-callback 'begin-frame imgui.begin-frame plonk.begin-frame
 chain-callback 'end-frame plonk.submit imgui.end-frame imgui.render
-chain-callback 'invalidate-frame imgui.reset-gpu-state imgui.end-frame
+chain-callback 'invalidate-frame imgui.reset-gpu-state
 
 fn run ()
     raising noreturn
@@ -61,9 +61,10 @@ fn run ()
 
             switch ex
             case 'ObjectCreationFailed
-                assert false "unhandled GPU Object creation failure"
+                # assert false "unhandled GPU Object creation failure"
+                abort;
             case 'DiscardedFrame
-                callbacks.invalidate-frame;
+                ()
             default ()
 
         time.sleep 1

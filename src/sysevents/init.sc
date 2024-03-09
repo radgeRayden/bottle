@@ -1,10 +1,11 @@
 using import struct
 
-import sdl
+sdl := import sdl3
 import .callbacks
 import ..gpu
 import ..enums
 import ..imgui
+import ..window
 
 struct SysEventsState
     really-quit? : bool
@@ -19,7 +20,7 @@ fn really-quit? ()
 
 fn quit ()
     local ev : sdl.Event
-    ev.type = sdl.SDL_QUIT
+    ev.type = sdl.EventType.QUIT
     sdl.PushEvent &ev
     ;
 
@@ -31,66 +32,64 @@ inline dispatch (handler)
         if (handler &event)
             continue;
 
-        switch event.type
-        case sdl.SDL_QUIT
+        switch (event.type as sdl.EventType)
+        case 'QUIT
             let result = (callbacks.quit)
             istate.really-quit? =
                 (none? result) or (imply result bool)
 
-        case sdl.SDL_KEYDOWN
+        case 'KEY_DOWN
             if (not event.key.repeat)
                 callbacks.key-pressed (event.key.keysym.sym as KeyboardKey)
 
-        case sdl.SDL_KEYUP
+        case 'KEY_UP
             if (not event.key.repeat)
                 callbacks.key-released (event.key.keysym.sym as KeyboardKey)
 
-        case sdl.SDL_MOUSEMOTION
+        case 'MOUSE_MOTION
             edata := event.motion
             callbacks.mouse-moved edata.x edata.y edata.xrel edata.yrel
 
-        case sdl.SDL_MOUSEBUTTONDOWN
+        case 'MOUSE_BUTTON_DOWN
             edata := event.button
             callbacks.mouse-pressed (edata.button as i32 as MouseButton) edata.x edata.y edata.clicks
 
-        case sdl.SDL_MOUSEBUTTONUP
+        case 'MOUSE_BUTTON_UP
             edata := event.button
             callbacks.mouse-released (edata.button as i32 as MouseButton) edata.x edata.y edata.clicks
 
-        case sdl.SDL_MOUSEWHEEL
+        case 'MOUSE_WHEEL
             edata := event.wheel
-            callbacks.wheel-scrolled edata.preciseX edata.preciseY
+            callbacks.wheel-scrolled edata.mouse_x edata.mouse_y
 
-        case sdl.SDL_TEXTINPUT
+        case 'TEXT_INPUT
             edata := event.text
             callbacks.text-input edata.text
 
-        case sdl.SDL_WINDOWEVENT
-            switch event.window.event
-            pass sdl.SDL_WINDOWEVENT_RESIZED
-            pass sdl.SDL_WINDOWEVENT_SIZE_CHANGED
-            pass sdl.SDL_WINDOWEVENT_RESTORED
-            do
-                gpu.flag-surface-outdated;
-            default
-                ;
+        case 'WINDOW_PIXEL_SIZE_CHANGED
+            gpu.flag-surface-outdated;
 
-        case sdl.SDL_CONTROLLERDEVICEADDED
+        case 'WINDOW_ENTER_FULLSCREEN
+            window._update-fullscreen-flag true
+        case 'WINDOW_LEAVE_FULLSCREEN
+            window._update-fullscreen-flag false
+
+        case 'GAMEPAD_ADDED
             callbacks.controller-added event.cdevice.which
 
-        case sdl.SDL_CONTROLLERDEVICEREMOVED
+        case 'GAMEPAD_REMOVED
             callbacks.controller-removed event.cdevice.which
 
-        case sdl.SDL_CONTROLLERBUTTONDOWN
-            edata := event.cbutton
+        case 'GAMEPAD_BUTTON_DOWN
+            edata := event.gbutton
             callbacks.controller-button-pressed edata.which (edata.button as ControllerButton)
 
-        case sdl.SDL_CONTROLLERBUTTONUP
-            edata := event.cbutton
+        case 'GAMEPAD_BUTTON_UP
+            edata := event.gbutton
             callbacks.controller-button-released edata.which (edata.button as ControllerButton)
 
-        case sdl.SDL_CONTROLLERAXISMOTION
-            edata := event.caxis
+        case 'GAMEPAD_AXIS_MOTION
+            edata := event.gaxis
             callbacks.controller-axis-moved edata.which (edata.axis as ControllerAxis) edata.value
 
         default

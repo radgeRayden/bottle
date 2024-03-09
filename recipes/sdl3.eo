@@ -1,0 +1,57 @@
+VERSION := "main"
+SUMMARY := "Simple Directmedia Layer"
+
+update-url "https://raw.githubusercontent.com/ScopesCommunity/eo-packages/main/recipes/sdl3.eo"
+
+archive :=
+    download
+        "https://github.com/libsdl-org/SDL/archive/{VERSION}.tar.gz"
+
+fn preinstall-dir (generator)
+    then
+        build-path :=
+            commonpath
+                extract archive
+        build-command :=
+            shell
+                mkdir "{build-path}/build"
+
+        install-dir := (tempdir)
+        build-command "cmake -G \"{generator}\" .."
+        build-command "cmake --build . -j"
+        build-command "cmake --install . --prefix {install-dir}"
+        install-dir
+
+fn patchelf (soname libpath)
+    then
+        (shell ".") "./bin/patchelf --set-soname {soname} $(realpath {libpath})"
+        libpath
+
+bindings :=
+    download "https://raw.githubusercontent.com/scopescommunity/eo-packages/main/bindings/sdl3.sc"
+
+package sdl3
+    summary SUMMARY
+    version VERSION
+    platform linux unknown
+    depends patchelf
+
+    preinstall-dir := (preinstall-dir "Unix Makefiles")
+    libpath := (patchelf "libSDL3.so" "{preinstall-dir}/lib/libSDL3.so")
+
+    alias "/lib/libSDL3.so" libpath
+    alias "/lib/scopes/packages/sdl3.sc" bindings
+    in "/include" "{preinstall-dir}/include/SDL3"
+    alias "/licenses/SDL3.txt" "{preinstall-dir}/share/licenses/SDL3/LICENSE.txt"
+
+package sdl3
+    summary SUMMARY
+    version VERSION
+    platform windows-mingw
+
+    preinstall-dir := (preinstall-dir "MSYS Makefiles")
+
+    alias "/lib/SDL3.dll" "{preinstall-dir}/bin/SDL3.dll"
+    alias "/lib/scopes/packages/sdl3.sc" bindings
+    in "/include" "{preinstall-dir}/include/SDL3"
+    alias "/licenses/SDL3.txt" "{preinstall-dir}/share/licenses/SDL3/LICENSE.txt"

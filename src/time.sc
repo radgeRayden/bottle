@@ -1,4 +1,4 @@
-import sdl
+sdl := import sdl3
 using import .context
 cfg := context-accessor 'config 'time
 

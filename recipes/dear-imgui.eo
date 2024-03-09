@@ -22,7 +22,7 @@ fn imgui-git (platform wgpu-lib sdl-lib)
         cmd "mkdir lib"
         cmd "cp {project-path}/lib/{wgpu-lib} ./lib"
         cmd "cp {project-path}/lib/{sdl-lib} ./lib"
-        cmd "cp -r {project-path}/include/SDL2 ./include"
+        cmd "cp -r {project-path}/include/SDL3 ./include"
         mkdir "{build-path}/include/webgpu"
         cmd "cp {project-path}/include/wgpu.h ./include/webgpu"
         cmd "cp {project-path}/include/webgpu.h ./include/webgpu"
@@ -38,9 +38,9 @@ package dear-imgui
     summary SUMMARY
     version VERSION
     platform windows-mingw
-    depends wgpu-native-release sdl2
+    depends wgpu-native-release sdl3
 
-    preinstall-dir := (imgui-git "windows" "wgpu_native.dll" "SDL2.dll")
+    preinstall-dir := (imgui-git "windows" "wgpu_native.dll" "SDL3.dll")
     alias "/lib/cimgui.dll" "{preinstall-dir}/cimgui.dll"
     alias "/include/cimgui.h" "{preinstall-dir}/cimgui.h"
     alias "/licenses/cimgui.txt" cimgui-license
@@ -50,9 +50,9 @@ package dear-imgui
     summary SUMMARY
     version VERSION
     platform linux
-    depends wgpu-native-release sdl2
+    depends wgpu-native-release sdl3
 
-    preinstall-dir := (imgui-git "linux" "libwgpu_native.so" "libSDL2.so")
+    preinstall-dir := (imgui-git "linux" "libwgpu_native.so" "libSDL3.so")
     alias "/lib/libcimgui.so" "{preinstall-dir}/libcimgui.so"
     alias "/include/cimgui.h" "{preinstall-dir}/cimgui.h"
     alias "/licenses/cimgui.txt" cimgui-license
