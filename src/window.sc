@@ -6,8 +6,9 @@ sdl := sdl3
 cfg := context-accessor 'config 'window
 platform-cfg := context-accessor 'config 'platform
 
-struct BottleWindowState plain
+struct BottleWindowState
     handle : (mutable@ sdl.Window)
+    video-driver : String
     fullscreen? : bool
 
 global istate : BottleWindowState
@@ -35,8 +36,7 @@ fn get-native-info ()
 
     static-match operating-system
     case 'linux
-        video-driver := 'from-rawstring String (sdl.GetCurrentVideoDriver)
-        match video-driver
+        match istate.video-driver
         case "x11"
             WindowNativeInfo.X11
                 prop sdl.SDL_PROP_WINDOW_X11_DISPLAY_POINTER
@@ -46,7 +46,7 @@ fn get-native-info ()
                 prop sdl.SDL_PROP_WINDOW_WAYLAND_DISPLAY_POINTER
                 prop sdl.SDL_PROP_WINDOW_WAYLAND_SURFACE_POINTER
         default
-            logger.write-fatal f"Unsupported SDL_video driver: ${video-driver}"
+            logger.write-fatal f"Unsupported SDL_video driver: ${istate.video-driver}"
             abort;
     case 'windows
         WindowNativeInfo.Windows
@@ -93,9 +93,7 @@ fn get-relative-size (wratio hratio)
     va-map i32 ((f32 dw) * wratio) ((f32 dh) * hratio)
 
 fn minimized? ()
-    as
-        (sdl.GetWindowFlags (get-handle)) & sdl.SDL_WINDOW_MINIMIZED
-        bool
+    bool ((sdl.GetWindowFlags (get-handle)) & sdl.SDL_WINDOW_MINIMIZED)
 
 fn set-title (title)
     sdl.SetWindowTitle (get-handle) (title as rawstring)
@@ -146,6 +144,8 @@ fn init ()
         logger.write-fatal f"SDL initialization failed: ${msg}"
         abort;
 
+    video-driver := 'from-rawstring String (sdl.GetCurrentVideoDriver)
+
     relative-width relative-height := (get-relative-size cfg.relative-width cfg.relative-height)
     let width =
         try (deref ('unwrap cfg.width))
@@ -154,7 +154,7 @@ fn init ()
         try (deref ('unwrap cfg.height))
         else relative-height
 
-    inline window-flags (flags...)
+    user-flags :=
         va-lfold 0:u32
             inline (k next result)
                 setting := getattr cfg k
@@ -162,22 +162,24 @@ fn init ()
                     result | next
                 else
                     result
-            flags...
+            fullscreen? = sdl.SDL_WINDOW_FULLSCREEN
+            hidden? = sdl.SDL_WINDOW_HIDDEN
+            borderless? = sdl.SDL_WINDOW_BORDERLESS
+            resizable? = sdl.SDL_WINDOW_RESIZABLE
+            minimized? = sdl.SDL_WINDOW_MINIMIZED
+            maximized? = sdl.SDL_WINDOW_MAXIMIZED
+            always-on-top? = sdl.SDL_WINDOW_ALWAYS_ON_TOP
+
+    window-flags :=
+        | user-flags
+            (video-driver == "wayland") sdl.SDL_WINDOW_HIGH_PIXEL_DENSITY 0:u32
 
     handle :=
         sdl.CreateWindow
             cfg.title
             width
             height
-            | sdl.SDL_WINDOW_HIGH_PIXEL_DENSITY
-                window-flags
-                    fullscreen? = sdl.SDL_WINDOW_FULLSCREEN
-                    hidden? = sdl.SDL_WINDOW_HIDDEN
-                    borderless? = sdl.SDL_WINDOW_BORDERLESS
-                    resizable? = sdl.SDL_WINDOW_RESIZABLE
-                    minimized? = sdl.SDL_WINDOW_MINIMIZED
-                    maximized? = sdl.SDL_WINDOW_MAXIMIZED
-                    always-on-top? = sdl.SDL_WINDOW_ALWAYS_ON_TOP
+            window-flags
 
     if (handle == null)
         # TODO: unify error handling
@@ -191,6 +193,7 @@ fn init ()
         typeinit
             handle = handle
             fullscreen? = bool (actual-flags & sdl.SDL_WINDOW_FULLSCREEN)
+            video-driver = video-driver
     ;
 
 fn shutdown ()
