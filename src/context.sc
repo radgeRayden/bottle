@@ -118,7 +118,9 @@ struct BottleConfig
             imgui = true
     platform :
         struct PlatformConfig
+            # Options relevant on Linux only
             force-x11? : bool = false
+            app-id : String = "lol.radge.Bottle"
 
     fn disable-module-by-name (self name)
         inline may-disable-module (k)

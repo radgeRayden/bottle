@@ -130,6 +130,7 @@ fn init ()
         sdl.SetHint sdl.SDL_HINT_WINDOWS_DPI_AWARENESS "permonitorv2"
         sdl.SetHint sdl.SDL_HINT_WINDOWS_DPI_SCALING "0"
     case 'linux
+        sdl.SetHint sdl.SDL_HINT_APP_ID platform-cfg.app-id
         if platform-cfg.force-x11?
             sdl.SetHint sdl.SDL_HINT_VIDEO_DRIVER "x11"
         else
