@@ -174,10 +174,14 @@ struct BottleWindowState
     video-driver : String
     fullscreen? : bool
 
+struct BottleSysEventsState
+    application-quit? : bool
+
 struct BottleContext
     config : BottleConfig
     gpu : BottleGPUState
     window : BottleWindowState
+    sysevents : BottleSysEventsState
 
 global context : BottleContext
 

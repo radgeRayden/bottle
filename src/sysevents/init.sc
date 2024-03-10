@@ -1,22 +1,14 @@
-using import struct
+using import ..context struct
+import .callbacks ..gpu ..enums ..imgui ..window
 
 sdl := import sdl3
-import .callbacks
-import ..gpu
-import ..enums
-import ..imgui
-import ..window
-
-struct SysEventsState
-    really-quit? : bool
-
-global istate : SysEventsState
+ctx := context-accessor 'sysevents
 
 fn really-quit! ()
-    istate.really-quit? = true
+    ctx.application-quit? = true
 
 fn really-quit? ()
-    istate.really-quit?
+    ctx.application-quit?
 
 fn quit ()
     local ev : sdl.Event
@@ -35,7 +27,7 @@ inline dispatch (handler)
         switch (event.type as sdl.EventType)
         case 'QUIT
             let result = (callbacks.quit)
-            istate.really-quit? =
+            ctx.application-quit? =
                 (none? result) or (imply result bool)
 
         case 'KEY_DOWN
@@ -71,6 +63,7 @@ inline dispatch (handler)
 
         case 'WINDOW_ENTER_FULLSCREEN
             window._update-fullscreen-flag true
+
         case 'WINDOW_LEAVE_FULLSCREEN
             window._update-fullscreen-flag false
 
