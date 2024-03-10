@@ -20,7 +20,7 @@ libs... :=
             # "scopesrt"
             "fontdue_native"
             "miniaudio"
-            "SDL2"
+            "SDL3"
             "stb"
             "wgpu_native"
             "cimgui"
