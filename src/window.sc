@@ -5,16 +5,15 @@ using import .context
 sdl := sdl3
 cfg := context-accessor 'config 'window
 platform-cfg := context-accessor 'config 'platform
+ctx := context-accessor 'window
 
 struct BottleWindowState
     handle : (mutable@ sdl.Window)
     video-driver : String
     fullscreen? : bool
 
-global istate : BottleWindowState
-
 inline get-handle ()
-    istate.handle
+    ctx.handle
 
 enum WindowNativeInfo
     Windows : (hinstance = voidstar) (hwnd = voidstar)
@@ -36,7 +35,7 @@ fn get-native-info ()
 
     static-match operating-system
     case 'linux
-        match istate.video-driver
+        match ctx.video-driver
         case "x11"
             WindowNativeInfo.X11
                 prop sdl.SDL_PROP_WINDOW_X11_DISPLAY_POINTER
@@ -46,7 +45,7 @@ fn get-native-info ()
                 prop sdl.SDL_PROP_WINDOW_WAYLAND_DISPLAY_POINTER
                 prop sdl.SDL_PROP_WINDOW_WAYLAND_SURFACE_POINTER
         default
-            logger.write-fatal f"Unsupported SDL_video driver: ${istate.video-driver}"
+            logger.write-fatal f"Unsupported SDL_video driver: ${ctx.video-driver}"
             abort;
     case 'windows
         WindowNativeInfo.Windows
@@ -107,14 +106,14 @@ fn set-fullscreen (value)
         logger.write-debug f"Failed to set window to fullscreen: ${(sdl.GetError)}"
 
 fn fullscreen? ()
-    deref istate.fullscreen?
+    deref ctx.fullscreen?
 
 fn toggle-fullscreen ()
     set-fullscreen (not (fullscreen?))
 
 # TODO: remove this once we migrate state to context.sc
 fn _update-fullscreen-flag (value)
-    istate.fullscreen? = value
+    ctx.fullscreen? = value
 
 fn set-icon (image-data)
     # sdl.SetWindowIcon (get-handle)
@@ -189,11 +188,10 @@ fn init ()
 
     sdl.SyncWindow handle
     actual-flags := sdl.GetWindowFlags handle
-    istate =
-        typeinit
-            handle = handle
-            fullscreen? = bool (actual-flags & sdl.SDL_WINDOW_FULLSCREEN)
-            video-driver = video-driver
+
+    ctx.handle = handle
+    ctx.fullscreen? = bool (actual-flags & sdl.SDL_WINDOW_FULLSCREEN)
+    ctx.video-driver = video-driver
     ;
 
 fn shutdown ()

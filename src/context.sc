@@ -1,7 +1,8 @@
 using import Array glm hash Option print String struct
-import .gpu.wgpu .types
+import .gpu.wgpu sdl3 .types
 
 wgpu := gpu.wgpu
+sdl  := sdl3
 
 # HELPERS
 # =======
@@ -168,9 +169,15 @@ struct BottleGPUState
     msaa? : bool
     present-mode : wgpu.PresentMode
 
+struct BottleWindowState
+    handle : (mutable@ sdl.Window)
+    video-driver : String
+    fullscreen? : bool
+
 struct BottleContext
     config : BottleConfig
     gpu : BottleGPUState
+    window : BottleWindowState
 
 global context : BottleContext
 
