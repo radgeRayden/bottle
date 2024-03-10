@@ -1,11 +1,10 @@
-using import enum logger print radl.strfmt String struct
+using import .context enum logger print radl.strfmt String struct
 import .logger sdl3
 
-using import .context
 sdl := sdl3
 cfg := context-accessor 'config 'window
-platform-cfg := context-accessor 'config 'platform
 ctx := context-accessor 'window
+platform-cfg := context-accessor 'config 'platform
 
 struct BottleWindowState
     handle : (mutable@ sdl.Window)
