@@ -36,7 +36,7 @@ inline make-log-macro (level anchor?)
 
             prefix := '@ prefixes level
             path := (sc_anchor_path anchor) as string
-            relpath := rslice path (countof (String+.common-prefix (String path) (String module-dir)))
+            relpath := rslice path ((countof (String+.common-prefix (String path) (String project-dir))) + 1)
             lineinfo := f"${relpath}:${sc_anchor_lineno anchor}:${sc_anchor_column anchor}:" as string
             `(log-write [lineinfo] [prefix] args)
         else
