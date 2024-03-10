@@ -235,7 +235,6 @@ fn begin-frame ()
 
     if ctx.outdated-surface?
         configure-surface;
-        raise GPUError.DiscardedFrame
 
     cmd-encoder := (wgpu.DeviceCreateCommandEncoder ctx.device (typeinit@))
 
