@@ -1,7 +1,7 @@
 import .audio .callbacks .filesystem .gpu .imgui .plonk .sysevents .time .window
 using import .context
 
-inline chain-callback (cb f...)
+inline callback-chain (cb f...)
     cb := getattr callbacks cb
     'clear cb
     va-map
@@ -10,10 +10,10 @@ inline chain-callback (cb f...)
             ()
         f...
 
-chain-callback 'load imgui.init plonk.init
-chain-callback 'begin-frame imgui.begin-frame plonk.begin-frame
-chain-callback 'end-frame plonk.submit imgui.end-frame imgui.render
-chain-callback 'invalidate-frame imgui.reset-gpu-state
+callback-chain 'load imgui.init plonk.init
+callback-chain 'begin-frame imgui.begin-frame plonk.begin-frame
+callback-chain 'end-frame plonk.submit imgui.end-frame imgui.render
+callback-chain 'invalidate-frame imgui.reset-gpu-state
 
 fn run ()
     raising noreturn
