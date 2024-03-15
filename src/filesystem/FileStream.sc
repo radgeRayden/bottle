@@ -1,4 +1,5 @@
-import physfs
+import ..logger physfs
+using import radl.strfmt
 
 vvv bind API
 do
@@ -46,6 +47,11 @@ do
 
     fn eof? (handle)
         (physfs.eof handle) as bool
+
+    inline log-error (prefix)
+        err := (physfs.getLastErrorCode)
+        msg := (physfs.getErrorByCode err)
+        logger.write-warning f"${prefix}:" msg
 
     local-scope;
 
