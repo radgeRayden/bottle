@@ -75,10 +75,7 @@ fn set-clear-color (color)
     ctx.clear-color = color
 
 fn get-cmd-encoder ()
-    using types
-
-    cmd-encoder := 'force-unwrap ctx.cmd-encoder
-    imply cmd-encoder CommandEncoder
+    deref ctx.cmd-encoder
 
 fn get-device ()
     deref ctx.device
@@ -225,6 +222,7 @@ fn init ()
         ctx.msaa-resolve-source = (create-msaa-resolve-source (window.get-drawable-size))
 
     ctx.queue = (wgpu.DeviceGetQueue ctx.device)
+    ctx.cmd-encoder = wgpu.DeviceCreateCommandEncoder ctx.device (typeinit@)
     ;
 
 fn begin-frame ()
@@ -233,27 +231,27 @@ fn begin-frame ()
     if ctx.outdated-surface?
         configure-surface;
 
-    cmd-encoder := (wgpu.DeviceCreateCommandEncoder ctx.device (typeinit@))
-
     surface-texture := (acquire-surface-texture)
     surface-texture-view := (TextureView surface-texture)
 
     # clear
     if (not ctx.msaa?)
         'finish
-            RenderPass cmd-encoder (ColorAttachment (view surface-texture-view) none true ctx.clear-color)
+            RenderPass ctx.cmd-encoder (ColorAttachment (view surface-texture-view) none true ctx.clear-color)
     else
         'finish
-            RenderPass cmd-encoder (ColorAttachment (get-msaa-resolve-source) (view surface-texture-view) true ctx.clear-color)
+            RenderPass ctx.cmd-encoder (ColorAttachment (get-msaa-resolve-source) (view surface-texture-view) true ctx.clear-color)
 
     ctx.surface-texture = surface-texture
     ctx.surface-texture-view = surface-texture-view
-    ctx.cmd-encoder = cmd-encoder
 
 fn present ()
     using types
 
-    cmd-encoder := imply ('force-unwrap ('swap ctx.cmd-encoder none)) CommandEncoder
+    # immediately replace with the next encoder
+    local cmd-encoder : CommandEncoder = wgpu.DeviceCreateCommandEncoder ctx.device (typeinit@)
+    swap ctx.cmd-encoder cmd-encoder
+
     'submit ('finish cmd-encoder)
     wgpu.SurfacePresent ctx.surface
     ctx.surface-texture-view = none

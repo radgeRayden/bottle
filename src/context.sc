@@ -159,7 +159,7 @@ struct BottleGPUState
 
     surface-size : ivec2
     scaled-surface-size : ivec2
-    cmd-encoder : (Option types.CommandEncoder)
+    cmd-encoder : types.CommandEncoder
     surface-texture : (Option types.Texture)
     surface-texture-view : (Option types.TextureView)
     msaa-resolve-source : (Option types.TextureView)
