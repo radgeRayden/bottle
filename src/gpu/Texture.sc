@@ -1,6 +1,4 @@
-using import Array
-using import String
-using import struct
+using import Array glm property String struct
 
 using import .common ..context ..helpers ..asset.ImageData ..exceptions \
     .texture-format .types radl.strfmt
@@ -57,24 +55,15 @@ type+ Texture
             copy image-data.format
             image-data
 
-    fn get-size (self)
-        width := wgpu.TextureGetWidth self
-        height := wgpu.TextureGetHeight self
-        slices := wgpu.TextureGetDepthOrArrayLayers self
-        _ width height slices
-
-    fn get-format (self)
-        wgpu.TextureGetFormat self
-
     fn... frame-write (self, image-data : ImageData, x = 0:u32, y = 0:u32, z = 0:u32, mip-level = 0:u32, aspect = wgpu.TextureAspect.All)
-        format := 'get-format self
+        format := self.Format
         if (image-data.format != format)
             raise GPUError.InvalidOperation #S"Mismatched formats between ImageData and Texture"
 
         block-size := get-texel-block-size format aspect
 
         iwidth iheight islices := image-data.width, image-data.height, image-data.slices
-        twidth theight tslices := 'get-size self
+        twidth theight tslices := unpack self.Size
         data-size          := iwidth * iheight * islices * block-size
         texture-size-bytes := twidth * theight * tslices * block-size
         buffer-offset      := x * y * z * block-size
@@ -98,6 +87,30 @@ type+ Texture
                 bytesPerRow = iwidth * block-size
                 rowsPerImage = iheight
             &local wgpu.Extent3D iwidth iheight islices
+
+    let Size =
+        property
+            inline (self)
+                width := wgpu.TextureGetWidth self
+                height := wgpu.TextureGetHeight self
+                slices := wgpu.TextureGetDepthOrArrayLayers self
+                uvec3 width height slices
+
+    let Dimension =
+        property
+            (self) -> (wgpu.TextureGetDimension self)
+
+    let Format =
+        property
+            (self) -> (wgpu.TextureGetFormat self)
+
+    let MipLevelCount =
+        property
+            (self) -> (wgpu.TextureGetMipLevelCount self)
+
+    let SampleCount =
+        property
+            (self) -> (wgpu.TextureGetSampleCount self)
 
 type+ TextureView
     inline... __typecall (cls, source-texture : Texture)
