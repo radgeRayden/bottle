@@ -68,7 +68,6 @@ type+ RenderPass
 
     inline finish (self)
         wgpu.RenderPassEncoderEnd self
-        lose self
 
     fn... set-pipeline (self, pipeline : RenderPipeline)
         wgpu.RenderPassEncoderSetPipeline (view self) (view pipeline)
