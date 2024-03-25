@@ -31,7 +31,7 @@ inline define-object (name super release reference)
         inline __imply (thisT otherT)
             static-if ((unqualified otherT) == super)
                 inline (self)
-                    dupe (self as otherT)
+                    bitcast ('rawptr self) otherT
 
         inline __== (thisT otherT)
             static-if (imply? thisT otherT)
@@ -52,7 +52,7 @@ inline define-object (name super release reference)
             imply (dupe ptr) (typeof self)
 
         inline rawptr (self)
-            dupe (storagecast self)
+            dupe (storagecast (view self))
 
 inline define-flags (enumT)
     inline __typecall (cls flags...)
