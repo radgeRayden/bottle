@@ -34,8 +34,7 @@ fn shader-module-from-GLSL (code stage)
             defines = &defines
 
 type+ ShaderModule
-    inline... __typecall (cls, source : String, source-language : ShaderLanguage, ...)
-        stage := ...
+    inline... __typecall (cls, source : String, source-language : ShaderLanguage, stage : (param? wgpu.ShaderStage) = none)
         let module =
             static-match source-language
             case ShaderLanguage.WGSL
@@ -52,11 +51,7 @@ type+ ShaderModule
 
         wrap-nullable-object cls module
 
-    case (cls, f : Closure, source-language : ShaderLanguage, ...)
-        stage := ...
-        static-if (none? stage)
-            static-error "scopes shaders require stage information"
-
+    case (cls, f : Closure, source-language : ShaderLanguage, stage : wgpu.ShaderStage)
         vvv bind target
         static-match stage
         case wgpu.ShaderStage.Vertex
