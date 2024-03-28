@@ -9,6 +9,7 @@ let gpu = (import .src.gpu)
 let imgui = (import .src.imgui)
 # let input = (import .src.input)
 let keyboard = (import .src.keyboard)
+let logger = (import .src.logger)
 let main = (import .src.main)
 let math = (import .src.math)
 let mouse = (import .src.mouse)
@@ -36,6 +37,7 @@ vvv bind bottle
             imgui
             # input
             keyboard
+            logger
             math
             mouse
             plonk
