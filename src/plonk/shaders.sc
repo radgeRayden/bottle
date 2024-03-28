@@ -35,6 +35,17 @@ inline vertex-shader (uniformT bindings...)
             vtexcoords = texcoords
             vcolor = color
 
+inline fragment-shader (f)
+    fn ()
+        uniform s : sampler (set = 1) (binding = 0)
+        uniform t : texture2D (set = 1) (binding = 1)
+
+        in vtexcoords : vec2 (location = 0)
+        in vcolor : vec4 (location = 1)
+        out fcolor : vec4 (location = 0)
+
+        fcolor = (f t s vtexcoords vcolor)
+
 do
     @@ vertex-shader PlonkUniforms VertexAttributes
     inline generic-vert (uniforms data)
@@ -117,14 +128,9 @@ do
             texcoords = (vec2)
             color = line.color
 
-    fn generic-frag ()
-        uniform s : sampler (set = 1) (binding = 0)
-        uniform t : texture2D (set = 1) (binding = 1)
+    @@ fragment-shader
+    inline generic-frag (t s vtexcoords vcolor)
+        (texture (sampler2D t s) vtexcoords) * vcolor
 
-        in vtexcoords : vec2 (location = 0)
-        in vcolor : vec4 (location = 1)
-        out fcolor : vec4 (location = 0)
-
-        fcolor = (texture (sampler2D t s) vtexcoords) * vcolor
 
     local-scope;
