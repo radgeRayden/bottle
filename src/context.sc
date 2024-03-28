@@ -1,5 +1,5 @@
-using import Array glm hash Option print String struct
-import .gpu.wgpu sdl3 .types
+using import Array glm hash Map Option print radl.strfmt String struct
+import .gpu.wgpu .logger sdl3 .types
 
 wgpu := gpu.wgpu
 sdl  := sdl3
@@ -166,6 +166,28 @@ struct BottleGPUState
     surface-texture-view : (Option types.TextureView)
     msaa-resolve-source : (Option types.TextureView)
     outdated-surface? : bool
+
+    internal-resources :
+        struct BottleInternalGPUResources
+            typedef ResourceKey <<: hash
+                inline __hash (self)
+                    bitcast self hash
+                inline __== (thisT otherT)
+                    static-if (otherT == hash)
+                        inline (self other)
+                            (bitcast self hash) == other
+                inline __rimply (otherT thisT)
+                    static-if (otherT == hash)
+                        inline (incoming)
+                            bitcast incoming this-type
+
+            Cache := (T) -> (Map ResourceKey T)
+
+            textures : (Cache types.Texture)
+            samplers : (Cache types.Sampler)
+            bind-groups : (Cache types.BindGroup)
+            pipeline-layouts : (Cache types.PipelineLayout)
+            pipelines : (Cache types.RenderPipeline)
 
     clear-color = (vec4 0.017 0.017 0.017 1.0)
     msaa? : bool

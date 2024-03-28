@@ -1,5 +1,5 @@
 import C.stdlib
-using import Array glm print radl.ext radl.strfmt String struct
+using import Array glm hash print radl.ext radl.strfmt String struct
 import ..logger sdl .types .wgpu ..window
 
 from wgpu let typeinit@ chained@
@@ -279,6 +279,35 @@ fn generate-report ()
         logger.write-fatal "unsupported renderer backend"
         abort;
 
+inline get-or-set-internal-resource (T name makef ...)
+    using types
+    let k =
+        static-if (constant? name)
+            static-eval (hash (name as string))
+        else
+            hash name
+
+    res := ctx.internal-resources
+
+    inline get-or-set (m)
+        try (copy ('get m k))
+        else
+            v := (makef ...)
+            'set m k (copy v)
+            v
+
+    static-match T
+    case Texture
+        get-or-set res.textures
+    case Sampler
+        get-or-set res.samplers
+    case BindGroup
+        get-or-set res.bind-groups
+    case PipelineLayout
+        get-or-set res.pipeline-layouts
+    case RenderPipeline
+        get-or-set res.pipelines
+    default (static-error "invalid type for internal resource")
 
 do
     let init set-clear-color begin-frame present \
@@ -287,6 +316,7 @@ do
         msaa-enabled? get-present-mode set-present-mode
     let flag-surface-outdated
     let generate-report
+    let get-or-set-internal-resource
 
     let types
 
