@@ -223,6 +223,8 @@ fn init ()
 
     ctx.queue = (wgpu.DeviceGetQueue ctx.device)
     ctx.cmd-encoder = wgpu.DeviceCreateCommandEncoder ctx.device (typeinit@)
+
+    'collect-info ctx.renderer-backend-info
     ;
 
 fn begin-frame ()
@@ -260,6 +262,11 @@ fn present ()
 
 fn flag-surface-outdated ()
     ctx.outdated-surface? = true
+
+fn generate-report ()
+    local report : wgpu.GlobalReport
+    wgpu.GenerateReport ctx.instance &report
+    report
 
 do
     let init set-clear-color begin-frame present \

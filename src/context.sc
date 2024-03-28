@@ -157,6 +157,8 @@ struct BottleGPUState
     device   : wgpu.Device
     queue    : wgpu.Queue
 
+    renderer-backend-info : types.RendererBackendInfo
+
     surface-size : ivec2
     scaled-surface-size : ivec2
     cmd-encoder : types.CommandEncoder

@@ -1,4 +1,4 @@
-using import Array enum String struct
+using import Array enum radl.strfmt String struct
 import .wgpu
 
 do
@@ -38,4 +38,33 @@ do
     ShaderStageFlags := wgpu.ShaderStageFlags
     Sampler := GPUSampler
     unlet GPUSampler
+
+    struct RendererBackendInfo
+        struct WGPUVersion
+            major : u8
+            minor : u8
+            patch : u8
+            revision : u8
+
+            inline... __typecall (cls, value)
+                using import format
+                super-type.__typecall cls
+                    major = ((value >> 24) & 0xFF) as u8
+                    minor = ((value >> 16) & 0xFF) as u8
+                    patch = ((value >> 8) & 0xFF) as u8
+                    revision = (value & 0xFF) as u8
+            case (cls)
+                this-function cls 0:u32
+
+            inline __repr (self)
+                f"v${self.major}.${self.minor}.${self.patch}.${self.revision}"
+
+        version : WGPUVersion
+        vendor : String
+        architecture : String
+        device : String
+        driver : String
+        adapter : wgpu.AdapterType
+        low-level-backend : wgpu.BackendType
+
     local-scope;
