@@ -12,14 +12,13 @@ type+ Texture
     inline... __typecall (cls,
                           width : u32,
                           height : u32,
+                          slices : u32 = 1:u32,
                           format : (param? wgpu.TextureFormat) = none,
                           image-data : (param? ImageData) = none,
-                          render-target? = false,
-                          dimension = wgpu.TextureDimension.2D,
-                          slices = 1:u32,
-                          mipmap-levels = 1:u32,
-                          generate-mipmaps? = false,
-                          sample-count = 1:u32)
+                          render-target? : bool = false,
+                          dimension : wgpu.TextureDimension = '2D,
+                          mipmap-levels : u32 = 1:u32,
+                          sample-count : u32 = 1:u32)
 
         usage :=
             | wgpu.TextureUsage.CopyDst
@@ -52,6 +51,7 @@ type+ Texture
         this-function cls
             copy image-data.width
             copy image-data.height
+            copy image-data.slices
             copy image-data.format
             image-data
 

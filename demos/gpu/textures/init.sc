@@ -46,7 +46,7 @@ fn ()
         let image-data =
             bottle.asset.load-image "assets/linus.jpg"
 
-        my-texture := Texture (copy image-data.width) (copy image-data.height) none (image-data = image-data)
+        my-texture := Texture (copy image-data.width) (copy image-data.height) 1:u32 (image-data = image-data)
         texture-view := TextureView my-texture
         bind-group := BindGroup ('get-bind-group-layout pipeline 0) (Sampler) texture-view
 

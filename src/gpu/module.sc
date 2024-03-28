@@ -46,7 +46,7 @@ fn create-msaa-resolve-source (width height)
     using types
     try
         TextureView
-            Texture (u32 width) (u32 height) (get-preferred-surface-format) none
+            Texture (u32 width) (u32 height) 1:u32 (get-preferred-surface-format) none
                 render-target? = true
                 sample-count = ctx.msaa? 4:u32 1:u32
     else
