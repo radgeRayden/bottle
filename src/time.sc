@@ -61,6 +61,6 @@ fn sleep (milliseconds)
 
 do
     let init set-global-time-scale get-global-time-scale \
-        get-time get-delta-time get-fixed-timestep get-raw-delta-time \
+        get-time get-delta-time get-fixed-timestep get-raw-time get-raw-delta-time \
         get-fps step sleep
     local-scope;
