@@ -240,6 +240,7 @@ fn begin-frame ()
     if (not ctx.msaa?)
         'finish
             RenderPass ctx.cmd-encoder (ColorAttachment (view surface-texture-view) none true ctx.clear-color)
+                label-suffix = "internal clear"
     else
         'finish
             RenderPass ctx.cmd-encoder (ColorAttachment (get-msaa-resolve-source) (view surface-texture-view) true ctx.clear-color)

@@ -6,6 +6,7 @@ using import .common
 using import ..exceptions
 using import ..helpers
 using import .types
+using import radl.strfmt
 import .wgpu
 
 type+ ColorAttachment
@@ -20,7 +21,7 @@ type+ ColorAttachment
         bitcast attachment cls
 
 type+ RenderPass
-    inline __typecall (cls cmd-encoder color-attachments depth-stencil-texture-view)
+    inline __typecall (cls cmd-encoder color-attachments depth-stencil-texture-view label-suffix)
         vvv bind color-attachments count
         static-match (typeof color-attachments)
         case (Array ColorAttachment)
@@ -59,7 +60,7 @@ type+ RenderPass
         let handle =
             wgpu.CommandEncoderBeginRenderPass cmd-encoder
                 &local wgpu.RenderPassDescriptor
-                    label = "Bottle Render Pass"
+                    label = dupe (f"Bottle Render Pass ${label-suffix}" as rawstring)
                     colorAttachmentCount = count
                     colorAttachments = color-attachments as (@ wgpu.RenderPassColorAttachment)
                     depthStencilAttachment = depth-stencil-attachment
