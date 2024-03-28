@@ -30,13 +30,29 @@ fn (key)
 fn display-fps ()
     ig := import ..src.imgui
     ig.SetNextWindowPos (ig.Vec2 10 10) ig.Cond.Always (ig.Vec2 0 0)
-    ig.SetNextWindowSize (ig.Vec2 245 80) ig.Cond.Always
+    ig.SetNextWindowSize (ig.Vec2 245 300) ig.Cond.Always
     ig.Begin "fps" null
         enum-bitfield ig.WindowFlags i32
             'NoDecoration
             'NoBackground
     ig.Text "FPS: %d" (bottle.time.get-fps)
     ig.Text "Time Scale: %.2f" (bottle.time.get-global-time-scale)
+    rep := (bottle.gpu.generate-report)
+
+    inline n (r)
+        r.numKeptFromUser
+
+    ig.Text
+        """"textures: %llu
+            textureViews: %llu
+            samplers: %llu
+            bg-layouts: %llu
+            pip-layouts: %llu
+        n rep.textures
+        n rep.textureViews
+        n rep.samplers
+        n rep.bindGroupLayouts
+        n rep.pipelineLayouts
     ig.End;
     ()
 

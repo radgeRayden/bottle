@@ -264,9 +264,20 @@ fn flag-surface-outdated ()
     ctx.outdated-surface? = true
 
 fn generate-report ()
-    local report : wgpu.GlobalReport
-    wgpu.GenerateReport ctx.instance &report
-    report
+    local global-report : wgpu.GlobalReport
+    wgpu.GenerateReport ctx.instance &global-report
+
+    switch ctx.renderer-backend-info.low-level-backend
+    case 'D3D12
+        global-report.dx12
+    case 'Metal
+        global-report.metal
+    case 'Vulkan
+        global-report.vulkan
+    default
+        logger.write-fatal "unsupported renderer backend"
+        abort;
+
 
 do
     let init set-clear-color begin-frame present \
@@ -274,6 +285,7 @@ do
         get-surface-texture get-msaa-resolve-source \
         msaa-enabled? get-present-mode set-present-mode
     let flag-surface-outdated
+    let generate-report
 
     let types
 
