@@ -20,10 +20,10 @@ type+ BindGroup
                                 size = ('get-byte-size entry) as u64
                         case (entry : TextureView)
                             _
-                                textureView = ('rawptr entry)
+                                textureView = view entry
                         case (entry : Sampler)
                             _
-                                sampler = entry
+                                sampler = view entry
 
                         wgpu.BindGroupEntry (binding = idx)
                             match-entry entry
