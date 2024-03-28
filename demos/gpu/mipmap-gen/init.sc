@@ -26,7 +26,6 @@ fn ()
         end := (bottle.time.get-raw-time)
         bench-time = end - start
     except (ex)
-        report ex
         ()
     bottle.quit!;
 
