@@ -37,7 +37,7 @@ def task_force_bootstrap():
     }
 
 def demo_cmd(name):
-    return cmd(f"scopes -e run.sc {name}")
+    return cmd(f"RUST_BACKTRACE=1 scopes -e run.sc {name}")
 
 demos = []
 with open('demos/demo-list.txt', 'r') as file:
