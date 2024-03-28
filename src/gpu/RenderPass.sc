@@ -68,7 +68,8 @@ type+ RenderPass
         wrap-nullable-object cls handle
 
     inline finish (self)
-        wgpu.RenderPassEncoderEnd self
+        wgpu.RenderPassEncoderEnd ('rawptr self)
+        lose self
 
     fn... set-pipeline (self, pipeline : RenderPipeline)
         wgpu.RenderPassEncoderSetPipeline (view self) (view pipeline)
