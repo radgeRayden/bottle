@@ -1,4 +1,4 @@
-using import .context enum logger print radl.strfmt String struct
+using import .context enum print radl.strfmt String struct
 import .logger sdl3
 
 sdl := sdl3
@@ -110,12 +110,6 @@ fn fullscreen? ()
 fn toggle-fullscreen ()
     set-fullscreen (not (fullscreen?))
 
-fn set-icon (image-data)
-    # sdl.SetWindowIcon (get-handle)
-    #     sdl.CreateRGBSurface 0 (i32 image-data.width) (i32 image-data.height) 32 \
-    #         0xFF000000 0x00FF0000 0x0000FF00 0x000000FF
-    ()
-
 fn init ()
     static-match operating-system
     case 'windows
@@ -207,7 +201,6 @@ do
         get-desktop-scaling-factor
         set-title
         get-title
-        set-icon
         minimized?
         shutdown
 
