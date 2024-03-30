@@ -79,7 +79,7 @@ fn mipmap-fragment-shader ()
     ()
 
 fn mipmap-pipeline-layout ()
-    module.get-or-set-internal-resource PipelineLayout "mipmap-gen-pipeline-layout"
+    module.get-internal-pipeline-layout S"mipmap-gen-pipeline-layout"
         fn ()
             local bg-entries =
                 arrayof wgpu.BindGroupLayoutEntry
@@ -126,7 +126,7 @@ fn mipmap-pipeline-layout ()
             imply pip-layout PipelineLayout
 
 fn mipmap-pipeline (color-format)
-    module.get-or-set-internal-resource RenderPipeline f"mipmap-gen-pipeline-${color-format}"
+    module.get-internal-pipeline f"mipmap-gen-pipeline-${color-format}"
         fn (color-format)
             pip-layout := (mipmap-pipeline-layout)
             vert := ShaderModule mipmap-vertex-shader 'SPIRV 'Vertex
@@ -173,7 +173,7 @@ fn mipmap-pipeline (color-format)
         color-format
 
 fn mipmap-render-target (color-format)
-    module.get-or-set-internal-resource Texture f"mipmap-gen-render-target-${color-format}"
+    module.get-internal-texture f"mipmap-gen-render-target-${color-format}"
         fn (color-format)
             wgpu.DeviceCreateTexture ctx.device
                 typeinit@
@@ -190,7 +190,7 @@ fn mipmap-render-target (color-format)
         color-format
 
 fn mipmap-sampler (level)
-    module.get-or-set-internal-resource Sampler f"mipmap-gen-sampler-${level}"
+    module.get-internal-sampler f"mipmap-gen-sampler-${level}"
         fn (level)
             wgpu.DeviceCreateSampler ctx.device
                 typeinit@

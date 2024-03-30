@@ -1,4 +1,4 @@
-using import Array glm hash Map Option print radl.strfmt String struct
+using import Array glm hash Map Option print radl.Cache radl.strfmt String struct
 import .gpu.wgpu .logger sdl3 .types
 
 wgpu := gpu.wgpu
@@ -169,20 +169,6 @@ struct BottleGPUState
 
     internal-resources :
         struct BottleInternalGPUResources
-            typedef ResourceKey <<: hash
-                inline __hash (self)
-                    bitcast self hash
-                inline __== (thisT otherT)
-                    static-if (otherT == hash)
-                        inline (self other)
-                            (bitcast self hash) == other
-                inline __rimply (otherT thisT)
-                    static-if (otherT == hash)
-                        inline (incoming)
-                            bitcast incoming this-type
-
-            Cache := (T) -> (Map ResourceKey T)
-
             textures : (Cache types.Texture)
             samplers : (Cache types.Sampler)
             bind-groups : (Cache types.BindGroup)

@@ -279,35 +279,9 @@ fn generate-report ()
         logger.write-fatal "unsupported renderer backend"
         abort;
 
-inline get-or-set-internal-resource (T name makef ...)
-    using types
-    let k =
-        static-if (constant? name)
-            static-eval (hash (name as string))
-        else
-            hash name
-
-    res := ctx.internal-resources
-
-    inline get-or-set (m)
-        try (copy ('get m k))
-        else
-            v := (makef ...)
-            'set m k (copy v)
-            v
-
-    static-match T
-    case Texture
-        get-or-set res.textures
-    case Sampler
-        get-or-set res.samplers
-    case BindGroup
-        get-or-set res.bind-groups
-    case PipelineLayout
-        get-or-set res.pipeline-layouts
-    case RenderPipeline
-        get-or-set res.pipelines
-    default (static-error "invalid type for internal resource")
+inline make-resource-cache-get (cache)
+    inline get-internal-resource (k makef args...)
+        'get (getattr ctx.internal-resources cache) k makef args...
 
 do
     let init set-clear-color begin-frame present \
@@ -316,7 +290,12 @@ do
         msaa-enabled? get-present-mode set-present-mode
     let flag-surface-outdated
     let generate-report
-    let get-or-set-internal-resource
+
+    get-internal-texture := make-resource-cache-get 'textures
+    get-internal-sampler := make-resource-cache-get 'samplers
+    get-internal-bind-group := make-resource-cache-get 'bind-groups
+    get-internal-pipeline-layout := make-resource-cache-get 'pipeline-layouts
+    get-internal-pipeline := make-resource-cache-get 'pipelines
 
     let types
 
