@@ -3,6 +3,7 @@ import .callbacks ..gpu ..enums ..imgui ..window
 
 sdl := import sdl3
 ctx := context-accessor 'sysevents
+window-ctx := context-accessor 'window
 
 fn really-quit! ()
     ctx.application-quit? = true
@@ -62,10 +63,10 @@ inline dispatch (handler)
             gpu.flag-surface-outdated;
 
         case 'WINDOW_ENTER_FULLSCREEN
-            window._update-fullscreen-flag true
+            window-ctx.fullscreen? = true
 
         case 'WINDOW_LEAVE_FULLSCREEN
-            window._update-fullscreen-flag false
+            window-ctx.fullscreen? = false
 
         case 'GAMEPAD_ADDED
             callbacks.controller-added event.cdevice.which

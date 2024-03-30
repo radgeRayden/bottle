@@ -110,10 +110,6 @@ fn fullscreen? ()
 fn toggle-fullscreen ()
     set-fullscreen (not (fullscreen?))
 
-# TODO: remove this once we migrate state to context.sc
-fn _update-fullscreen-flag (value)
-    ctx.fullscreen? = value
-
 fn set-icon (image-data)
     # sdl.SetWindowIcon (get-handle)
     #     sdl.CreateRGBSurface 0 (i32 image-data.width) (i32 image-data.height) 32 \
@@ -214,7 +210,6 @@ do
         set-icon
         minimized?
         shutdown
-        _update-fullscreen-flag
 
     let WindowNativeInfo
 
