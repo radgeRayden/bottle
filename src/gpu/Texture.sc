@@ -312,28 +312,16 @@ type+ Texture
             (uniform-data.mip-level-size @ i) = vec4 x y z 0
             'frame-write uniforms (view uniform-data)
 
-        # NOTE: if the texture is already a render target, then copying can be ellided
-        # naturally we don't need to render to the first mip level
+        # NOTE: if the texture is already a render target, then copying can be ellided.
+        # Naturally we don't need to render to the first mip level
         for i in (range 1:u32 levels)
-            local bg-entries =
-                arrayof wgpu.BindGroupEntry
-                    typeinit
-                        binding = 0
-                        sampler = (mipmap-sampler i)
-                    typeinit
-                        binding = 1
-                        textureView = texture-view
-                    typeinit
-                        binding = 2
-                        buffer = imply (view uniforms) wgpu.Buffer
-                        offset = 0
-                        size = ('get-byte-size uniforms) as u64
+            local bind-group = 'builder BindGroup
+            'set-layout bind-group bg-layout
+            'add-entry bind-group (mipmap-sampler i)
+            'add-entry bind-group texture-view
+            'add-entry bind-group uniforms
 
-            bind-group := wgpu.DeviceCreateBindGroup ctx.device
-                typeinit@
-                    layout = (view bg-layout)
-                    entryCount = (countof bg-entries)
-                    entries = &bg-entries
+            bind-group := 'finalize bind-group
 
             render-pass :=
                 wgpu.CommandEncoderBeginRenderPass cmd-encoder
