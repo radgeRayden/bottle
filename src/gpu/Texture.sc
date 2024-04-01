@@ -298,25 +298,12 @@ type+ Texture
         render-target := (mipmap-render-target color-format)
         cmd-encoder := ctx.cmd-encoder
         texture-view :=
-            wgpu.TextureCreateView self
-                typeinit@
-                    format = color-format
-                    dimension = '2D
-                    baseMipLevel = 0
-                    mipLevelCount = 1
-                    baseArrayLayer = 0
-                    arrayLayerCount = 1
-                    aspect = 'All
+            TextureView self
+                mip-level-count = 1
+
         rt-view :=
-            wgpu.TextureCreateView (view render-target)
-                typeinit@
-                    format = color-format
-                    dimension = '2D
-                    baseMipLevel = 0
-                    mipLevelCount = 1
-                    baseArrayLayer = 0
-                    arrayLayerCount = 1
-                    aspect = 'All
+            TextureView (view render-target)
+                mip-level-count = 1
 
         uniforms := ((UniformBuffer MipmapUniformData) 1)
         local uniform-data : MipmapUniformData
@@ -405,7 +392,39 @@ type+ Texture
 type+ TextureView
     inline... __typecall (cls, source-texture : Texture)
         wrap-nullable-object cls
-            wgpu.TextureCreateView source-texture null # TODO: allow configuration via descriptor
+            wgpu.TextureCreateView source-texture null
+    case (cls, source-texture : Texture,
+            dimension : wgpu.TextureViewDimension = '2D,
+            base-mip : u32 = 0:u32,
+            mip-level-count : (param? u32) = none,
+            base-array-layer : u32 = 0:u32,
+            array-layer-count : u32 = 1:u32,
+            aspect : wgpu.TextureAspect = 'All,
+            format : (param? wgpu.TextureFormat) = none)
+
+        let mip-level-count =
+            static-if (none? mip-level-count)
+                source-texture.MipLevelCount
+            else
+                mip-level-count
+
+        let view-format =
+            static-if (none? format)
+                source-texture.Format
+            else
+                format
+
+        wrap-nullable-object cls
+            wgpu.TextureCreateView source-texture
+                typeinit@
+                    label = "bottle texture view"
+                    format = view-format
+                    dimension = dimension
+                    baseMipLevel = base-mip
+                    mipLevelCount = mip-level-count
+                    baseArrayLayer = base-array-layer
+                    arrayLayerCount = array-layer-count
+                    aspect = aspect
 
 do
     let TextureView Texture
