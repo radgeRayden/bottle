@@ -1,6 +1,6 @@
 using import enum
 
-import sdl
+sdl := import sdl3
 
 enum MouseButton plain
     Left    = sdl.SDL_BUTTON_LEFT

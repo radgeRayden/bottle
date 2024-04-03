@@ -1,4 +1,4 @@
-import sdl
+sdl := import sdl3
 import ..gpu
 import ..window
 using import ..gpu.common ..context radl.ext
@@ -39,14 +39,14 @@ fn process-event (event)
     result := ig.ImplSDL3_ProcessEvent event # do we even use this result for anything?
     io := (ig.GetIO)
 
-    switch event.type
-    pass sdl.SDL_MOUSEMOTION
-    pass sdl.SDL_MOUSEBUTTONDOWN
-    pass sdl.SDL_MOUSEBUTTONUP
-    pass sdl.SDL_MOUSEWHEEL
+    switch (event.type as sdl.EventType)
+    pass 'MOUSE_MOTION
+    pass 'MOUSE_BUTTON_DOWN
+    pass 'MOUSE_BUTTON_UP
+    pass 'MOUSE_WHEEL
     do (deref io.WantCaptureMouse)
-    pass sdl.SDL_KEYDOWN
-    pass sdl.SDL_KEYUP
+    pass 'KEY_DOWN
+    pass 'KEY_UP
     do (deref io.WantCaptureKeyboard)
     default false #result
 

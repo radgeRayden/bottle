@@ -1,8 +1,8 @@
 import C.stdlib
 using import Array glm hash print radl.ext radl.strfmt String struct
-import ..logger sdl .types .wgpu ..window
+import ..logger .types .wgpu ..window
 
-from wgpu let typeinit@ chained@
+from wgpu let chained@
 
 using import .common
 using import ..context ..exceptions
