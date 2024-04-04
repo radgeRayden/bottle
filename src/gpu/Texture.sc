@@ -377,6 +377,22 @@ type+ Texture
         property
             (self) -> (wgpu.TextureGetSampleCount self)
 
+    let MaxTextureSize1D =
+        spice-quote
+            deref ctx.limits.maxTextureDimension1D
+
+    let MaxTextureSize2D =
+        spice-quote
+            deref ctx.limits.maxTextureDimension2D
+
+    let MaxTextureSize3D =
+        spice-quote
+            deref ctx.limits.maxTextureDimension3D
+
+    let MaxTextureArrayLayers =
+        spice-quote
+            deref ctx.limits.maxTextureArrayLayers
+
 type+ TextureView
     inline... __typecall (cls, source-texture : Texture)
         wrap-nullable-object cls
