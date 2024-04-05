@@ -173,6 +173,7 @@ fn mipmap-pipeline (color-format)
         color-format
 
 fn mipmap-render-target (color-format)
+    # TODO: estimate a texture size and grow if necessary
     module.get-internal-texture f"mipmap-gen-render-target-${color-format}"
         fn (color-format)
             wgpu.DeviceCreateTexture ctx.device
