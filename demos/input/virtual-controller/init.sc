@@ -107,9 +107,9 @@ inline... convert-axis (axis : bottle.enums.ControllerAxis)
         evdev.ABS_RX
     case 'RightY
         evdev.ABS_RY
-    case 'TriggerLeft
+    case 'LeftTrigger
         evdev.ABS_HAT2Y
-    case 'TriggerRight
+    case 'RightTrigger
         evdev.ABS_HAT2X
     default
         0
@@ -143,8 +143,8 @@ struct VirtualController
         enable-axis 'LeftY -1 1
         enable-axis 'RightX -1 1
         enable-axis 'RightY -1 1
-        enable-axis 'TriggerLeft 0 1
-        enable-axis 'TriggerRight 0 1
+        enable-axis 'LeftTrigger 0 1
+        enable-axis 'RightTrigger 0 1
 
         local uidev : (mutable@ evdev.uinput)
         err := evdev.uinput_create_from_device device evdev.LIBEVDEV_UINPUT_OPEN_MANAGED &uidev
@@ -236,9 +236,9 @@ inline map-axis (key cb)
 
     switch key
     case 'q
-        cb 'TriggerLeft 1
+        cb 'LeftTrigger 1
     case 'e
-        cb 'TriggerRight 1
+        cb 'RightTrigger 1
     case 'w
         axis := shift? CA.RightY CA.LeftY
         cb axis -1
