@@ -22,6 +22,10 @@ inline wgpu-array-query (f args...)
     f ((va-join args...) ptr)
     result
 
+
+fn get-preferred-surface-format ()
+    wgpu.SurfaceGetPreferredFormat ctx.surface ctx.adapter
+
 fn create-surface ()
     dispatch (window.get-native-info)
     case X11 (display window)

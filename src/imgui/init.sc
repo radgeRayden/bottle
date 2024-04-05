@@ -1,10 +1,9 @@
-sdl := import sdl3
-import ..gpu
-import ..window
+import ..gpu ..window
 using import ..gpu.common ..context radl.ext
 
 wgpu := import ..gpu.wgpu
 ig   := import .bindings
+sdl  := import sdl3
 
 wgpu-device := context-accessor 'gpu 'device
 scaled-surface-size := context-accessor 'gpu 'scaled-surface-size
@@ -18,7 +17,7 @@ fn init ()
         do
             local info : ig.ImGui_ImplWGPU_InitInfo
                 (wgpu-device)
-                RenderTargetFormat = (get-preferred-surface-format)
+                RenderTargetFormat = (gpu.get-preferred-surface-format)
             ig.ImplWGPU_Init &info
     ()
 
