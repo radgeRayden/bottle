@@ -73,7 +73,7 @@ type+ BindGroup
                         entryCount = count
                         entries = dupe ptr
 
-    fn builder (cls)
+    inline builder (cls)
         (BindGroupBuilder)
 
 ()
