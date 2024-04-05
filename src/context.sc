@@ -1,4 +1,4 @@
-using import Array glm hash Map Option print radl.Cache radl.strfmt String struct
+using import Array glm hash Map Option print radl.Cache radl.strfmt Set String struct
 import .gpu.wgpu .logger sdl3 .types
 
 wgpu := gpu.wgpu
@@ -148,7 +148,7 @@ struct WGPUAdapterInfo
 
 struct BottleGPUState
     available-adapters      : (Array WGPUAdapterInfo)
-    available-present-modes : (Array wgpu.PresentMode)
+    available-present-modes : (Set wgpu.PresentMode)
     limits : wgpu.Limits
 
     instance : wgpu.Instance

@@ -95,9 +95,34 @@ fn get-msaa-resolve-source ()
 fn get-present-mode ()
     deref ctx.present-mode
 
-fn... set-present-mode (present-mode : wgpu.PresentMode)
-    ctx.present-mode = present-mode
-    ctx.outdated-surface? = true
+fn... set-present-mode (present-mode : wgpu.PresentMode, reconfigure-surface? : bool = true)
+    from wgpu let PresentMode
+    modes := ctx.available-present-modes
+
+    inline... check-mode (mode : PresentMode, fallback : PresentMode)
+        mode fallback := imply mode wgpu.PresentMode, imply fallback wgpu.PresentMode
+        if ('in? modes mode)
+            mode
+        elseif ('in? modes fallback)
+            fallback
+        else PresentMode.Fifo
+
+    let selected-mode =
+        switch present-mode
+        case 'Immediate
+            check-mode 'Immediate 'Mailbox
+        case 'Mailbox
+            check-mode 'Mailbox 'Immediate
+        case 'FifoRelaxed
+            check-mode 'FifoRelaxed 'Fifo
+        default
+            PresentMode.Fifo # always available
+
+    if (present-mode != selected-mode)
+        logger.write-warning f"${present-mode} present mode was unavailable, falling back to ${selected-mode}"
+
+    ctx.present-mode = selected-mode
+    ctx.outdated-surface? = reconfigure-surface?
 
 fn msaa-enabled? ()
     deref ctx.msaa?
@@ -177,6 +202,16 @@ fn init ()
                 abort;
         null
 
+    do
+        local caps : wgpu.SurfaceCapabilities
+        wgpu.SurfaceGetCapabilities ctx.surface ctx.adapter &caps
+        for i in (range caps.presentModeCount)
+            'insert ctx.available-present-modes (caps.presentModes @ i)
+
+        wgpu.SurfaceCapabilitiesFreeMembers caps
+
+    set-present-mode cfg.present-mode false
+
     local required-features =
         arrayof wgpu.FeatureName
             'Depth32FloatStencil8
@@ -214,7 +249,6 @@ fn init ()
                 ()
         null
 
-    ctx.present-mode = cfg.present-mode
     ctx.msaa? = cfg.msaa?
     configure-surface;
 
