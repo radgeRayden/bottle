@@ -324,6 +324,8 @@ fn generate-report ()
         global-report.metal
     case 'Vulkan
         global-report.vulkan
+    case 'OpenGL
+        global-report.gl
     default
         logger.write-fatal "unsupported renderer backend"
         abort;
