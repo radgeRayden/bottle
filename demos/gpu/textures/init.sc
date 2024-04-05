@@ -1,10 +1,5 @@
-using import Array
-using import Option
-using import struct
-using import String
-
-import bottle
-import ...demo-common
+using import Array Option struct String
+import bottle ...demo-common
 
 using bottle.gpu.types
 using bottle.types
