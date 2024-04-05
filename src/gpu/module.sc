@@ -205,8 +205,19 @@ fn init ()
     do
         local caps : wgpu.SurfaceCapabilities
         wgpu.SurfaceGetCapabilities ctx.surface ctx.adapter &caps
+
+        local present-mode-report : String = "\nAvailable present modes:\n"
         for i in (range caps.presentModeCount)
-            'insert ctx.available-present-modes (caps.presentModes @ i)
+            present-mode := caps.presentModes @ i
+            'insert ctx.available-present-modes present-mode
+            present-mode-report ..= f""""    - ${present-mode}
+        logger.write-info present-mode-report
+
+        local surface-format-report : String = "\nAvailable surface formats:\n"
+        for i in (range caps.formatCount)
+            surface-format := caps.formats @ i
+            surface-format-report ..= f""""    - ${surface-format}
+        logger.write-info surface-format-report
 
         wgpu.SurfaceCapabilitiesFreeMembers caps
 
