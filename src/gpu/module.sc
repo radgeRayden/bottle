@@ -59,7 +59,6 @@ fn create-msaa-resolve-source (width height)
 
 fn configure-surface ()
     width height := (window.get-drawable-size)
-    logger.write-debug f"Configuring surface of size: ${width}x${height}"
     ctx.surface-size = ivec2 width height
     ctx.scaled-surface-size = ivec2 (window.get-size)
     wgpu.SurfaceConfigure ctx.surface
