@@ -1,6 +1,6 @@
 using import Array glm Option String struct radl.strfmt
-import bottle sdl
-using import print
+import bottle
+sdl := import sdl3
 
 @@ 'on bottle.configure
 fn (cfg)
@@ -9,8 +9,8 @@ fn (cfg)
     cfg.window.height = 900
 
 struct AppContext
-    controllers : (Array (mutable@ sdl.GameController))
-    selected-controller : (mutable@ sdl.GameController)
+    controllers : (Array (mutable@ sdl.Gamepad))
+    selected-controller : (mutable@ sdl.Gamepad)
 
 global ctx : AppContext
 
@@ -19,7 +19,7 @@ fn ()
 
 @@ 'on bottle.controller-added
 fn (id)
-    'append ctx.controllers (sdl.GameControllerOpen id)
+    'append ctx.controllers (sdl.OpenGamepad id)
 
 @@ 'on bottle.controller-removed
 fn (id)
@@ -39,7 +39,7 @@ fn render-UI ()
     for idx id in (enumerate ctx.controllers)
         is-selected? := id == ctx.selected-controller
 
-        name := sdl.GameControllerName id
+        name := sdl.GetGamepadName id
         name := (name == null) &"unnamed" name
         if (ig.Selectable_Bool f"${name}##${idx}" is-selected? 0 (ig.Vec2))
             ctx.selected-controller = id
@@ -48,7 +48,7 @@ fn render-UI ()
     ig.End;
 
 fn... button-down? (button : bottle.enums.ControllerButton)
-    bool (sdl.GameControllerGetButton ctx.selected-controller button)
+    bool (sdl.GetGamepadButton ctx.selected-controller button)
 
 @@ 'on bottle.render
 fn ()
