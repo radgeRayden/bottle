@@ -74,6 +74,16 @@ fn env-wgpu-backend (value)
 fn env-wgpu-log-level (value)
     match-string-enum wgpu.LogLevel value
 
+@@ from-environment "BOTTLE_WGPU_ENABLE_VALIDATION" false
+fn env-wgpu-enable-validation (value)
+    match value
+    case "false"
+        false
+    case "0"
+        false
+    default
+        true
+
 @@ from-environment "BOTTLE_DISABLED_MODULES" (() -> ((Array String)))
 fn env-disabled-modules (value)
     using import radl.String+
@@ -112,7 +122,7 @@ struct BottleConfig
             present-mode : wgpu.PresentMode = 'Fifo
             wgpu-low-level-backend : wgpu.InstanceBackend = 'Primary
             wgpu-log-level : wgpu.LogLevel = 'Warn
-            enable-validation? : bool = true
+            enable-validation? : bool = false
     enabled-modules :
         struct BottleEnabledModules plain
             plonk = true
@@ -135,6 +145,7 @@ struct BottleConfig
         if (not self.ignore-environment-variables?)
             self.gpu.wgpu-low-level-backend = (env-wgpu-backend)
             self.gpu.wgpu-log-level         = (env-wgpu-log-level)
+            self.gpu.enable-validation?     = (env-wgpu-enable-validation)
 
             disabled-modules := (env-disabled-modules)
             for module in (env-disabled-modules)
