@@ -58,7 +58,7 @@ struct GeometryBatch
                         color-targets =
                             typeinit
                                 ColorTarget
-                                    format = TextureFormat.BGRA8UnormSrgb
+                                    format = (gpu.get-preferred-surface-format)
                 msaa-samples = (gpu.msaa-enabled?) 4:u32 1:u32
 
         attrbuf := (StorageBuffer VertexAttributes) 4096
