@@ -3,6 +3,7 @@ using import Array Map Option print radl.ext radl.rect-pack \
 
 import ..demo-common
 import bottle fontdue
+using bottle.types
 
 test-string :=
     """"Crazy? I Was Crazy Once. They Locked Me In A Room.
@@ -11,26 +12,22 @@ test-string :=
 @@ 'on bottle.configure
 fn (cfg)
     cfg.window.title = "font rendering"
-
-struct GlyphInfo
-    rect : AtlasRect
-    metrics : fontdue.Metrics
-
-struct RasterizedFont
-    atlas : bottle.types.TextureView
-    glyphs : (Map u32 GlyphInfo)
+    cfg.platform.force-x11? = true
 
 struct DemoContext
-    font : RasterizedFont
+    font : FontFamily
+    font-atlas : Texture
+    atlas-view : TextureView
+
 global ctx : (Option DemoContext)
 
-fn load-font (font-data font-size)
+# fn load-font (font-data font-size)
     using bottle.types
 
     local font-atlas : Atlas
     # TODO: estimate atlas size, then correct if too small
-    atlas-size := 60
-    'clear font-atlas atlas-size
+    atlas-size := 1024
+    'clear font-atlas 256
     local image-data : ImageData atlas-size atlas-size
     local glyphs : (Map u32 GlyphInfo)
 
@@ -39,7 +36,7 @@ fn load-font (font-data font-size)
         fontdue.font_new_from_bytes ptr size
             typeinit
                 collection_index = 0
-                scale = font-size
+                scale = font-size / 2
 
     characters := S"abcdefghijklmnopqrstuvwxyz"
     local bitmap-data : (Array u8)
@@ -50,7 +47,14 @@ fn load-font (font-data font-size)
         gw gh := metrics.width, metrics.height
 
         local rect : AtlasRect 0 0 (i32 (gw + 2)) (i32 (gh + 2))
-        fits? := 'pack font-atlas rect
+        while (not ('pack font-atlas rect))
+            original := font-atlas.spaces @ 0
+            if (original.w > original.h)
+                'emplace-append font-atlas.spaces 0 original.h original.w original.h
+                original.h *= 2
+            else
+                'emplace-append font-atlas.spaces original.w 0 original.w original.h
+                original.w *= 2
 
         'resize bitmap-data (gw * gh)
         ptr size := 'data bitmap-data
@@ -78,9 +82,9 @@ fn ()
     using bottle.types
     try
         try
-            'read-all-bytes (FileStream "assets/monogram.ttf" FileMode.Read)
+            'read-all-bytes (FileStream "assets/EratoRegular.otf" FileMode.Read)
         then (font-data)
-            ctx = DemoContext (load-font font-data 16.0)
+            ctx = DemoContext (FontFamily font-data 120.0)
             ()
         except (ex)
             abort;

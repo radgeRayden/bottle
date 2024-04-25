@@ -1,4 +1,4 @@
-using import Array enum struct
+using import Array struct
 using import ..context ..helpers .types
 
 import .wgpu
@@ -33,7 +33,7 @@ type+ BindGroup
         using import .common
         wrap-nullable-object cls
             wgpu.DeviceCreateBindGroup ctx.device
-                &local wgpu.BindGroupDescriptor
+                typeinit@
                     label = "bottle bind group"
                     layout = layout
                     entryCount = (countof entries) as u32

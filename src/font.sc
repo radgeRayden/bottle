@@ -1,108 +1,80 @@
-using import struct
-using import Array
-using import UTF-8
-
+using import Array Map .math radl.ext radl.rect-pack struct .gpu.types UTF-8
 import fontdue
-using import .asset.ImageData
-using import .enums
-using import .math
 
-struct Font
-    font : fontdue.Font
-    font-size : f32
-    line-metrics : fontdue.LineMetrics
-    char-width : u32
+fn rasterize-glyph (buf font ch size)
+    local metrics : fontdue.Metrics
+    fontdue.font_metrics font ch size &metrics
+    gw gh := metrics.width, metrics.height
 
-    inline... __typecall (cls data font-size)
-        ptr count := 'data data
-        let font =
-            fontdue.font_new_from_bytes ptr count
-                fontdue.FontSettings
-                    collection_index = 0
-                    scale = font-size
+    'resize buf (gw * gh)
+    ptr size := 'data buf
 
-        local lm : fontdue.LineMetrics
-        fontdue.font_horizontal_line_metrics font font-size &lm
+    fontdue.font_rasterize font ch size
+        typeinit@
+            metrics = metrics
+            data = dupe ptr
+            data_length = size
+    _ gw gh
 
-        local metrics : fontdue.Metrics
-        fontdue.font_metrics font (char32 " ") font-size &metrics
+struct GlyphInfo
+    rect : AtlasRect
+    metrics : fontdue.Metrics
 
-        super-type.__typecall cls
-            font         = font
-            font-size    = font-size
-            line-metrics = lm
-            char-width   = ((ceil metrics.advance_width) as u32)
+struct FontAtlas
+    atlas  : Texture
+    glyphs : (Map u32 GlyphInfo)
+    size   : f32
 
-    fn glyph-metrics (self c)
-        c as:= u32
+    inline __typecall (cls font size)
+        local buf : (Array u8)
+        for i in (range (char " ") ((char"~") + 1))
+            gw gh := rasterize-glyph buf font i size
 
-        local metrics : fontdue.Metrics
-        fontdue.font_metrics self.font c self.font-size &metrics
-        metrics
-
-    fn rasterize-glyph (self c buffer)
-        c as:= u32
-
-        local metrics : fontdue.Metrics
-        fontdue.font_metrics self.font c self.font-size &metrics
-
-        len := metrics.width * metrics.height
-        'resize buffer len
-
-        ptr := 'data buffer
-        local bitmap =
-            fontdue.GlyphBitmap
-                metrics = metrics
-                data = dupe ptr
-                data_length = len
-
-        fontdue.font_rasterize self.font c self.font-size &bitmap
-
-        metrics
-
-    inline rasterize-glyph-range (self first-glyph last-glyph dst-buffer packf userdata)
-        local char-buf : (Array u8)
-        for idx c in (enumerate (range first-glyph (last-glyph + 1)))
-            let metrics = ('rasterize-glyph self (c as u32) char-buf)
-            packf (view char-buf) (view dst-buffer) idx metrics userdata
-
-    inline rasterize-all-glyphs (self buffer packf userdata)
-        # ...
-
-    fn pack-atlas (self first-glyph last-glyph)
-        struct PackedFontAtlasUserData plain
-            glyph-width : u32
-            glyph-height : u32
-            atlas-width : u32
-            atlas-height : u32
-
-        fn pack-glyph (char-buf dst-buf idx metrics userdata)
-            row-size := userdata.glyph-width * 4
-            offset := userdata.atlas-height * row-size
-
-            userdata.atlas-height += userdata.glyph-height
-            'resize dst-buf (userdata.atlas-height * row-size)
-
-            using import itertools
-            for x y in (dim metrics.width metrics.height)
-                offset := offset + (y * row-size) + (x * 4)
-                dst-buf @ (offset + 0) = char-buf @ ((y * metrics.width) + x)
-                dst-buf @ (offset + 1) = char-buf @ ((y * metrics.width) + x)
-                dst-buf @ (offset + 2) = char-buf @ ((y * metrics.width) + x)
-                dst-buf @ (offset + 3) = char-buf @ ((y * metrics.width) + x)
-
-        local atlas-data : (Array u8)
-        local userdata : PackedFontAtlasUserData
-            self.char-width
-            u32 (ceil self.line-metrics.new_line_size)
-            self.char-width
-
-        'rasterize-glyph-range self first-glyph last-glyph atlas-data pack-glyph userdata
-        ImageData userdata.atlas-width userdata.atlas-height 1 (data = atlas-data) (format = TextureFormat.RGBA8Unorm)
-
+typedef FontData <:: fontdue.Font
     inline __drop (self)
-        fontdue.font_free self.font
+        fontdue.font_free (imply self fontdue.Font)
+
+struct FontFamily
+    atlases : (Map f32 FontAtlas)
+    source : fontdue.Font
+
+    DefaultSize := 16.0
+    DefaultBias := 1.0
+
+    inline... __typecall (cls, font-data, sizes, quality-bias : f32)
+        vvv bind smallest largest
+        fold (smallest largest = 0.0 0.0) for s in sizes
+            _ (min smallest s) (max largest s)
+
+        t := clamp quality-bias 0.0 1.0
+        font-scale := ceil (fmix smallest largest t)
+
+        ptr size := 'data font-data
+        font :=
+            fontdue.font_new_from_bytes ptr size
+                typeinit
+                    collection_index = 0
+                    scale = font-scale
+
+        local atlases : (Map f32 FontAtlas)
+        for s in sizes
+            'set atlases s (FontAtlas font s)
+        super-type.__typecall cls atlases font
+
+    case (cls, font-data, sizes)
+        this-function cls font-data sizes DefaultBias
+    case (cls, font-data)
+        local sizes = (arrayof f32 DefaultSize)
+        this-function cls font-data sizes DefaultBias
+
+    fn rasterize-characters (self)
+
+    fn rasterize-all-characters (self)
+
+    fn rasterize-range (self)
+
+    inline __drop ()
 
 do
-    let Font
-    locals;
+    let FontFamily
+    local-scope;
