@@ -183,6 +183,7 @@ struct BottleGPUState
             textures : (Cache types.Texture)
             samplers : (Cache types.Sampler)
             bind-groups : (Cache types.BindGroup)
+            bind-group-layouts : (Cache types.BindGroupLayout)
             pipeline-layouts : (Cache types.PipelineLayout)
             pipelines : (Cache types.RenderPipeline)
 

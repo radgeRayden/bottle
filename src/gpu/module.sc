@@ -332,6 +332,7 @@ do
     get-internal-texture := make-resource-cache-get 'textures
     get-internal-sampler := make-resource-cache-get 'samplers
     get-internal-bind-group := make-resource-cache-get 'bind-groups
+    get-internal-bind-group-layout := make-resource-cache-get 'bind-group-layouts
     get-internal-pipeline-layout := make-resource-cache-get 'pipeline-layouts
     get-internal-pipeline := make-resource-cache-get 'pipelines
 
