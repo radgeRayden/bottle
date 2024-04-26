@@ -8,6 +8,7 @@ do
     PrimitiveTopology := wgpu.PrimitiveTopology
     ShaderStage   := wgpu.ShaderStage
     TextureFormat := wgpu.TextureFormat
+    WrapMode := wgpu.AddressMode
 
     from (import ..gpu.types) let ShaderLanguage
     from (import .keyconstants) let KeyboardKey
