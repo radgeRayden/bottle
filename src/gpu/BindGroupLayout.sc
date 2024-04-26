@@ -2,6 +2,8 @@ using import Array struct radl.ext
 using import ..context .types
 import .wgpu
 
+ctx := context-accessor 'gpu
+
 inline set-bit (dst mask value)
     if value
         dst |= mask
@@ -29,15 +31,17 @@ type+ BindGroupLayout
             'append self.entries
                 wgpu.BindGroupLayoutEntry (binding = (countof self.entries) as u32)
                     visibility = self.visibility
-                    wgpu.BufferBindingLayout
-                        type = buffer-type
+                    buffer =
+                        wgpu.BufferBindingLayout
+                            type = buffer-type
 
         fn... add-sampler-binding (self, sampler-type : wgpu.SamplerBindingType = 'Filtering)
             'append self.entries
                 wgpu.BindGroupLayoutEntry (binding = (countof self.entries) as u32)
                     visibility = self.visibility
-                    wgpu.SamplerBindingLayout
-                        type = sampler-type
+                    sampler =
+                        wgpu.SamplerBindingLayout
+                            type = sampler-type
 
         fn... add-texture-binding (self, texture-sample-type : wgpu.TextureSampleType = 'Float,
                                     dimension : wgpu.TextureViewDimension = '2D,
@@ -45,10 +49,11 @@ type+ BindGroupLayout
             'append self.entries
                 wgpu.BindGroupLayoutEntry (binding = (countof self.entries) as u32)
                     visibility = self.visibility
-                    wgpu.TextureBindingLayout
-                        sampleType = texture-sample-type
-                        viewDimension = dimension
-                        multisampled = multisampled?
+                    texture =
+                        wgpu.TextureBindingLayout
+                            sampleType = texture-sample-type
+                            viewDimension = dimension
+                            multisampled = multisampled?
 
         fn finalize (self)
             using import .common
