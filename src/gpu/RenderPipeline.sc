@@ -65,8 +65,9 @@ fn make-pipeline-layout (count layouts)
 
 type+ PipelineLayout
     inline... __typecall (cls, bind-group-layouts : (Array BindGroupLayout))
+        ptr count := 'data bind-group-layouts
         wrap-nullable-object cls
-            make-pipeline-layout (countof bind-group-layouts) (imply bind-group-layouts pointer)
+            make-pipeline-layout count (dupe ptr)
     case (cls, bind-group-layouts : (array BindGroupLayout))
         local layouts = bind-group-layouts
         wrap-nullable-object cls
