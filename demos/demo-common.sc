@@ -1,8 +1,8 @@
 import C.stdio
-using import print radl.ext String
-from (import ..src.context) let if-module-enabled
+using import print radl.ext radl.strfmt String
+using import ..src.context
 
-import bottle
+import bottle sdl3
 
 @@ 'on bottle.configure
 fn (cfg)
@@ -57,8 +57,12 @@ fn display-fps ()
     ()
 
 @@ 'on bottle.log-write
-fn (lineinfo prefix args...)
-    print lineinfo prefix args...
+fn (log-level lineinfo prefix args...)
+    if (log-level == 'Fatal)
+        window := context-accessor 'window 'handle
+        sdl3.ShowSimpleMessageBox sdl3.SDL_MESSAGEBOX_ERROR "FATAL ERROR" f"${args...}" (window)
+    else
+        print lineinfo prefix args...
 
 do
     local-scope;
