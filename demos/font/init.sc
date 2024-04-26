@@ -16,8 +16,8 @@ fn (cfg)
 
 struct DemoContext
     font : FontFamily
-    font-atlas : Texture
-    atlas-view : TextureView
+    # font-atlas : Texture
+    # atlas-view : TextureView
 
 global ctx : (Option DemoContext)
 
@@ -89,6 +89,10 @@ fn ()
         except (ex)
             abort;
     else ()
+
+@@ 'on bottle.key-pressed
+fn (key)
+    print key
 
 @@ 'on bottle.update
 fn (dt)

@@ -4,10 +4,10 @@ let callbacks = (import .src.callbacks)
 let enums = (import .src.enums)
 let exceptions = (import .src.exceptions)
 let filesystem = (import .src.filesystem)
-let font = (import .src.font)
+# let font = (import .src.font)
 let gpu = (import .src.gpu)
 let imgui = (import .src.imgui)
-# let input = (import .src.input)
+let input = (import .src.input)
 let keyboard = (import .src.keyboard)
 let logger = (import .src.logger)
 let main = (import .src.main)
@@ -32,10 +32,10 @@ vvv bind bottle
             enums
             exceptions
             filesystem
-            font
+            # font
             gpu
             imgui
-            # input
+            input
             keyboard
             logger
             math
@@ -49,6 +49,6 @@ vvv bind bottle
         let quit! = sysevents.quit
         let get-version = version.get-version
 
-        locals;
+        local-scope;
 
 bottle

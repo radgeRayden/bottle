@@ -8,6 +8,5 @@ gpu.mipmap-gen
 plonk.sprites
 plonk.shapes
 plonk.line-benchmark
-snake
 font
 imgui
