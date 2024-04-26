@@ -1,18 +1,19 @@
 using import struct ..types ..enums String radl.strfmt
 import ..gpu
 
-fn create-bind-group (texture-view sampler)
-    layout =
+fn get-bind-group-layout ()
+    let layout =
         gpu.get-internal-bind-group-layout S"plonk.texture-binding-layout"
-             fn ()
-                 local bg-layout = 'builder BindGroupLayout
-                 'set-fragment-visibility bg-layout true
-                 'add-sampler-binding bg-layout
-                 'add-texture-binding bg-layout
-                 'finalize bg-layout
+            fn ()
+                local bg-layout = 'builder BindGroupLayout
+                'set-fragment-visibility bg-layout true
+                'add-sampler-binding bg-layout
+                'add-texture-binding bg-layout
+                'finalize bg-layout
 
+fn create-bind-group (texture-view sampler)
     local bind-group = 'builder BindGroup
-    'set-layout bind-group layout
+    'set-layout bind-group (get-bind-group-layout)
     'add-entry bind-group sampler
     'add-entry bind-group texture-view
     'finalize bind-group
@@ -40,6 +41,8 @@ struct TextureBinding
 
     fn get-texture (self)
         self.texture
+
+    let BindGroupLayout = `(get-bind-group-layout)
 
 do
     let TextureBinding

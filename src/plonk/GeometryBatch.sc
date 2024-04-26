@@ -11,6 +11,17 @@ using import ..enums
 using import ..gpu.types
 using import .common
 using import ..helpers
+using import .TextureBinding
+
+fn get-buffer-binding-layout ()
+    let layout =
+        gpu.get-internal-bind-group-layout S"plonk.buffer-binding-layout"
+            fn ()
+                local bg-layout = 'builder BindGroupLayout
+                'set-vertex-visibility bg-layout true
+                'add-buffer-binding bg-layout 'Uniform
+                'add-buffer-binding bg-layout 'ReadOnlyStorage
+                'finalize bg-layout
 
 fn calculate-circle-segment-count (radius)
     radius as:= f32
@@ -36,15 +47,22 @@ struct GeometryBatch
     index-offset  : usize
 
     pipeline : RenderPipeline
-    bind-group : BindGroup
+    buffer-binding : BindGroup
+    texture-binding : TextureBinding
     cached-buffer-id : u64
+    render-pass : RenderPass
 
-    inline __typecall (cls)
+    inline __typecall (cls texture-binding render-pass)
         vert := ShaderModule shaders.generic-vert ShaderLanguage.SPIRV ShaderStage.Vertex
         frag := ShaderModule shaders.generic-frag ShaderLanguage.SPIRV ShaderStage.Fragment
+
+        local pip-layout-entries : (Array BindGroupLayout)
+        'append pip-layout-entries (get-buffer-binding-layout)
+        'append pip-layout-entries TextureBinding.BindGroupLayout
+
         pipeline :=
             RenderPipeline
-                layout = (nullof PipelineLayout)
+                layout = PipelineLayout pip-layout-entries
                 topology = PrimitiveTopology.TriangleList
                 winding = FrontFace.CCW
                 vertex-stage =
@@ -63,7 +81,6 @@ struct GeometryBatch
 
         attrbuf := (StorageBuffer VertexAttributes) 4096
         uniform-buffer := (UniformBuffer PlonkUniforms) 1
-        bind-group := BindGroup ('get-bind-group-layout pipeline 0) (view uniform-buffer) (view attrbuf)
 
         super-type.__typecall cls
             cached-buffer-id = copy ('get-id attrbuf)
@@ -71,15 +88,27 @@ struct GeometryBatch
             index-buffer = typeinit 8192
             uniform-buffer = uniform-buffer
             pipeline = pipeline
-            bind-group = bind-group
+            buffer-binding = BindGroup (get-buffer-binding-layout) (view uniform-buffer) (view attrbuf)
+            texture-binding = copy texture-binding
+            render-pass = dupe (nullof RenderPass)
 
     fn set-projection (self mvp)
         self.uniforms.mvp = mvp
 
+    fn set-render-pass (self render-pass)
+        if (('get-id self.render-pass) != ('get-id render-pass))
+            'flush self
+        self.render-pass = copy render-pass
+
+    fn set-texture-binding (self texture-binding)
+        if (('get-key self.texture-binding) != ('get-key texture-binding))
+            'flush self
+        self.texture-binding = copy texture-binding
+
     fn begin-frame (self)
         ()
 
-    fn flush (self render-pass)
+    fn flush (self)
         if (not (self.outdated-vertices? or self.outdated-indices?))
             return;
 
@@ -94,11 +123,11 @@ struct GeometryBatch
                 # resize then try again
                 self.attribute-buffer =
                     'clone attrbuf (max (countof self.vertex-data) (attrbuf.Capacity * 2:usize)) self.vertex-offset
-                return (this-function self render-pass)
+                return (this-function self)
 
             if (self.cached-buffer-id != ('get-id attrbuf))
-                self.bind-group =
-                    BindGroup ('get-bind-group-layout self.pipeline 0) self.uniform-buffer attrbuf
+                self.buffer-binding =
+                    BindGroup (get-buffer-binding-layout) self.uniform-buffer attrbuf
                 self.cached-buffer-id = ('get-id attrbuf)
 
             self.outdated-vertices? = false
@@ -111,14 +140,16 @@ struct GeometryBatch
                 # resize then try again
                 self.index-buffer =
                     'clone idxbuf (max (countof self.index-data) (idxbuf.Capacity * 2:usize)) self.vertex-offset
-                return (this-function self render-pass)
+                return (this-function self)
 
             self.outdated-indices? = false
 
+        render-pass := self.render-pass
         index-count := (countof self.index-data)
         'set-index-buffer render-pass self.index-buffer
         'set-pipeline render-pass self.pipeline
-        'set-bind-group render-pass 0 self.bind-group
+        'set-bind-group render-pass 0 self.buffer-binding
+        'set-bind-group render-pass 1 self.texture-binding.bind-group
         'draw-indexed render-pass (index-count as u32) 1:u32 (u32 self.index-offset)
 
         self.vertex-offset += (countof self.vertex-data)
@@ -365,8 +396,8 @@ struct GeometryBatch
         'add-polygon-line self center segments radius 0:f32 line-width color join-kind cap-kind
         ()
 
-    fn finish (self render-pass)
-        'flush self render-pass
+    fn finish (self)
+        'flush self
         self.vertex-offset = 0
         self.index-offset = 0
         try ('frame-write self.uniform-buffer self.uniforms)
