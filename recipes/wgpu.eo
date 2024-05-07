@@ -1,5 +1,5 @@
 VERSION := "trunk"
-TAG := "v0.19.3.1"
+TAG := "v0.19.4.1"
 SUMMARY := "Native WebGPU implementation based on wgpu-core"
 
 update-url "https://raw.githubusercontent.com/ScopesCommunity/eo-packages/main/recipes/wgpu.eo"
@@ -38,7 +38,6 @@ license := (download "https://raw.githubusercontent.com/gfx-rs/wgpu-native/trunk
 package wgpu-native
     platform linux unknown
     summary SUMMARY
-    depends ffi-helper
 
     preinstall-dir := git-release-dir
     alias "/include/webgpu.h" "{preinstall-dir}/webgpu.h"
@@ -50,7 +49,6 @@ package wgpu-native
 package wgpu-native
     platform windows-mingw
     summary SUMMARY
-    depends ffi-helper
 
     preinstall-dir := (git-release-dir)
     alias "/include/webgpu.h" "{preinstall-dir}/webgpu.h"

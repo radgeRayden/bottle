@@ -25,7 +25,6 @@ package miniaudio
     summary SUMMARY
     platform linux unknown
     version VERSION
-    depends ffi-helper
 
     libname := "libminiaudio.so"
     alias "/lib/{libname}" (shared-library libname)
@@ -36,7 +35,6 @@ package miniaudio
     summary SUMMARY
     platform windows-mingw
     version VERSION
-    depends ffi-helper
 
     libname := "miniaudio.dll"
     alias "/lib/{libname}" (shared-library libname)

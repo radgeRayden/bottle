@@ -1,11 +1,11 @@
-TAG := "main"
+VERSION := "main"
 SUMMARY := "Simple Directmedia Layer"
 
 update-url "https://raw.githubusercontent.com/ScopesCommunity/eo-packages/main/recipes/sdl3.eo"
 
 archive :=
     download
-        "https://github.com/libsdl-org/SDL/archive/{TAG}.tar.gz"
+        "https://github.com/libsdl-org/SDL/archive/{VERSION}.tar.gz"
 
 fn preinstall-dir (generator)
     then
@@ -32,6 +32,7 @@ bindings :=
 
 package sdl3
     summary SUMMARY
+    version VERSION
     platform linux unknown
     depends patchelf
 
@@ -45,6 +46,7 @@ package sdl3
 
 package sdl3
     summary SUMMARY
+    version VERSION
     platform windows-mingw
 
     preinstall-dir := (preinstall-dir "MSYS Makefiles")
