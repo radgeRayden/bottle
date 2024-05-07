@@ -2,12 +2,12 @@ using import enum
 sdl := import sdl3
 
 enum ControllerAxis : u8
-    LeftX = sdl.SDL_GAMEPAD_AXIS_LEFTX
-    LeftY = sdl.SDL_GAMEPAD_AXIS_LEFTY
-    RightX = sdl.SDL_GAMEPAD_AXIS_RIGHTX
-    RightY = sdl.SDL_GAMEPAD_AXIS_RIGHTY
-    LeftTrigger = sdl.SDL_GAMEPAD_AXIS_LEFT_TRIGGER
-    RightTrigger = sdl.SDL_GAMEPAD_AXIS_RIGHT_TRIGGER
+    LeftX = sdl.GamepadAxis.LEFTX
+    LeftY = sdl.GamepadAxis.LEFTY
+    RightX = sdl.GamepadAxis.RIGHTX
+    RightY = sdl.GamepadAxis.RIGHTY
+    LeftTrigger = sdl.GamepadAxis.LEFT_TRIGGER
+    RightTrigger = sdl.GamepadAxis.RIGHT_TRIGGER
 
     inline __imply (lhsT rhsT)
         static-if (rhsT == sdl.GamepadAxis)
@@ -17,27 +17,27 @@ enum ControllerAxis : u8
             super-type.__imply lhsT rhsT
 
 enum ControllerButton : u8
-    A = sdl.SDL_GAMEPAD_BUTTON_SOUTH
-    B = sdl.SDL_GAMEPAD_BUTTON_EAST
-    X = sdl.SDL_GAMEPAD_BUTTON_WEST
-    Y = sdl.SDL_GAMEPAD_BUTTON_NORTH
-    Back = sdl.SDL_GAMEPAD_BUTTON_BACK
-    Guide = sdl.SDL_GAMEPAD_BUTTON_GUIDE
-    Start = sdl.SDL_GAMEPAD_BUTTON_START
-    LeftStick = sdl.SDL_GAMEPAD_BUTTON_LEFT_STICK
-    RightStick = sdl.SDL_GAMEPAD_BUTTON_RIGHT_STICK
-    LeftBumper = sdl.SDL_GAMEPAD_BUTTON_LEFT_SHOULDER
-    RightBumper = sdl.SDL_GAMEPAD_BUTTON_RIGHT_SHOULDER
-    Up = sdl.SDL_GAMEPAD_BUTTON_DPAD_UP
-    Down = sdl.SDL_GAMEPAD_BUTTON_DPAD_DOWN
-    Left = sdl.SDL_GAMEPAD_BUTTON_DPAD_LEFT
-    Right = sdl.SDL_GAMEPAD_BUTTON_DPAD_RIGHT
-    Misc1 = sdl.SDL_GAMEPAD_BUTTON_MISC1
-    RightPaddle1 = sdl.SDL_GAMEPAD_BUTTON_RIGHT_PADDLE1
-    LeftPaddle1 = sdl.SDL_GAMEPAD_BUTTON_LEFT_PADDLE1
-    RightPaddle2 = sdl.SDL_GAMEPAD_BUTTON_RIGHT_PADDLE2
-    LeftPaddle2 = sdl.SDL_GAMEPAD_BUTTON_LEFT_PADDLE2
-    Touchpad = sdl.SDL_GAMEPAD_BUTTON_TOUCHPAD
+    A = sdl.GamepadButton.SOUTH
+    B = sdl.GamepadButton.EAST
+    X = sdl.GamepadButton.WEST
+    Y = sdl.GamepadButton.NORTH
+    Back = sdl.GamepadButton.BACK
+    Guide = sdl.GamepadButton.GUIDE
+    Start = sdl.GamepadButton.START
+    LeftStick = sdl.GamepadButton.LEFT_STICK
+    RightStick = sdl.GamepadButton.RIGHT_STICK
+    LeftBumper = sdl.GamepadButton.LEFT_SHOULDER
+    RightBumper = sdl.GamepadButton.RIGHT_SHOULDER
+    Up = sdl.GamepadButton.DPAD_UP
+    Down = sdl.GamepadButton.DPAD_DOWN
+    Left = sdl.GamepadButton.DPAD_LEFT
+    Right = sdl.GamepadButton.DPAD_RIGHT
+    Misc1 = sdl.GamepadButton.MISC1
+    RightPaddle1 = sdl.GamepadButton.RIGHT_PADDLE1
+    LeftPaddle1 = sdl.GamepadButton.LEFT_PADDLE1
+    RightPaddle2 = sdl.GamepadButton.RIGHT_PADDLE2
+    LeftPaddle2 = sdl.GamepadButton.LEFT_PADDLE2
+    Touchpad = sdl.GamepadButton.TOUCHPAD
 
     inline __imply (lhsT rhsT)
         static-if (rhsT == sdl.GamepadButton)
