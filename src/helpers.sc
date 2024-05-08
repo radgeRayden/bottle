@@ -1,7 +1,6 @@
 inline... &local (T : type, ...)
     &
-        local T
-            ...
+        local := T ...
 case (value)
     &
         local dummy-name = value

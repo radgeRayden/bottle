@@ -1,4 +1,4 @@
-using import Array Map radl.strfmt slice String
+using import Array Map radl.strfmt slice String include
 import C.bindings
 from C.bindings.extern let popen pclose feof fread
 
@@ -133,7 +133,7 @@ struct VirtualController
         evdev.enable_event_type device evdev.EV_ABS
 
         inline enable-axis (axis min max)
-            local absinfo : evdev.input_absinfo
+            local absinfo := evdev.input_absinfo
                 resolution = 1000
                 minimum = i32 (min * 32768)
                 maximum = i32 (max * 32767)

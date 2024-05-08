@@ -13,7 +13,7 @@ global context : (Option PlonkState)
 @@ if-module-enabled 'plonk
 fn init ()
     try # none of this is supposed to fail. If it does, we will crash as we should when trying to unwrap state.
-        local default-texture-imdata : asset.ImageData 1 1
+        local default-texture-imdata = asset.ImageData 1 1
         for byte in default-texture-imdata.data
             byte = 0xFF
 

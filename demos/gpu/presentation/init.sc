@@ -23,7 +23,7 @@ struct DemoState
     last-reaction-time : f64
 
 global ctx : DemoState
-global rng : bottle.random.RNG 0
+global rng = bottle.random.RNG 0
 
 @@ 'on bottle.load
 fn ()

@@ -79,25 +79,26 @@ type+ PipelineLayout
 fn make-pipeline (layout topology winding vertex-stage fragment-stage sample-count depth-testing?)
     let depth-stencil-state =
         if depth-testing?
-            local state : wgpu.DepthStencilState
-                # FIXME: allow a configurable depth format
-                format = 'Depth32FloatStencil8
-                depthWriteEnabled = true
-                depthCompare = 'Less
-                # FIXME: configurable stencil state
-                stencilFront =
-                    typeinit
-                        compare = 'Always
-                        failOp = 'Zero
-                        depthFailOp = 'Zero
-                        passOp = 'Zero
-                stencilBack =
-                    typeinit
-                        compare = 'Always
-                        failOp = 'Zero
-                        depthFailOp = 'Zero
-                        passOp = 'Zero
-                # FIXME: depth bias stuff missing
+            local state =
+                wgpu.DepthStencilState
+                    # FIXME: allow a configurable depth format
+                    format = 'Depth32FloatStencil8
+                    depthWriteEnabled = true
+                    depthCompare = 'Less
+                    # FIXME: configurable stencil state
+                    stencilFront =
+                        typeinit
+                            compare = 'Always
+                            failOp = 'Zero
+                            depthFailOp = 'Zero
+                            passOp = 'Zero
+                    stencilBack =
+                        typeinit
+                            compare = 'Always
+                            failOp = 'Zero
+                            depthFailOp = 'Zero
+                            passOp = 'Zero
+                    # FIXME: depth bias stuff missing
             &state
         else null
 

@@ -353,7 +353,7 @@ struct GeometryBatch
         self.outdated-vertices? = true
         self.outdated-indices? = true
 
-        local vertices : (array vec2 5)
+        local vertices = (array vec2 5)
             va-map
                 inline (v)
                     position + (math.rotate2D ((v - origin) * size) rotation)

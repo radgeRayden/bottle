@@ -15,9 +15,10 @@ fn init ()
         ig.ImplSDL3_InitForVulkan (window.get-handle)
     assert
         do
-            local info : ig.ImGui_ImplWGPU_InitInfo
-                (wgpu-device)
-                RenderTargetFormat = (gpu.get-preferred-surface-format)
+            local info =
+                ig.ImGui_ImplWGPU_InitInfo
+                    (wgpu-device)
+                    RenderTargetFormat = (gpu.get-preferred-surface-format)
             ig.ImplWGPU_Init &info
     ()
 

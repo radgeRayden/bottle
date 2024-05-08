@@ -32,7 +32,7 @@ fn gen-quads ()
     local quads : (Array Quad)
     'resize quads QUAD-COUNT
 
-    local rng : random.RNG 0
+    local rng = random.RNG 0
     unit-rand := () -> (random.normalize (rng))
     for quad in quads
         quad.rotation = (2 * pi:f64 * (unit-rand)) as f32
