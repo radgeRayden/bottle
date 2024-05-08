@@ -6,7 +6,7 @@ case 'windows
 default
     error "Unsupported OS"
 
-using import Array enum slice struct
+using import Array enum slice struct include
 
 inline filter-scope (scope pattern)
     pattern as:= string
@@ -19,7 +19,7 @@ inline filter-scope (scope pattern)
             scope
 
 header :=
-    include
+    deprecated-include
         """"#include "cimgui.h"
         options "-DCIMGUI_DEFINE_ENUMS_AND_STRUCTS"
 

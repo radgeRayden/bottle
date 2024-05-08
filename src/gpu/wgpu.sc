@@ -8,7 +8,7 @@ inline wrap-constructor (f T)
             T
 
 inline define-object (name super release reference)
-    type (_ name) <<:: super
+    typedef (_ name) < pointer :: super
         inline __typecall (cls)
             bitcast null cls
 
@@ -19,7 +19,7 @@ inline define-object (name super release reference)
         inline __rimply (otherT thisT)
             static-if (otherT == super)
                 inline (incoming)
-                    (dupe incoming) as thisT
+                    bitcast (dupe incoming) thisT
             # for handles that descend from this
             elseif ((unqualified otherT) == (superof thisT))
                 inline (incoming)
@@ -212,7 +212,7 @@ do
     inline typeinit@ (...)
         implies (T)
             static-assert (T < pointer)
-            imply (& (local (elementof T) ...)) T
+            imply (& (local hidden = (elementof T) ...)) T
 
     inline chained@ (K ...)
         using wgpu
@@ -224,7 +224,7 @@ do
         typeinit@
             nextInChain = as
                 &
-                    local K
+                    local := K
                         chain = typeinit
                             sType = chaintype
                         ...
