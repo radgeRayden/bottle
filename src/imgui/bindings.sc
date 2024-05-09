@@ -19,7 +19,7 @@ inline filter-scope (scope pattern)
             scope
 
 header :=
-    deprecated-include
+    include
         """"#include "cimgui.h"
         options "-DCIMGUI_DEFINE_ENUMS_AND_STRUCTS"
 
