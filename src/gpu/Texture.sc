@@ -253,7 +253,7 @@ type+ Texture
             copy image-data.format
             image-data
 
-    fn... frame-write (self, image-data : ImageData, x = 0:u32, y = 0:u32, z = 0:u32, mip-level = 0:u32, aspect = wgpu.TextureAspect.All)
+    fn... frame-write (self, image-data : ImageData, x : u32 = 0:u32, y : u32 = 0:u32, z : u32 = 0:u32, mip-level : u32 = 0:u32, aspect : wgpu.TextureAspect = 'All)
         format := self.Format
         if (image-data.format != format)
             raise GPUError.InvalidOperation #S"Mismatched formats between ImageData and Texture"
@@ -264,13 +264,12 @@ type+ Texture
         twidth theight tslices := unpack self.Size
         data-size          := iwidth * iheight * islices * block-size
         texture-size-bytes := twidth * theight * tslices * block-size
-        buffer-offset      := x * y * z * block-size
 
         ptr count := 'data image-data.data
         assert (count == data-size) "malformed ImageData"
 
-        if (data-size > (texture-size-bytes - buffer-offset))
-            raise GPUError.InvalidInput #S"Writing image data at offset exceeds texture bounds"
+        write-offset := ((twidth * theight * z) + (twidth * y) + x) * block-size
+        assert (data-size <= (texture-size-bytes - write-offset))
 
         wgpu.QueueWriteTexture ctx.queue
             &local wgpu.ImageCopyTexture
@@ -281,7 +280,7 @@ type+ Texture
             ptr
             data-size
             &local wgpu.TextureDataLayout
-                offset = buffer-offset
+                offset = 0 #buffer-offset
                 bytesPerRow = iwidth * block-size
                 rowsPerImage = iheight
             &local wgpu.Extent3D iwidth iheight islices
