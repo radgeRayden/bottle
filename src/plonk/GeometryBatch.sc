@@ -12,6 +12,9 @@ using import ..gpu.types
 using import .common
 using import ..helpers
 using import .TextureBinding
+using import ..context
+
+gpu-ctx := context-accessor 'gpu
 
 fn get-buffer-binding-layout ()
     let layout =
@@ -81,6 +84,8 @@ struct GeometryBatch
 
         attrbuf := (StorageBuffer VertexAttributes) 4096
         uniform-buffer := (UniformBuffer PlonkUniforms) 1
+        buffer-binding := BindGroup (get-buffer-binding-layout) (view uniform-buffer) (view attrbuf)
+        'insert gpu-ctx.in-flight-resources.bind-groups (copy buffer-binding)
 
         super-type.__typecall cls
             cached-buffer-id = copy ('get-id attrbuf)
@@ -88,7 +93,7 @@ struct GeometryBatch
             index-buffer = typeinit 8192
             uniform-buffer = uniform-buffer
             pipeline = pipeline
-            buffer-binding = BindGroup (get-buffer-binding-layout) (view uniform-buffer) (view attrbuf)
+            buffer-binding = buffer-binding
             texture-binding = copy texture-binding
             render-pass = dupe (nullof RenderPass)
 
@@ -102,8 +107,10 @@ struct GeometryBatch
 
     fn set-texture-binding (self texture-binding)
         if (('get-key self.texture-binding) != ('get-key texture-binding))
+            'insert gpu-ctx.in-flight-resources.bind-groups (copy texture-binding.bind-group)
             'flush self
         self.texture-binding = copy texture-binding
+        ()
 
     fn begin-frame (self)
         ()
@@ -121,11 +128,14 @@ struct GeometryBatch
                 'frame-write attrbuf self.vertex-data self.vertex-offset
             else
                 # resize then try again
+                # FIXME: make sure it can at least accomodate the new required size
+                'insert gpu-ctx.in-flight-resources.buffers (copy attrbuf)
                 self.attribute-buffer =
                     'clone attrbuf (max (countof self.vertex-data) (attrbuf.Capacity * 2:usize)) self.vertex-offset
                 return (this-function self)
 
             if (self.cached-buffer-id != ('get-id attrbuf))
+                'insert gpu-ctx.in-flight-resources.bind-groups (copy self.buffer-binding)
                 self.buffer-binding =
                     BindGroup (get-buffer-binding-layout) self.uniform-buffer attrbuf
                 self.cached-buffer-id = ('get-id attrbuf)
@@ -137,6 +147,7 @@ struct GeometryBatch
             try
                 'frame-write idxbuf self.index-data self.index-offset
             else
+                'insert gpu-ctx.in-flight-resources.buffers (copy idxbuf)
                 # resize then try again
                 self.index-buffer =
                     'clone idxbuf (max (countof self.index-data) (idxbuf.Capacity * 2:usize)) self.vertex-offset

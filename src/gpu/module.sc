@@ -295,6 +295,8 @@ fn present ()
     wgpu.SurfacePresent ctx.surface
     ctx.surface-texture-view = none
     ctx.surface-texture = none
+
+    ctx.in-flight-resources = (typeinit)
     ()
 
 fn flag-surface-outdated ()

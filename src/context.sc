@@ -187,6 +187,11 @@ struct BottleGPUState
             pipeline-layouts : (Cache types.PipelineLayout)
             pipelines : (Cache types.RenderPipeline)
 
+    in-flight-resources :
+        struct BottleGPUInFlightResources
+            bind-groups : (Set wgpu.BindGroup)
+            buffers : (Set wgpu.Buffer)
+
     clear-color = (vec4 0.017 0.017 0.017 1.0)
     msaa? : bool
     present-mode : wgpu.PresentMode
