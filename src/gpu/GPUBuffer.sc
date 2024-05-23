@@ -32,6 +32,11 @@ inline gen-buffer-type (parent-type prefix backing-type usage-flags)
                 inline "getter" (self)
                     (wgpu.BufferGetSize (view self)) // ElementSize
 
+        CapacityBytes :=
+            property
+                inline "getter" (self)
+                    wgpu.BufferGetSize (view self)
+
         inline constructor (cls max-elements usage-flags)
             # TODO: ensure size obeys alignment rules
             size   := max-elements * (sizeof BackingType)
