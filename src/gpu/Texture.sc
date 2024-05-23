@@ -340,18 +340,10 @@ type+ Texture
             wgpu.RenderPassEncoderDraw render-pass 6 1 0 i
             wgpu.RenderPassEncoderEnd render-pass
 
-            wgpu.CommandEncoderCopyTextureToTexture cmd-encoder
-                typeinit@ # source
-                    texture = (view render-target)
-                    mipLevel = 0
-                    origin = typeinit 0 0 0
-                    aspect = 'All
-                typeinit@ # destination
-                    texture = (view self)
-                    mipLevel = i
-                    origin = typeinit 0 0 0
-                    aspect = 'All
-                typeinit@ (unpack (mip-level-size self.Dimension self.Size i))
+            'copy-texture cmd-encoder \
+                render-target 0 (uvec3) 'All \
+                self i (uvec3) 'All \
+                (mip-level-size self.Dimension self.Size i)
 
     let Size =
         property

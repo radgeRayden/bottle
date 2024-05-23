@@ -41,7 +41,7 @@ fn ()
         let image-data =
             bottle.asset.load-image "assets/linus.jpg"
 
-        my-texture := Texture (copy image-data.width) (copy image-data.height) 1:u32 (image-data = image-data)
+        my-texture := Texture (copy image-data.width) (copy image-data.height) 1:u32 (image-data = image-data) (mipmap-levels = 0)
         'generate-mipmaps my-texture
 
         texture-view := TextureView my-texture
