@@ -219,7 +219,8 @@ type+ Texture
                           sample-count : u32 = 1:u32)
 
         usage :=
-            | wgpu.TextureUsage.CopyDst
+            |   wgpu.TextureUsage.CopySrc
+                wgpu.TextureUsage.CopyDst
                 wgpu.TextureUsage.TextureBinding
                 (render-target? wgpu.TextureUsage.RenderAttachment (bitcast 0 wgpu.TextureUsage))
 
