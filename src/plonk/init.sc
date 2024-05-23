@@ -100,6 +100,7 @@ fn submit ()
     rp := 'force-unwrap ('swap ctx.render-pass none)
     'finish ctx.geometry-batch
     'finish rp
+    set-texture-binding ctx ctx.default-texture-binding
 
 do
     let init begin-frame sprite rectangle rectangle-line circle circle-line polygon polygon-line line submit
