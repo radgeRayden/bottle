@@ -27,11 +27,11 @@ fn (key)
 
 @@ 'on bottle.render
 @@ if-module-enabled 'imgui
-fn display-fps ()
+fn demo-info ()
     ig := import ..src.imgui
     ig.SetNextWindowPos (ig.Vec2 10 10) ig.Cond.Always (ig.Vec2 0 0)
     ig.SetNextWindowSize (ig.Vec2 245 300) ig.Cond.Always
-    ig.Begin "fps" null
+    ig.Begin "demo-common.fps" null
         enum-bitfield ig.WindowFlags i32
             'NoDecoration
             'NoBackground
@@ -53,6 +53,15 @@ fn display-fps ()
         n rep.samplers
         n rep.bindGroupLayouts
         n rep.pipelineLayouts
+    ig.End;
+
+    ww wh := (bottle.window.get-size)
+    ig.SetNextWindowPos (ig.Vec2 ((f32 ww) - 120) 10) ig.Cond.Always (ig.Vec2 0 0)
+    ig.Begin "demo-common.version" null
+        enum-bitfield ig.WindowFlags i32
+            'NoDecoration
+            'NoBackground
+    ig.Text "%s" ((bottle.get-version) as rawstring)
     ig.End;
     ()
 
