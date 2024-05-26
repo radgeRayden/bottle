@@ -1,4 +1,4 @@
-using import Array Map .math radl.ext radl.rect-pack struct .gpu.types UTF-8
+using import Array glm Map .math radl.ext radl.rect-pack Rc struct .gpu.types UTF-8
 import fontdue
 
 fn rasterize-glyph (buf font ch size)
@@ -30,21 +30,26 @@ struct FontAtlas
         for i in (range (char " ") ((char"~") + 1))
             gw gh := rasterize-glyph buf font i size
 
-typedef FontData <:: fontdue.Font
+typedef FTDFont :: fontdue.Font
     inline __drop (self)
-        fontdue.font_free (imply self fontdue.Font)
+        fontdue.font_free self
 
-struct FontFamily
-    atlases : (Map f32 FontAtlas)
-    source : fontdue.Font
+    inline __imply (thisT otherT)
+        static-if (otherT == fontdue.Font)
+            inline (self)
+                bitcast self fontdue.Font
 
+typedef FontFamily <:: (Rc FTDFont)
     DefaultSize := 16.0
     DefaultBias := 1.0
 
     inline... __typecall (cls, font-data, sizes, quality-bias : f32)
         vvv bind smallest largest
-        fold (smallest largest = 0.0 0.0) for s in sizes
-            _ (min smallest s) (max largest s)
+        static-if (imply? sizes Generator)
+            fold (smallest largest = 0.0 0.0) for s in sizes
+                _ (min smallest s) (max largest s)
+        else
+            _ sizes sizes
 
         t := clamp quality-bias 0.0 1.0
         font-scale := ceil (fmix smallest largest t)
@@ -55,12 +60,7 @@ struct FontFamily
                 typeinit
                     collection_index = 0
                     scale = font-scale
-
-        local atlases : (Map f32 FontAtlas)
-        for s in sizes
-            'set atlases s (FontAtlas font s)
-        super-type.__typecall cls atlases font
-
+        bitcast (Rc.wrap font) this-type
     case (cls, font-data, sizes)
         this-function cls font-data sizes DefaultBias
     case (cls, font-data)
