@@ -31,7 +31,7 @@ def task_bootstrap():
 def task_force_bootstrap():
     return {
         'verbosity': 2,
-        'actions': [cmd("rm -rf .eo lib include"), cmd("./eo init"), cmd("./eo update"), cmd("./eo install -y bootstrap")],
+        'actions': [cmd("rm -rf .eo lib include"), cmd("./eo init"), cmd("./eo install -y bootstrap")],
         'uptodate': [False],
         'file_dep': ["eo"],
     }
