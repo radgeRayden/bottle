@@ -2,15 +2,15 @@ using import enum
 
 sdl := import sdl3
 
-enum KeyboardKey plain
+enum KeyboardKey : u32
     Unknown = sdl.SDLK_UNKNOWN
     Return = sdl.SDLK_RETURN
     Escape = sdl.SDLK_ESCAPE
     Backspace = sdl.SDLK_BACKSPACE
     Tab = sdl.SDLK_TAB
     Space = sdl.SDLK_SPACE
-    Quote = sdl.SDLK_QUOTE
-    DoubleQuote = sdl.SDLK_QUOTEDBL
+    Apostrophe = sdl.SDLK_APOSTROPHE
+    DoubleApostrophe = sdl.SDLK_DBLAPOSTROPHE
     Hash = sdl.SDLK_HASH
     LeftParen = sdl.SDLK_LEFTPAREN
     RightParen = sdl.SDLK_RIGHTPAREN
@@ -52,7 +52,7 @@ enum KeyboardKey plain
     Caret = sdl.SDLK_CARET
     Underscore = sdl.SDLK_UNDERSCORE
 
-    Backquote = sdl.SDLK_BACKQUOTE
+    Backquote = sdl.SDLK_GRAVE
 
     a = sdl.SDLK_a
     b = sdl.SDLK_b
@@ -262,7 +262,6 @@ enum KeyboardKey plain
 
     AudioRewind = sdl.SDLK_AUDIOREWIND
     AudioFastForward = sdl.SDLK_AUDIOFASTFORWARD
-
 
 do
     let KeyboardKey
