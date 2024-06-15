@@ -1,5 +1,7 @@
 VERSION := "docking_inter"
 SUMMARY := "Dear ImGui: Bloat-free Graphical User interface for C++ with minimal dependencies (cimgui)"
+# FIXME: temporary workaround until cimgui catches up with upstream / SDL3 stabilizes
+IMGUI_BACKEND_REV := "f8de9fec8c5dc72fca6c35fc6052a8bb9813f5fc"
 
 fn imgui-git (platform wgpu-lib sdl-lib)
     then
@@ -10,6 +12,12 @@ fn imgui-git (platform wgpu-lib sdl-lib)
                 (shell git-parent) "git clone --recursive https://github.com/cimgui/cimgui.git"
                 (shell git-dir) "git checkout {VERSION}"
                 (shell git-dir) "chmod -R a+w .git"
+
+                backend-dir := "{git-dir}/imgui/backends"
+                sdl3-impl-c := (download "https://raw.githubusercontent.com/ocornut/imgui/{IMGUI_BACKEND_REV}/backends/imgui_impl_sdl3.cpp")
+                sdl3-impl-h := (download "https://raw.githubusercontent.com/ocornut/imgui/{IMGUI_BACKEND_REV}/backends/imgui_impl_sdl3.h")
+                (shell backend-dir) "cp -f {sdl3-impl-c} ./imgui_impl_sdl3.cpp"
+                (shell backend-dir) "cp -f {sdl3-impl-h} ./imgui_impl_sdl3.h"
                 git-dir
 
         project-path := ((rshell ".") "pwd")
@@ -22,7 +30,8 @@ fn imgui-git (platform wgpu-lib sdl-lib)
         cmd "mkdir lib"
         cmd "cp {project-path}/lib/{wgpu-lib} ./lib"
         cmd "cp {project-path}/lib/{sdl-lib} ./lib"
-        cmd "cp -r {project-path}/include/SDL3 ./include"
+        mkdir "{build-path}/include"
+        cmd "cp -r {project-path}/include/SDL3 ./include/SDL3"
         mkdir "{build-path}/include/webgpu"
         cmd "cp {project-path}/include/wgpu.h ./include/webgpu"
         cmd "cp {project-path}/include/webgpu.h ./include/webgpu"
