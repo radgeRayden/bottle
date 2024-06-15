@@ -221,13 +221,34 @@ do
         chaintype := static-try (getattr SType chaintypename)
         else
             (getattr NativeSType chaintypename) as (storageof SType) as SType
+
+        let chained-fields... =
+            va-map
+                inline (...)
+                    fname := keyof ...
+                    static-try
+                        elementof K fname
+                        ...
+                    else ()
+                ...
+        let passthrough-fields... =
+            va-map
+                inline (...)
+                    fname := keyof ...
+                    static-try
+                        elementof K fname
+                        ()
+                    else ...
+                ...
+
         typeinit@
             nextInChain = as
                 &
                     local := K
                         chain = typeinit
                             sType = chaintype
-                        ...
+                        chained-fields...
                 mutable@ ChainedStruct
+            passthrough-fields...
 
     .. (local-scope) wgpu
