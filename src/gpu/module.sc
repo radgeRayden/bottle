@@ -214,9 +214,11 @@ fn init ()
 
     set-present-mode cfg.present-mode false
 
+    native-feature := (name) -> (bitcast (imply name wgpu.NativeFeature) wgpu.FeatureName)
     local required-features =
         arrayof wgpu.FeatureName
             'Depth32FloatStencil8
+            native-feature 'PushConstants
 
     wgpu.AdapterRequestDevice ctx.adapter
         typeinit@
