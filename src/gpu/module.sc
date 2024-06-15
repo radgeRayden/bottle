@@ -4,7 +4,7 @@ import ..logger .types .wgpu ..window
 from wgpu let chained@
 
 using import .common
-using import ..context ..exceptions
+using import ..context ..exceptions ..helpers
 
 cfg := context-accessor 'config 'gpu
 ctx := context-accessor 'gpu
@@ -20,7 +20,6 @@ inline wgpu-array-query (f args...)
     ptr := 'data result
     f ((va-join args...) ptr)
     result
-
 
 fn get-preferred-surface-format ()
     wgpu.SurfaceGetPreferredFormat ctx.surface ctx.adapter
@@ -232,9 +231,26 @@ fn init ()
             ;
         null
 
-    local device-limits : wgpu.SupportedLimits
+    inline make-limits-struct ()
+        wgpu.SupportedLimits
+            nextInChain =
+                bitcast
+                    &local wgpu.SupportedLimitsExtras
+                        chain =
+                            typeinit
+                                sType = bitcast wgpu.NativeSType.SupportedLimitsExtras wgpu.SType
+                    mutable@ wgpu.ChainedStructOut
+
+    local adapter-limits := (make-limits-struct)
+    wgpu.AdapterGetLimits ctx.adapter &adapter-limits
+    limits-extras := bitcast adapter-limits.nextInChain (mutable@ wgpu.SupportedLimitsExtras)
+
+    local device-limits := (make-limits-struct)
     wgpu.DeviceGetLimits ctx.device &device-limits
-    ctx.limits = device-limits.limits
+    limits-extras := bitcast device-limits.nextInChain (mutable@ wgpu.SupportedLimitsExtras)
+
+    ctx.supported-limits = adapter-limits.limits
+    ctx.requested-limits = device-limits.limits
 
     wgpu.DeviceSetUncapturedErrorCallback ctx.device
         fn (err message userdata)

@@ -160,7 +160,9 @@ struct WGPUAdapterInfo
 struct BottleGPUState
     available-adapters      : (Array WGPUAdapterInfo)
     available-present-modes : (Set wgpu.PresentMode)
-    limits : wgpu.Limits
+    # TODO: wrap limits struct for easy retrieval of native limits
+    supported-limits : wgpu.Limits
+    requested-limits : wgpu.Limits
 
     instance : wgpu.Instance
     surface  : wgpu.Surface
