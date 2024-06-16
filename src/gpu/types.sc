@@ -1,4 +1,4 @@
-using import Array enum radl.strfmt String struct
+using import Array enum Map radl.strfmt String struct
 import .wgpu
 
 do
@@ -34,6 +34,11 @@ do
         WGSL
         GLSL
         SPIRV
+
+    struct PushConstantLayout
+        ranges-map : (Map String wgpu.PushConstantRange)
+        ranges-array : (Array wgpu.PushConstantRange)
+        next-offset : u32
 
     ShaderStageFlags := wgpu.ShaderStageFlags
     Sampler := GPUSampler

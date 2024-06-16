@@ -7,6 +7,7 @@ using import struct
 import ..gpu
 import ..math
 import .shaders
+using import ..filesystem.FileStream
 using import ..enums
 using import ..gpu.types
 using import .common
@@ -50,22 +51,33 @@ struct GeometryBatch
     index-offset  : usize
 
     pipeline : RenderPipeline
+    push-constant-layout : PushConstantLayout
     buffer-binding : BindGroup
     texture-binding : TextureBinding
     cached-buffer-id : u64
     render-pass : RenderPass
 
     inline __typecall (cls texture-binding render-pass)
-        vert := ShaderModule shaders.generic-vert ShaderLanguage.SPIRV ShaderStage.Vertex
+        let vert-shader =
+            try (FileStream "assets/vert.spv" FileMode.Read)
+            then (fs)
+                try ('read-all-string fs)
+                else (abort)
+            else (abort)
+        # vert := ShaderModule shaders.generic-vert ShaderLanguage.SPIRV ShaderStage.Vertex
+        vert := ShaderModule vert-shader ShaderLanguage.SPIRV ShaderStage.Vertex
         frag := ShaderModule shaders.generic-frag ShaderLanguage.SPIRV ShaderStage.Fragment
 
         local pip-layout-entries : (Array BindGroupLayout)
         'append pip-layout-entries (get-buffer-binding-layout)
         'append pip-layout-entries TextureBinding.BindGroupLayout
 
+        local push-constant-layout : PushConstantLayout
+        'add-range push-constant-layout ShaderStage.Vertex S"transform-idx" u32
+
         pipeline :=
             RenderPipeline
-                layout = PipelineLayout pip-layout-entries
+                layout = PipelineLayout pip-layout-entries (view push-constant-layout)
                 topology = PrimitiveTopology.TriangleList
                 winding = FrontFace.CCW
                 vertex-stage =
@@ -83,7 +95,7 @@ struct GeometryBatch
                 msaa-samples = (gpu.msaa-enabled?) 4:u32 1:u32
 
         attrbuf := (StorageBuffer VertexAttributes) 4096
-        uniform-buffer := (UniformBuffer PlonkUniforms) 1
+        uniform-buffer := (UniformBuffer PlonkUniforms) 1024
         buffer-binding := BindGroup (get-buffer-binding-layout) (view uniform-buffer) (view attrbuf)
         'insert gpu-ctx.in-flight-resources.bind-groups (copy buffer-binding)
 
@@ -93,6 +105,7 @@ struct GeometryBatch
             index-buffer = typeinit 8192
             uniform-buffer = uniform-buffer
             pipeline = pipeline
+            push-constant-layout = push-constant-layout
             buffer-binding = buffer-binding
             texture-binding = copy texture-binding
             render-pass = dupe (nullof RenderPass)
@@ -162,6 +175,12 @@ struct GeometryBatch
         'set-bind-group render-pass 0 self.buffer-binding
         'set-bind-group render-pass 1 self.texture-binding.bind-group
         'draw-indexed render-pass (index-count as u32) 1:u32 (u32 self.index-offset)
+
+        wgpu := import ..gpu.wgpu
+        local idx : u32
+        transform-idx-range := 'get-range self.push-constant-layout 0
+        wgpu.RenderPassEncoderSetPushConstants render-pass \
+            wgpu.ShaderStage.Vertex transform-idx-range.start transform-idx-range.end &idx
 
         self.vertex-offset += (countof self.vertex-data)
         self.index-offset  += (countof self.index-data)

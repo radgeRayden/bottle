@@ -219,18 +219,6 @@ fn init ()
             'Depth32FloatStencil8
             native-feature 'PushConstants
 
-    wgpu.AdapterRequestDevice ctx.adapter
-        typeinit@
-            requiredFeatureCount = (countof required-features)
-            requiredFeatures = &required-features
-        fn (status result msg userdata)
-            if (status != wgpu.RequestDeviceStatus.Success)
-                logger.write-fatal ('from-rawstring String msg)
-                abort;
-            ctx.device = result
-            ;
-        null
-
     inline make-limits-struct ()
         wgpu.SupportedLimits
             nextInChain =
@@ -245,9 +233,27 @@ fn init ()
     wgpu.AdapterGetLimits ctx.adapter &adapter-limits
     limits-extras := bitcast adapter-limits.nextInChain (mutable@ wgpu.SupportedLimitsExtras)
 
+    wgpu.AdapterRequestDevice ctx.adapter
+        typeinit@
+            requiredFeatureCount = (countof required-features)
+            requiredFeatures = &required-features
+            requiredLimits =
+                chained@ 'RequiredLimitsExtras
+                    limits =
+                        typeinit
+                            maxPushConstantSize = limits-extras.limits.maxPushConstantSize
+        fn (status result msg userdata)
+            if (status != wgpu.RequestDeviceStatus.Success)
+                logger.write-fatal ('from-rawstring String msg)
+                abort;
+            ctx.device = result
+            ;
+        null
+
     local device-limits := (make-limits-struct)
     wgpu.DeviceGetLimits ctx.device &device-limits
     limits-extras := bitcast device-limits.nextInChain (mutable@ wgpu.SupportedLimitsExtras)
+    logger.write-info limits-extras.limits.maxPushConstantSize
 
     ctx.supported-limits = adapter-limits.limits
     ctx.requested-limits = device-limits.limits

@@ -1,7 +1,7 @@
 using import Array String struct
-using import .common ..context .types
+using import .common ..context .types ..helpers
 
-import .wgpu
+import .wgpu .constants
 from wgpu let typeinit@ chained@
 
 ctx := context-accessor 'gpu
@@ -55,26 +55,48 @@ type+ FragmentStage
     inline __toptr (self)
         & (imply self wgpu.FragmentState)
 
-fn make-pipeline-layout (count layouts)
+fn make-pipeline-layout (layouts count ranges push-constant-count)
     layouts as:= pointer (storageof wgpu.BindGroupLayout)
     wgpu.DeviceCreatePipelineLayout ctx.device
-        typeinit@
+        chained@ 'PipelineLayoutExtras
             label = "Bottle Pipeline Layout"
             bindGroupLayoutCount = count
             bindGroupLayouts = layouts
+            pushConstantRangeCount = push-constant-count
+            pushConstantRanges = ranges
 
 type+ PipelineLayout
-    inline... __typecall (cls, bind-group-layouts : (Array BindGroupLayout))
-        ptr count := 'data bind-group-layouts
+    inline... __typecall (cls, bind-group-layouts : (Array BindGroupLayout), push-constant-layout : (param? PushConstantLayout) = none)
+        layouts-ptr layouts-count := 'data bind-group-layouts
+        ranges-ptr ranges-count := 'data push-constant-layout.ranges-array
         wrap-nullable-object cls
-            make-pipeline-layout count (dupe ptr)
+            make-pipeline-layout (dupe layouts-ptr) layouts-count (dupe ranges-ptr) ranges-count
     case (cls, bind-group-layouts : (array BindGroupLayout))
         local layouts = bind-group-layouts
         wrap-nullable-object cls
-            make-pipeline-layout (countof layouts) &layouts
+            make-pipeline-layout &layouts (countof layouts) null 0:usize
     case (cls)
         wrap-nullable-object cls
-            make-pipeline-layout 0:u32 null
+            make-pipeline-layout null 0:usize null 0:usize
+
+type+ PushConstantLayout
+    inline... add-range (self, visibility : wgpu.ShaderStage, name : String, storage : type)
+        static-assert (((alignof storage) % 4) == 0) "push constant storage must have 4 byte alignment"
+        start end := copy self.next-offset, self.next-offset + (u32 (sizeof storage))
+        assert (end <= constants.MAX_PUSH_CONSTANT_SIZE) "push constant layout exceeded max push constant size"
+        range_ :=
+            wgpu.PushConstantRange
+                stages = visibility
+                start = start
+                end = end
+        self.next-offset = end
+        'set self.ranges-map name range_
+        'append self.ranges-array range_
+        ()
+    fn... get-range (self, name : String)
+        try! ('get self.ranges-map name)
+    case (self, index : i32)
+        self.ranges-array @ (usize index)
 
 fn make-pipeline (layout topology winding vertex-stage fragment-stage sample-count depth-testing?)
     let depth-stencil-state =
