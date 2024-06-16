@@ -119,6 +119,29 @@ for scope in ('lineage wgpu)
             'set-symbol T '__tostring
                 CEnum->String T
 
+spice split-chained-fields (args...)
+    using import slice
+    local chained : (Array Value)
+    local passthrough : (Array Value)
+
+    for arg in ('args args...)
+        k v := 'dekey arg
+        kname := k as Symbol as string
+        if ((kname @ 0) == (char "."))
+            new-name := Symbol (rslice kname 1)
+            'append passthrough (sc_keyed_new new-name v)
+        else
+            'append chained arg
+
+    chained-ptr chained-count := 'data chained
+    passthrough-ptr passthrough-count := 'data passthrough
+    spice-quote
+        _
+            inline "chained-fields" ()
+                [(sc_argument_list_new (i32 chained-count) (view chained-ptr))]
+            inline "passthrough-fields" ()
+                [(sc_argument_list_new (i32 passthrough-count) (view passthrough-ptr))]
+
 run-stage;
 
 type+ wgpu.Limits
@@ -222,24 +245,7 @@ do
         else
             (getattr NativeSType chaintypename) as (storageof SType) as SType
 
-        let chained-fields... =
-            va-map
-                inline (...)
-                    fname := keyof ...
-                    static-try
-                        elementof K fname
-                        ...
-                    else ()
-                ...
-        let passthrough-fields... =
-            va-map
-                inline (...)
-                    fname := keyof ...
-                    static-try
-                        elementof K fname
-                        ()
-                    else ...
-                ...
+        chained-fields passthrough-fields := split-chained-fields ...
 
         typeinit@
             nextInChain = as
@@ -247,8 +253,8 @@ do
                     local := K
                         chain = typeinit
                             sType = chaintype
-                        chained-fields...
+                        (chained-fields)
                 mutable@ ChainedStruct
-            passthrough-fields...
+            (passthrough-fields)
 
     .. (local-scope) wgpu
