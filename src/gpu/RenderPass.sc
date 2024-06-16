@@ -1,6 +1,4 @@
-using import Array
-using import glm
-using import struct
+using import Array glm String struct
 
 using import .common
 using import ..exceptions
@@ -106,4 +104,15 @@ type+ RenderPass
         self ... := *...
         wgpu.RenderPassEncoderDrawIndexed (view self) ...
 
+    fn _set-push-constant (render-pass range_ value)
+        local value = value
+        wgpu.RenderPassEncoderSetPushConstants render-pass \
+            range_.stages range_.start range_.end &value
+
+    fn... set-push-constant (self, layout : PushConstantLayout, name : String, value)
+        _set-push-constant self ('get-range layout name) value
+    case (self, layout : PushConstantLayout, index : integer, value)
+        _set-push-constant self ('get-range layout index) value
+
+    unlet _set-push-constant
 ()
