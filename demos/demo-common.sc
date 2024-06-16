@@ -69,7 +69,8 @@ fn demo-info ()
 fn (log-level lineinfo prefix args...)
     if (log-level == 'Fatal)
         window := context-accessor 'window 'handle
-        sdl3.ShowSimpleMessageBox sdl3.SDL_MESSAGEBOX_ERROR "FATAL ERROR" f"${args...}" (window)
+        # sdl3.ShowSimpleMessageBox sdl3.SDL_MESSAGEBOX_ERROR "FATAL ERROR" f"${args...}" (window)
+        print lineinfo prefix args...
     else
         print lineinfo prefix args...
 
