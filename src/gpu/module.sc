@@ -233,6 +233,10 @@ fn init ()
     wgpu.AdapterGetLimits ctx.adapter &adapter-limits
     limits-extras := bitcast adapter-limits.nextInChain (mutable@ wgpu.SupportedLimitsExtras)
 
+    # needs to be initialized to default values
+    local required-limits : wgpu.Limits
+    required-limits.maxUniformBufferBindingSize = constants.MAX_UNIFORM_BUFFER_SIZE
+
     wgpu.AdapterRequestDevice ctx.adapter
         typeinit@
             requiredFeatureCount = (countof required-features)
@@ -242,9 +246,7 @@ fn init ()
                     limits =
                         typeinit
                             maxPushConstantSize = constants.MAX_PUSH_CONSTANT_SIZE
-                limits =
-                    typeinit
-                        maxUniformBufferBindingSize = constants.MAX_UNIFORM_BUFFER_SIZE
+                    .limits = required-limits
 
         fn (status result msg userdata)
             if (status != wgpu.RequestDeviceStatus.Success)

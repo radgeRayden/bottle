@@ -59,16 +59,21 @@ fn make-pipeline-layout (layouts count ranges push-constant-count)
     layouts as:= pointer (storageof wgpu.BindGroupLayout)
     wgpu.DeviceCreatePipelineLayout ctx.device
         chained@ 'PipelineLayoutExtras
-            label = "Bottle Pipeline Layout"
-            bindGroupLayoutCount = count
-            bindGroupLayouts = layouts
+            .label = "Bottle Pipeline Layout"
+            .bindGroupLayoutCount = count
+            .bindGroupLayouts = layouts
             pushConstantRangeCount = push-constant-count
             pushConstantRanges = ranges
 
 type+ PipelineLayout
     inline... __typecall (cls, bind-group-layouts : (Array BindGroupLayout), push-constant-layout : (param? PushConstantLayout) = none)
         layouts-ptr layouts-count := 'data bind-group-layouts
-        ranges-ptr ranges-count := 'data push-constant-layout.ranges-array
+        let ranges-ptr ranges-count =
+            static-if (not (none? push-constant-layout))
+                'data push-constant-layout.ranges-array
+            else
+                _ null 0:usize
+
         wrap-nullable-object cls
             make-pipeline-layout (dupe layouts-ptr) layouts-count (dupe ranges-ptr) ranges-count
     case (cls, bind-group-layouts : (array BindGroupLayout))
