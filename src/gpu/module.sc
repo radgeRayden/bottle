@@ -1,5 +1,5 @@
 using import Array glm hash print radl.ext radl.strfmt String struct
-import ..logger .types .wgpu ..window
+import .constants ..logger .types .wgpu ..window
 
 from wgpu let chained@
 
@@ -241,7 +241,11 @@ fn init ()
                 chained@ 'RequiredLimitsExtras
                     limits =
                         typeinit
-                            maxPushConstantSize = limits-extras.limits.maxPushConstantSize
+                            maxPushConstantSize = constants.MAX_PUSH_CONSTANT_SIZE
+                limits =
+                    typeinit
+                        maxUniformBufferBindingSize = constants.MAX_UNIFORM_BUFFER_SIZE
+
         fn (status result msg userdata)
             if (status != wgpu.RequestDeviceStatus.Success)
                 logger.write-fatal ('from-rawstring String msg)
