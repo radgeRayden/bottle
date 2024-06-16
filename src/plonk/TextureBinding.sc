@@ -35,6 +35,8 @@ struct TextureBinding
         super-type.__typecall cls
             texture = texture
             bind-group = (create-bind-group texture-view sampler)
+    case (cls, texture : Texture, bind-group : BindGroup)
+        super-type.__typecall *...
 
     fn get-key (self)
         'get-id self.bind-group
