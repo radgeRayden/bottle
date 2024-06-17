@@ -1,4 +1,4 @@
-using import enum glm struct ..types
+using import enum glm struct
 
 struct VertexAttributes plain
     position : vec2

@@ -18,10 +18,7 @@ fn create-bind-group (texture-view sampler)
     'add-entry bind-group texture-view
     'finalize bind-group
 
-struct TextureBinding
-    texture : Texture
-    bind-group : BindGroup
-
+type+ TextureBinding
     inline... __typecall (cls, texture : Texture, wrap-mode : WrapMode = 'ClampToEdge,
         min-filter : FilterMode = 'Linear,
         mag-filter : FilterMode = 'Linear)

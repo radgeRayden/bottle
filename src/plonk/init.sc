@@ -1,7 +1,9 @@
 using import Array enum glm Option String struct
 
-using import .common ..context ..gpu.types ..enums \
-    ..helpers .TextureBinding
+# imported to define the implementations
+using import .TextureBinding
+
+using import .common ..context ..gpu.types ..enums ..helpers
 import ..asset ..gpu ..math ..window .shaders
 
 struct DrawCommand
