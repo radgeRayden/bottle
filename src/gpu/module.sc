@@ -259,7 +259,6 @@ fn init ()
     local device-limits := (make-limits-struct)
     wgpu.DeviceGetLimits ctx.device &device-limits
     limits-extras := bitcast device-limits.nextInChain (mutable@ wgpu.SupportedLimitsExtras)
-    logger.write-info limits-extras.limits.maxPushConstantSize
 
     ctx.supported-limits = adapter-limits.limits
     ctx.requested-limits = device-limits.limits
