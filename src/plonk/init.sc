@@ -68,8 +68,7 @@ fn get-pipeline-layout ()
 fn default-pipeline ()
     gpu.get-internal-pipeline "plonk.default-pipeline"
         fn ()
-            # vert := ShaderModule shaders.generic-vert ShaderLanguage.SPIRV ShaderStage.Vertex
-            vert := ShaderModule shaders.generic-vert-push-constants ShaderLanguage.SPIRV ShaderStage.Vertex
+            vert := ShaderModule shaders.generic-vert ShaderLanguage.SPIRV ShaderStage.Vertex
             frag := ShaderModule shaders.generic-frag ShaderLanguage.SPIRV ShaderStage.Fragment
 
             pipeline :=

@@ -27,7 +27,7 @@ struct LineData plain
     width : f32
     color : vec4
 
-struct PlonkUniforms plain
+struct PlonkTransform plain
     mvp : mat4
 
 struct Quad plain
@@ -35,6 +35,6 @@ struct Quad plain
     extent : vec2
 
 do
-    let PlonkUniforms Quad VertexAttributes LineSegment LineData \
+    let PlonkTransform Quad VertexAttributes LineSegment LineData \
         LineJoinKind LineCapKind
     local-scope;

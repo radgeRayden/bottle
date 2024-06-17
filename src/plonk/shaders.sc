@@ -15,13 +15,12 @@ inline vertex-shader (uniformT bindings...)
     inline (f)
         fn ()
             uniform uniforms : uniformT
-                set = 0
-                binding = 0
+                push_constant
 
             data-bindings... :=
                 va-map
                     inline (i)
-                        binding := i + 1
+                        binding := i
                         buffer input-data : (make-buffer-type (va@ i bindings...)) readonly
                             set = 0
                             binding = binding
@@ -48,7 +47,7 @@ inline fragment-shader (f)
         fcolor = (f t s vtexcoords vcolor)
 
 do
-    @@ vertex-shader PlonkUniforms VertexAttributes
+    @@ vertex-shader PlonkTransform VertexAttributes
     inline generic-vert (uniforms data)
         idx := gl_VertexIndex
         vertex := data @ idx
@@ -58,7 +57,7 @@ do
             texcoords = vertex.texcoords
             color = vertex.color
 
-    @@ vertex-shader PlonkUniforms LineSegment LineData
+    @@ vertex-shader PlonkTransform LineSegment LineData
     inline line-vert (uniforms segments lines)
         local vertices =
             arrayof vec2
@@ -82,7 +81,7 @@ do
             vtexcoords = (vec2)
             vcolor = line.color
 
-    @@ vertex-shader PlonkUniforms LineSegment LineData
+    @@ vertex-shader PlonkTransform LineSegment LineData
     inline join-vert (uniforms segments lines)
         idx := gl_InstanceIndex
         last next := segments @ idx, segments @ (idx + 1)
@@ -133,12 +132,9 @@ do
     inline generic-frag (t s vtexcoords vcolor)
         (texture (sampler2D t s) vtexcoords) * vcolor
 
-    generic-vert-push-constants :=
-        static-eval
-            using import radl.IO.FileStream
-            try (FileStream (module-dir .. "/vert.spv") FileMode.Read)
-            then (fs)
-                try! ('read-all-string fs)
-            else S""
+    @@ fragment-shader
+    inline font-frag (t s vtexcoords vcolor)
+        texel := texture (sampler2D t s) vtexcoords
+        texel.rrrr * vcolor
 
     local-scope;
