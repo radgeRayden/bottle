@@ -3,6 +3,7 @@ using import glm
 using import glsl
 using import print
 using import struct
+using import String
 import ..math
 
 @@ memo
@@ -132,5 +133,12 @@ do
     inline generic-frag (t s vtexcoords vcolor)
         (texture (sampler2D t s) vtexcoords) * vcolor
 
+    generic-vert-push-constants :=
+        static-eval
+            using import radl.IO.FileStream
+            try (FileStream (module-dir .. "/vert.spv") FileMode.Read)
+            then (fs)
+                try! ('read-all-string fs)
+            else S""
 
     local-scope;
