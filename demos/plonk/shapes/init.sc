@@ -53,7 +53,8 @@ fn (dt)
 @@ 'on bottle.render
 fn ()
     plonk := bottle.plonk
-    from plonk let LineJoinKind LineCapKind
+    using bottle.enums
+
     plonk.rectangle (vec2 200 450) (vec2 200 100) rotation (vec4 1 0 1 1)
     plonk.circle (vec2 150 200) 100 (color = (vec4 0 1 0 1))
     plonk.polygon (vec2 150 200) 3 100 rotation (vec4 0 0.5 0.5 1)
