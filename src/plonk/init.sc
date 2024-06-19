@@ -467,20 +467,27 @@ fn submit ()
             RenderPass cmd-encoder (ColorAttachment resolve-source surface-texture false)
 
     vvv bind final-pass
-    fold (current-pass = rp) for cmd in ctx.commands
+    fold (current-pass pipeline tbinding = rp (nullof RenderPipeline) (nullof BindGroup)) \
+    for cmd in ctx.commands
         dispatch cmd
         case Draw (cmd)
-            'set-pipeline current-pass cmd.pipeline
+            if (cmd.pipeline != pipeline)
+                'set-pipeline current-pass cmd.pipeline
             'set-index-buffer current-pass ctx.index-buffer
             'set-bind-group current-pass 0 ctx.buffer-binding
-            'set-bind-group current-pass 1 cmd.texture-binding.bind-group
+            if (cmd.texture-binding.bind-group != tbinding)
+                'set-bind-group current-pass 1 cmd.texture-binding.bind-group
             'set-push-constant current-pass ctx.push-constant-layout 0 cmd.transform
             'draw-indexed current-pass (u32 cmd.elements) 1:u32 (u32 cmd.offset)
-            current-pass
+            _ current-pass cmd.pipeline cmd.texture-binding.bind-group
         case StartPass (cmd)
             'finish current-pass
-            RenderPass cmd-encoder (ColorAttachment cmd.render-target none cmd.clear? cmd.clear-color)
-        default current-pass
+            _
+                RenderPass cmd-encoder (ColorAttachment cmd.render-target none cmd.clear? cmd.clear-color)
+                nullof RenderPipeline
+                nullof BindGroup
+        default
+            abort;
 
     'finish final-pass
     'clear ctx.commands
