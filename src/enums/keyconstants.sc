@@ -54,32 +54,32 @@ enum KeyboardKey : u32
 
     Backquote = sdl.SDLK_GRAVE
 
-    a = sdl.SDLK_a
-    b = sdl.SDLK_b
-    c = sdl.SDLK_c
-    d = sdl.SDLK_d
-    e = sdl.SDLK_e
-    f = sdl.SDLK_f
-    g = sdl.SDLK_g
-    h = sdl.SDLK_h
-    i = sdl.SDLK_i
-    j = sdl.SDLK_j
-    k = sdl.SDLK_k
-    l = sdl.SDLK_l
-    m = sdl.SDLK_m
-    n = sdl.SDLK_n
-    o = sdl.SDLK_o
-    p = sdl.SDLK_p
-    q = sdl.SDLK_q
-    r = sdl.SDLK_r
-    s = sdl.SDLK_s
-    t = sdl.SDLK_t
-    u = sdl.SDLK_u
-    v = sdl.SDLK_v
-    w = sdl.SDLK_w
-    x = sdl.SDLK_x
-    y = sdl.SDLK_y
-    z = sdl.SDLK_z
+    a = sdl.SDLK_A
+    b = sdl.SDLK_B
+    c = sdl.SDLK_C
+    d = sdl.SDLK_D
+    e = sdl.SDLK_E
+    f = sdl.SDLK_F
+    g = sdl.SDLK_G
+    h = sdl.SDLK_H
+    i = sdl.SDLK_I
+    j = sdl.SDLK_J
+    k = sdl.SDLK_K
+    l = sdl.SDLK_L
+    m = sdl.SDLK_M
+    n = sdl.SDLK_N
+    o = sdl.SDLK_O
+    p = sdl.SDLK_P
+    q = sdl.SDLK_Q
+    r = sdl.SDLK_R
+    s = sdl.SDLK_S
+    t = sdl.SDLK_T
+    u = sdl.SDLK_U
+    v = sdl.SDLK_V
+    w = sdl.SDLK_W
+    x = sdl.SDLK_X
+    y = sdl.SDLK_Y
+    z = sdl.SDLK_Z
 
     CapsLock = sdl.SDLK_CAPSLOCK
 
@@ -231,16 +231,14 @@ enum KeyboardKey : u32
 
     Mode = sdl.SDLK_MODE
 
-    AudioNext = sdl.SDLK_AUDIONEXT
-    AudioPrev = sdl.SDLK_AUDIOPREV
-    AudioStop = sdl.SDLK_AUDIOSTOP
-    AudioPlay = sdl.SDLK_AUDIOPLAY
-    AudioMute = sdl.SDLK_AUDIOMUTE
-    MediaSelect = sdl.SDLK_MEDIASELECT
-    WWW = sdl.SDLK_WWW
-    Mail = sdl.SDLK_MAIL
-    Calculator = sdl.SDLK_CALCULATOR
-    Computer = sdl.SDLK_COMPUTER
+    MediaNextTrack = sdl.SDLK_MEDIA_NEXT_TRACK
+    MediaPreviousTrack = sdl.SDLK_MEDIA_PREVIOUS_TRACK
+    MediaStop = sdl.SDLK_MEDIA_STOP
+    MediaPlay = sdl.SDLK_MEDIA_PLAY
+    MediaRewind = sdl.SDLK_MEDIA_REWIND
+    MediaFastForward = sdl.SDLK_MEDIA_FAST_FORWARD
+    MediaSelect = sdl.SDLK_MEDIA_SELECT
+    MediaEject = sdl.SDLK_MEDIA_EJECT
     AcSearch = sdl.SDLK_AC_SEARCH
     AcHome = sdl.SDLK_AC_HOME
     AcBack = sdl.SDLK_AC_BACK
@@ -248,20 +246,7 @@ enum KeyboardKey : u32
     AcStop = sdl.SDLK_AC_STOP
     AcRefresh = sdl.SDLK_AC_REFRESH
     AcBookmarks = sdl.SDLK_AC_BOOKMARKS
-
-    BrightnessDown = sdl.SDLK_BRIGHTNESSDOWN
-    BrightnessUp = sdl.SDLK_BRIGHTNESSUP
-    DisplaySwitch = sdl.SDLK_DISPLAYSWITCH
-    KbdIllumToggle = sdl.SDLK_KBDILLUMTOGGLE
-    KbdIllumDown = sdl.SDLK_KBDILLUMDOWN
-    KbdIllumUp = sdl.SDLK_KBDILLUMUP
-    Eject = sdl.SDLK_EJECT
     Sleep = sdl.SDLK_SLEEP
-    App1 = sdl.SDLK_APP1
-    App2 = sdl.SDLK_APP2
-
-    AudioRewind = sdl.SDLK_AUDIOREWIND
-    AudioFastForward = sdl.SDLK_AUDIOFASTFORWARD
 
 do
     let KeyboardKey

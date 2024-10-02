@@ -33,11 +33,11 @@ inline dispatch (handler)
 
         case 'KEY_DOWN
             if (not event.key.repeat)
-                callbacks.key-pressed (event.key.keysym.sym as KeyboardKey)
+                callbacks.key-pressed (event.key.key as KeyboardKey)
 
         case 'KEY_UP
             if (not event.key.repeat)
-                callbacks.key-released (event.key.keysym.sym as KeyboardKey)
+                callbacks.key-released (event.key.key as KeyboardKey)
 
         case 'MOUSE_MOTION
             edata := event.motion

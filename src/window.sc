@@ -26,7 +26,7 @@ fn get-native-info ()
         abort;
 
     inline prop (p)
-        prop := sdl.GetProperty props p null
+        prop := sdl.GetPointerProperty props p null
         if (prop == null)
             logger.write-fatal f"${p} ${(sdl.GetError)}"
             abort;
@@ -125,7 +125,7 @@ fn init ()
 
     status :=
         sdl.Init
-            | sdl.SDL_INIT_VIDEO sdl.SDL_INIT_TIMER sdl.SDL_INIT_GAMEPAD
+            | sdl.SDL_INIT_VIDEO sdl.SDL_INIT_GAMEPAD
 
     if (status < 0)
         msg := (sdl.GetError)

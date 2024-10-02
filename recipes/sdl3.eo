@@ -1,4 +1,4 @@
-VERSION := "63138c7"
+VERSION := "d5fe6dd"
 SUMMARY := "Simple Directmedia Layer"
 
 update-url "https://raw.githubusercontent.com/ScopesCommunity/eo-packages/main/recipes/sdl3.eo"
