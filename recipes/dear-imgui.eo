@@ -1,7 +1,7 @@
 VERSION := "docking_inter"
 SUMMARY := "Dear ImGui: Bloat-free Graphical User interface for C++ with minimal dependencies (cimgui)"
 # FIXME: temporary workaround until cimgui catches up with upstream / SDL3 stabilizes
-IMGUI_BACKEND_REV := "f8de9fec8c5dc72fca6c35fc6052a8bb9813f5fc"
+IMGUI_BACKEND_REV := "bc77ccc"
 
 fn imgui-git (platform wgpu-lib sdl-lib)
     then
