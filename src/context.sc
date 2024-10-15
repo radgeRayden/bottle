@@ -153,7 +153,7 @@ struct BottleConfig
 
 struct WGPUAdapterInfo
     adapter : wgpu.Adapter
-    properties : wgpu.AdapterProperties
+    properties : wgpu.AdapterInfo
     limits : wgpu.SupportedLimits
     supported-features : (Array wgpu.FeatureName)
 

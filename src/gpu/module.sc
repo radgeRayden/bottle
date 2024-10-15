@@ -22,7 +22,9 @@ inline wgpu-array-query (f args...)
     result
 
 fn get-preferred-surface-format ()
-    wgpu.SurfaceGetPreferredFormat ctx.surface ctx.adapter
+    # wgpu.SurfaceGetPreferredFormat ctx.surface ctx.adapter
+    # FIXME: the preferred format is now the first result from available formats
+    wgpu.TextureFormat.BGRA8UnormSrgb
 
 fn create-surface ()
     dispatch (window.get-native-info)
@@ -247,6 +249,23 @@ fn init ()
                         typeinit
                             maxPushConstantSize = constants.MAX_PUSH_CONSTANT_SIZE
                     .limits = required-limits
+            uncapturedErrorCallbackInfo = typeinit
+                callback =
+                    fn (err message userdata)
+                        msgstr := () -> ('from-rawstring String message)
+
+                        switch err
+                        pass 'Validation
+                        pass 'OutOfMemory
+                        pass 'Internal
+                        pass 'Unknown
+                        pass 'DeviceLost
+                        do
+                            logger.write-fatal "\n" (msgstr)
+                            abort;
+                        default
+                            ()
+                userdata = null
 
         fn (status result msg userdata)
             if (status != wgpu.RequestDeviceStatus.Success)
@@ -262,23 +281,6 @@ fn init ()
 
     ctx.supported-limits = adapter-limits.limits
     ctx.requested-limits = device-limits.limits
-
-    wgpu.DeviceSetUncapturedErrorCallback ctx.device
-        fn (err message userdata)
-            msgstr := () -> ('from-rawstring String message)
-
-            switch err
-            pass 'Validation
-            pass 'OutOfMemory
-            pass 'Internal
-            pass 'Unknown
-            pass 'DeviceLost
-            do
-                logger.write-fatal "\n" (msgstr)
-                abort;
-            default
-                ()
-        null
 
     ctx.msaa? = cfg.msaa?
     configure-surface;

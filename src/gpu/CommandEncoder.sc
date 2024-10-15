@@ -15,9 +15,9 @@ type+ CommandEncoder
             wgpu.DeviceCreateCommandEncoder ctx.device (&local wgpu.CommandEncoderDescriptor)
 
     fn finish (self)
-        cmd-buf := wgpu.CommandEncoderFinish (view self) null
-        # gets transmogrified into CommandBuffer, so no need to drop
-        lose self
+        cmd-buf := wgpu.CommandEncoderFinish (view self)
+            typeinit@
+                label = "Command Buffer"
         imply cmd-buf CommandBuffer
 
     fn... copy-buffer (self, source : GPUBuffer, src-offset : usize,

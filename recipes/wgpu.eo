@@ -28,7 +28,7 @@ fn release-dir (platform arch)
     (commonpath
         (extract
             (download
-                "https://github.com/gfx-rs/wgpu-native/releases/download/{TAG}/wgpu-{platform}-{arch}-release.zip")))
+                "https://github.com/gfx-rs/wgpu-native/releases/download/{TAG}/wgpu-{platform}-{arch}-debug.zip")))
 
 bindings :=
     download "https://raw.githubusercontent.com/ScopesCommunity/eo-packages/main/bindings/wgpu.sc"
@@ -64,9 +64,9 @@ package wgpu-native-release
 
     dir := (release-dir "linux" "x86_64")
 
-    alias "/include/webgpu.h" "{preinstall-dir}/include/webgpu/webgpu.h"
-    alias "/include/wgpu.h" "{preinstall-dir}/include/wgpu/wgpu.h"
-    alias "/lib/lib{LIBNAME}.so" "{dir}/lib{LIBNAME}.so"
+    alias "/include/webgpu.h" "{dir}/include/webgpu/webgpu.h"
+    alias "/include/wgpu.h" "{dir}/include/wgpu/wgpu.h"
+    alias "/lib/lib{LIBNAME}.so" "{dir}/lib/lib{LIBNAME}.so"
     alias "/lib/scopes/packages/wgpu.sc" bindings
     alias "/licenses/wgpu-native.txt" license
 
@@ -77,8 +77,8 @@ package wgpu-native-release
 
     dir := (release-dir "windows" "x86_64")
 
-    alias "/include/webgpu.h" "{preinstall-dir}/include/webgpu/webgpu.h"
-    alias "/include/wgpu.h" "{preinstall-dir}/include/wgpu/wgpu.h"
-    alias "/lib/{LIBNAME}.dll" "{dir}/{LIBNAME}.dll"
+    alias "/include/webgpu.h" "{dir}/include/webgpu/webgpu.h"
+    alias "/include/wgpu.h" "{dir}/include/wgpu/wgpu.h"
+    alias "/lib/{LIBNAME}.dll" "{dir}/lib/{LIBNAME}.dll"
     alias "/lib/scopes/packages/wgpu.sc" bindings
     alias "/licenses/wgpu-native.txt" license
