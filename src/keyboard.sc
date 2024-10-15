@@ -2,7 +2,8 @@ import .enums sdl3
 
 fn... down? (key : enums.KeyboardKey)
     kbstate := (sdl3.GetKeyboardState null)
-    bool (kbstate @ (sdl3.GetScancodeFromKey key))
+    # FIXME: understand the modstate parameter
+    bool (kbstate @ (sdl3.GetScancodeFromKey key null))
 
 do
     let down?
