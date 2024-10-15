@@ -49,7 +49,14 @@ inline build-demo (name use-genc?)
     assert (libflags != null)
     libflags := string libflags
 
-    cmd := f"gcc -o ${bin-dir}/${exe-name} ${obj-dir}/${obj-name} -I../include -lm -L${bin-dir} ${libflags} -Wl,-rpath '-Wl,$ORIGIN'"
+    let extra-lflags =
+        static-match operating-system
+        case 'linux
+            "-levdev"
+        default
+            ""
+
+    cmd := f"gcc -o ${bin-dir}/${exe-name} ${obj-dir}/${obj-name} -I../include -lm ${extra-lflags} -L${bin-dir} ${libflags} -Wl,-rpath '-Wl,$ORIGIN'"
     print "+" cmd
     status := system cmd
     if (status == -1)
