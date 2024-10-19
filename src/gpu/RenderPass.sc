@@ -16,6 +16,7 @@ type+ ColorAttachment
                 loadOp = (clear? wgpu.LoadOp.Clear wgpu.LoadOp.Load)
                 storeOp = wgpu.StoreOp.Store
                 clearValue = wgpu.Color (unpack clear-color)
+                depthSlice = wgpu.WGPU_DEPTH_SLICE_UNDEFINED
         bitcast attachment cls
 
 type+ RenderPass
