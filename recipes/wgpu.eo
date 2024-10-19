@@ -28,7 +28,7 @@ fn release-dir (platform arch)
     (commonpath
         (extract
             (download
-                "https://github.com/gfx-rs/wgpu-native/releases/download/{TAG}/wgpu-{platform}-{arch}-debug.zip")))
+                "https://github.com/gfx-rs/wgpu-native/releases/download/{TAG}/wgpu-{platform}-{arch}-release.zip")))
 
 bindings :=
     download "https://raw.githubusercontent.com/ScopesCommunity/eo-packages/main/bindings/wgpu.sc"
