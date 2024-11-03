@@ -107,6 +107,7 @@ struct BottleConfig
             minimized? = false
             maximized? = false
             always-on-top? = false
+            transparent? = false
     time :
         struct TimeConfig
             use-delta-accumulator? : bool

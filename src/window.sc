@@ -157,6 +157,7 @@ fn init ()
             minimized? = sdl.SDL_WINDOW_MINIMIZED
             maximized? = sdl.SDL_WINDOW_MAXIMIZED
             always-on-top? = sdl.SDL_WINDOW_ALWAYS_ON_TOP
+            transparent? = sdl.SDL_WINDOW_TRANSPARENT
 
     window-flags :=
         | user-flags
