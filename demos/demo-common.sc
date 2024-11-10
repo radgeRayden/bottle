@@ -1,8 +1,12 @@
 import C.stdio
-using import print radl.ext radl.strfmt String
+using import print radl.ext radl.strfmt String struct
 using import ..src.context
 
 import bottle sdl3
+
+struct DemoWrapperContext plain
+    show-stats? : bool
+global demo-wrapper-ctx : DemoWrapperContext
 
 @@ 'on bottle.configure
 fn (cfg)
@@ -24,36 +28,39 @@ fn (key)
         bottle.quit!;
     if (key == KeyboardKey.F11)
         bottle.window.toggle-fullscreen;
+    if (key == 'F4)
+        demo-wrapper-ctx.show-stats? = not demo-wrapper-ctx.show-stats?
 
 @@ 'on bottle.render
 @@ if-module-enabled 'imgui
 fn demo-info ()
     ig := import ..src.imgui
-    ig.SetNextWindowPos (ig.Vec2 10 10) ig.Cond.Always (ig.Vec2 0 0)
-    ig.SetNextWindowSize (ig.Vec2 245 300) ig.Cond.Always
-    ig.Begin "demo-common.fps" null
-        enum-bitfield ig.WindowFlags i32
-            'NoDecoration
-            'NoBackground
-    ig.Text "FPS: %d" (bottle.time.get-fps)
-    ig.Text "Time Scale: %.2f" (bottle.time.get-global-time-scale)
-    rep := (bottle.gpu.generate-report)
+    if demo-wrapper-ctx.show-stats?
+        ig.SetNextWindowPos (ig.Vec2 10 10) ig.Cond.Always (ig.Vec2 0 0)
+        ig.SetNextWindowSize (ig.Vec2 245 300) ig.Cond.Always
+        ig.Begin "demo-common.fps" null
+            enum-bitfield ig.WindowFlags i32
+                'NoDecoration
+                'NoBackground
+        ig.Text "FPS: %d" (bottle.time.get-fps)
+        ig.Text "Time Scale: %.2f" (bottle.time.get-global-time-scale)
+        rep := (bottle.gpu.generate-report)
 
-    inline n (r)
-        r.numKeptFromUser
+        inline n (r)
+            r.numKeptFromUser
 
-    ig.Text
-        """"textures: %llu
-            textureViews: %llu
-            samplers: %llu
-            bg-layouts: %llu
-            pip-layouts: %llu
-        n rep.textures
-        n rep.textureViews
-        n rep.samplers
-        n rep.bindGroupLayouts
-        n rep.pipelineLayouts
-    ig.End;
+        ig.Text
+            """"textures: %llu
+                textureViews: %llu
+                samplers: %llu
+                bg-layouts: %llu
+                pip-layouts: %llu
+            n rep.textures
+            n rep.textureViews
+            n rep.samplers
+            n rep.bindGroupLayouts
+            n rep.pipelineLayouts
+        ig.End;
 
     ww wh := (bottle.window.get-size)
     ig.SetNextWindowPos (ig.Vec2 ((f32 ww) - 120) 10) ig.Cond.Always (ig.Vec2 0 0)
