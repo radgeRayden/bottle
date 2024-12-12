@@ -1,7 +1,5 @@
-VERSION := "8268b6748b40d38d08df75c15af46024f90cd7d9"
+VERSION := "3d5b2e7"
 SUMMARY := "Dear ImGui: Bloat-free Graphical User interface for C++ with minimal dependencies (cimgui)"
-# FIXME: temporary workaround until cimgui catches up with upstream / SDL3 stabilizes
-IMGUI_BACKEND_REV := "c3629adbeb22740c7f352a0dcc17870b80630e37"
 
 fn imgui-git (platform wgpu-lib sdl-lib)
     then
@@ -12,12 +10,6 @@ fn imgui-git (platform wgpu-lib sdl-lib)
                 (shell git-parent) "git clone --recursive https://github.com/cimgui/cimgui.git"
                 (shell git-dir) "git checkout {VERSION}"
                 (shell git-dir) "chmod -R a+w .git"
-
-                backend-dir := "{git-dir}/imgui/backends"
-                sdl3-impl-c := (download "https://raw.githubusercontent.com/ocornut/imgui/{IMGUI_BACKEND_REV}/backends/imgui_impl_sdl3.cpp")
-                sdl3-impl-h := (download "https://raw.githubusercontent.com/ocornut/imgui/{IMGUI_BACKEND_REV}/backends/imgui_impl_sdl3.h")
-                (shell backend-dir) "cp -f {sdl3-impl-c} ./imgui_impl_sdl3.cpp"
-                (shell backend-dir) "cp -f {sdl3-impl-h} ./imgui_impl_sdl3.h"
                 git-dir
 
         project-path := ((rshell ".") "pwd")
