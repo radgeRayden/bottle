@@ -1,0 +1,36 @@
+VERSION := "a90b6938ddf2104f53d682d9c8388c6c173e98f0"
+SUMMARY := "Support for TrueType (.ttf) font files with Simple Directmedia Layer."
+
+archive :=
+    download
+        "https://github.com/libsdl-org/SDL_ttf/archive/{VERSION}.tar.gz"
+
+fn preinstall-dir (generator)
+    then
+        build-path :=
+            commonpath
+                extract archive
+        build-command :=
+            shell
+                mkdir "{build-path}/build"
+
+        install-dir := (tempdir)
+        build-command "cmake -G \"{generator}\" .."
+        build-command "cmake --build . -j"
+        build-command "cmake --install . --prefix {install-dir}"
+        install-dir
+
+# TODO: add bindings file
+
+package sdl3_ttf
+    summary SUMMARY
+    version VERSION
+    platform linux unknown
+
+    preinstall-dir := (preinstall-dir "Unix Makefiles")
+    alias "/lib/libSDL3_ttf.so" "{preinstall-dir}/lib/libSDL3_ttf.so"
+    # alias "/lib/scopes/packages/sdl3_ttf.sc" bindings
+    in "/include" "{preinstall-dir}/include/SDL3_ttf"
+    alias "/licenses/SDL3_ttf.txt" "{preinstall-dir}/share/licenses/SDL3_ttf/LICENSE.txt"
+
+# TODO: windows package
