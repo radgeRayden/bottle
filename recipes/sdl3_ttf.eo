@@ -20,7 +20,7 @@ fn preinstall-dir (generator)
         build-command "cmake --install . --prefix {install-dir}"
         install-dir
 
-# TODO: add bindings file
+bindings := "./bindings/sdl3_ttf.sc"
 
 package sdl3_ttf
     summary SUMMARY
@@ -29,7 +29,7 @@ package sdl3_ttf
 
     preinstall-dir := (preinstall-dir "Unix Makefiles")
     alias "/lib/libSDL3_ttf.so" "{preinstall-dir}/lib/libSDL3_ttf.so"
-    # alias "/lib/scopes/packages/sdl3_ttf.sc" bindings
+    alias "/lib/scopes/packages/sdl3_ttf.sc" bindings
     in "/include" "{preinstall-dir}/include/SDL3_ttf"
     alias "/licenses/SDL3_ttf.txt" "{preinstall-dir}/share/licenses/SDL3_ttf/LICENSE.txt"
 
