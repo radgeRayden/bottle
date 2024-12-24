@@ -140,6 +140,7 @@ fn init ()
 fn begin-frame ()
     ctx := 'force-unwrap context
     ctx.render-target = copy (gpu.get-surface-texture)
+    ctx.transform = (default-transform)
     ()
 
 fn finalize-enqueue-command (ctx)
