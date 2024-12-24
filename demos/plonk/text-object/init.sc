@@ -23,11 +23,23 @@ fn ()
     using bottle.types
 
     try
+        image-font := bottle.asset.load-image "assets/gelatin_mono.png"
+
+        # remove black pixels
+        pixel-count := image-font.width * image-font.height
+        for i in (range pixel-count)
+            d := image-font.data
+            i := i * 4
+            color := uvec3 (d @ i) (d @ (i + 1)) (d @  (i + 2))
+
+            if (color == (uvec3 0))
+                d @ (i + 3) = 0
+
         local demo-context =
             DemoContext
                 font-atlas =
                     plonk.TextureBinding
-                        Texture (bottle.asset.load-image "assets/gelatin_mono.png")
+                        Texture image-font
                         min-filter = 'Nearest
         font-string := S"!\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_ abcdefghijklmnopqrstuvwxyz(|)~"
 
