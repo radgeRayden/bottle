@@ -1,5 +1,5 @@
-using import glm Map Option String struct UTF-8
-import bottle ...demo-common
+using import Array glm itertools Map Option String struct
+import bottle ...demo-common UTF-8
 plonk := bottle.plonk
 
 struct DemoContext
@@ -7,7 +7,11 @@ struct DemoContext
     character-mappings : (Map i32 plonk.Quad)
     tofu : plonk.Quad
     bg-color : vec4
-    test-string = S"Hello World\nHello L\xFFVE discord server"
+    test-string = S"Hello World\nHello LÖVE discord server"
+
+    advance : f32
+    line-height : f32
+    y-offset : f32
 
 global ctx : (Option DemoContext)
 
@@ -52,6 +56,9 @@ fn ()
         for i c in (enumerate font-string)
             'set demo-context.character-mappings (i32 c) (get-quad (first-cell + i))
         demo-context.tofu = get-quad (first-cell + 30)
+        demo-context.advance = 14
+        demo-context.y-offset = 5
+        demo-context.line-height = 24
 
         ctx = demo-context
 
@@ -60,19 +67,27 @@ fn ()
 @@ 'on bottle.render
 fn ()
     ctx := 'force-unwrap ctx
-    fold (pen = (vec2 0 600)) for c in ctx.test-string
-        if (c == (char32 "\n"))
-            vec2 0 (pen.y - 32.0)
+
+    let codepoints =
+        ->>
+            ctx.test-string
+            UTF-8.decoder
+            filter ((x) -> (x > 0))
+            local dst : (Array i32)
+
+    fold (pen = (vec2 0 600)) for c in codepoints
+        if (c == c"\n")
+            vec2 0 (pen.y - ctx.line-height)
         else
             let quad =
                 try
-                    'get ctx.character-mappings (i32 c) # FIXME: hello UTF-8??
+                    'get ctx.character-mappings c
                 else
                     deref ctx.tofu
 
-            plonk.sprite ctx.font-atlas pen (vec2 32 32) 0:f32 quad (origin = (vec2))
-            pen + (vec2 32 0)
-
+            position := pen + (vec2 0 ctx.y-offset)
+            plonk.sprite ctx.font-atlas position (vec2 32 32) 0:f32 quad (origin = (vec2))
+            pen + (vec2 ctx.advance 0)
 
 sugar-if main-module?
     bottle.run;
