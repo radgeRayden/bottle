@@ -222,7 +222,7 @@ type+ Texture
             |   wgpu.TextureUsage.CopySrc
                 wgpu.TextureUsage.CopyDst
                 wgpu.TextureUsage.TextureBinding
-                (render-target? wgpu.TextureUsage.RenderAttachment (bitcast 0 wgpu.TextureUsage))
+                (render-target? wgpu.TextureUsage.RenderAttachment (bitcast 0:u64 wgpu.TextureUsage))
 
         let format =
             static-if (none? format)
@@ -232,7 +232,7 @@ type+ Texture
         handle :=
             wgpu.DeviceCreateTexture ctx.device
                 &local wgpu.TextureDescriptor
-                    label = dupe (f"Bottle Texture ${format}" as rawstring)
+                    label = f"Bottle Texture ${format}"
                     usage = usage
                     dimension = dimension
                     size = (wgpu.Extent3D width height slices)
@@ -273,14 +273,14 @@ type+ Texture
         assert (data-size <= (texture-size-bytes - write-offset))
 
         wgpu.QueueWriteTexture ctx.queue
-            &local wgpu.ImageCopyTexture
+            &local wgpu.TexelCopyTextureInfo
                 texture = self
                 mipLevel = mip-level
                 origin = (wgpu.Origin3D x y z)
                 aspect = aspect
             ptr
             data-size
-            &local wgpu.TextureDataLayout
+            &local wgpu.TexelCopyBufferLayout
                 offset = 0 #buffer-offset
                 bytesPerRow = iwidth * block-size
                 rowsPerImage = iheight

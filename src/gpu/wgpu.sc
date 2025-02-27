@@ -1,5 +1,19 @@
-using import Array hash String
+using import Array enum hash String
 import wgpu
+
+# HELPERS
+# =======
+
+spice Scope->CEnum (scope tagf)
+    vvv bind expr
+    fold (expr = `()) for k v in (scope as Scope)
+        spice-quote
+            expr
+            tagf [(k as Symbol)] Nothing v
+
+    spice-quote
+        embed
+            expr
 
 inline wrap-constructor (f T)
     inline (...)
@@ -144,65 +158,45 @@ spice split-chained-fields (args...)
 
 run-stage;
 
-type+ wgpu.Limits
-    inline... __typecall (cls)
-        super-type.__typecall cls
-            maxTextureDimension1D = wgpu.WGPU_LIMIT_U32_UNDEFINED
-            maxTextureDimension2D = wgpu.WGPU_LIMIT_U32_UNDEFINED
-            maxTextureDimension3D = wgpu.WGPU_LIMIT_U32_UNDEFINED
-            maxTextureArrayLayers = wgpu.WGPU_LIMIT_U32_UNDEFINED
-            maxBindGroups = wgpu.WGPU_LIMIT_U32_UNDEFINED
-            maxBindingsPerBindGroup = wgpu.WGPU_LIMIT_U32_UNDEFINED
-            maxDynamicUniformBuffersPerPipelineLayout = wgpu.WGPU_LIMIT_U32_UNDEFINED
-            maxDynamicStorageBuffersPerPipelineLayout = wgpu.WGPU_LIMIT_U32_UNDEFINED
-            maxSampledTexturesPerShaderStage = wgpu.WGPU_LIMIT_U32_UNDEFINED
-            maxSamplersPerShaderStage = wgpu.WGPU_LIMIT_U32_UNDEFINED
-            maxStorageBuffersPerShaderStage = wgpu.WGPU_LIMIT_U32_UNDEFINED
-            maxStorageTexturesPerShaderStage = wgpu.WGPU_LIMIT_U32_UNDEFINED
-            maxUniformBuffersPerShaderStage = wgpu.WGPU_LIMIT_U32_UNDEFINED
-            maxUniformBufferBindingSize = wgpu.WGPU_LIMIT_U64_UNDEFINED
-            maxStorageBufferBindingSize = wgpu.WGPU_LIMIT_U64_UNDEFINED
-            minUniformBufferOffsetAlignment = wgpu.WGPU_LIMIT_U32_UNDEFINED
-            minStorageBufferOffsetAlignment = wgpu.WGPU_LIMIT_U32_UNDEFINED
-            maxVertexBuffers = wgpu.WGPU_LIMIT_U32_UNDEFINED
-            maxBufferSize = wgpu.WGPU_LIMIT_U64_UNDEFINED
-            maxVertexAttributes = wgpu.WGPU_LIMIT_U32_UNDEFINED
-            maxVertexBufferArrayStride = wgpu.WGPU_LIMIT_U32_UNDEFINED
-            maxInterStageShaderComponents = wgpu.WGPU_LIMIT_U32_UNDEFINED
-            maxInterStageShaderVariables = wgpu.WGPU_LIMIT_U32_UNDEFINED
-            maxColorAttachments = wgpu.WGPU_LIMIT_U32_UNDEFINED
-            maxColorAttachmentBytesPerSample = wgpu.WGPU_LIMIT_U32_UNDEFINED
-            maxComputeWorkgroupStorageSize = wgpu.WGPU_LIMIT_U32_UNDEFINED
-            maxComputeInvocationsPerWorkgroup = wgpu.WGPU_LIMIT_U32_UNDEFINED
-            maxComputeWorkgroupSizeX = wgpu.WGPU_LIMIT_U32_UNDEFINED
-            maxComputeWorkgroupSizeY = wgpu.WGPU_LIMIT_U32_UNDEFINED
-            maxComputeWorkgroupSizeZ = wgpu.WGPU_LIMIT_U32_UNDEFINED
-            maxComputeWorkgroupsPerDimension = wgpu.WGPU_LIMIT_U32_UNDEFINED
-    case (...)
-        super-type.__typecall ...
+type+ wgpu.StringView
+    inline __rimply (otherT thisT)
+        static-if (otherT == String)
+            inline (incoming)
+                ptr count := 'data incoming
+                thisT (dupe ptr) count
+        else
+            inline (incoming)
+                thisT (incoming as rawstring) (countof incoming)
+
+    inline __imply (thisT otherT)
+        static-if (otherT == String)
+            inline (self)
+                String self.data self.length
+
+run-stage;
 
 do
-    Instance := define-object "WGPUInstance" wgpu.Instance wgpu.InstanceRelease wgpu.InstanceReference
-    Adapter := define-object "WGPUAdapter" wgpu.Adapter wgpu.AdapterRelease wgpu.AdapterReference
-    BindGroup := define-object "WGPUBindGroup" wgpu.BindGroup wgpu.BindGroupRelease wgpu.BindGroupReference
-    BindGroupLayout := define-object "WGPUBindGroupLayout" wgpu.BindGroupLayout wgpu.BindGroupLayoutRelease wgpu.BindGroupLayoutReference
-    Buffer := define-object "WGPUBuffer" wgpu.Buffer wgpu.BufferRelease wgpu.BufferReference
-    CommandBuffer := define-object "WGPUCommandBuffer" wgpu.CommandBuffer wgpu.CommandBufferRelease wgpu.CommandBufferReference
-    CommandEncoder := define-object "WGPUCommandEncoder" wgpu.CommandEncoder wgpu.CommandEncoderRelease wgpu.CommandEncoderReference
-    RenderPassEncoder := define-object "WGPURenderPassEncoder" wgpu.RenderPassEncoder wgpu.RenderPassEncoderRelease wgpu.RenderPassEncoderReference
-    ComputePassEncoder := define-object "WGPUComputePassEncoder" wgpu.ComputePassEncoder wgpu.ComputePassEncoderRelease wgpu.ComputePassEncoderReference
-    RenderBundleEncoder := define-object "WGPURenderBundleEncoder" wgpu.RenderBundleEncoder wgpu.RenderBundleEncoderRelease wgpu.RenderBundleEncoderReference
-    ComputePipeline := define-object "WGPUComputePipeline" wgpu.ComputePipeline wgpu.ComputePipelineRelease wgpu.ComputePipelineReference
-    Device := define-object "WGPUDevice" wgpu.Device wgpu.DeviceRelease wgpu.DeviceReference
-    PipelineLayout := define-object "WGPUPipelineLayout" wgpu.PipelineLayout wgpu.PipelineLayoutRelease wgpu.PipelineLayoutReference
-    QuerySet := define-object "WGPUQuerySet" wgpu.QuerySet wgpu.QuerySetRelease wgpu.QuerySetReference
-    RenderBundle := define-object "WGPURenderBundle" wgpu.RenderBundle wgpu.RenderBundleRelease wgpu.RenderBundleReference
-    RenderPipeline := define-object "WGPURenderPipeline" wgpu.RenderPipeline wgpu.RenderPipelineRelease wgpu.RenderPipelineReference
-    Sampler := define-object "WGPUSampler" wgpu.Sampler wgpu.SamplerRelease wgpu.SamplerReference
-    ShaderModule := define-object "WGPUShaderModule" wgpu.ShaderModule wgpu.ShaderModuleRelease wgpu.ShaderModuleReference
-    Surface := define-object "WGPUSurface" wgpu.Surface wgpu.SurfaceRelease wgpu.SurfaceReference
-    Texture := define-object "WGPUTexture" wgpu.Texture wgpu.TextureRelease wgpu.TextureReference
-    TextureView := define-object "WGPUTextureView" wgpu.TextureView wgpu.TextureViewRelease wgpu.TextureViewReference
+    Instance := define-object "WGPUInstance" wgpu.Instance wgpu.InstanceRelease wgpu.InstanceAddRef
+    Adapter := define-object "WGPUAdapter" wgpu.Adapter wgpu.AdapterRelease wgpu.AdapterAddRef
+    BindGroup := define-object "WGPUBindGroup" wgpu.BindGroup wgpu.BindGroupRelease wgpu.BindGroupAddRef
+    BindGroupLayout := define-object "WGPUBindGroupLayout" wgpu.BindGroupLayout wgpu.BindGroupLayoutRelease wgpu.BindGroupLayoutAddRef
+    Buffer := define-object "WGPUBuffer" wgpu.Buffer wgpu.BufferRelease wgpu.BufferAddRef
+    CommandBuffer := define-object "WGPUCommandBuffer" wgpu.CommandBuffer wgpu.CommandBufferRelease wgpu.CommandBufferAddRef
+    CommandEncoder := define-object "WGPUCommandEncoder" wgpu.CommandEncoder wgpu.CommandEncoderRelease wgpu.CommandEncoderAddRef
+    RenderPassEncoder := define-object "WGPURenderPassEncoder" wgpu.RenderPassEncoder wgpu.RenderPassEncoderRelease wgpu.RenderPassEncoderAddRef
+    ComputePassEncoder := define-object "WGPUComputePassEncoder" wgpu.ComputePassEncoder wgpu.ComputePassEncoderRelease wgpu.ComputePassEncoderAddRef
+    RenderBundleEncoder := define-object "WGPURenderBundleEncoder" wgpu.RenderBundleEncoder wgpu.RenderBundleEncoderRelease wgpu.RenderBundleEncoderAddRef
+    ComputePipeline := define-object "WGPUComputePipeline" wgpu.ComputePipeline wgpu.ComputePipelineRelease wgpu.ComputePipelineAddRef
+    Device := define-object "WGPUDevice" wgpu.Device wgpu.DeviceRelease wgpu.DeviceAddRef
+    PipelineLayout := define-object "WGPUPipelineLayout" wgpu.PipelineLayout wgpu.PipelineLayoutRelease wgpu.PipelineLayoutAddRef
+    QuerySet := define-object "WGPUQuerySet" wgpu.QuerySet wgpu.QuerySetRelease wgpu.QuerySetAddRef
+    RenderBundle := define-object "WGPURenderBundle" wgpu.RenderBundle wgpu.RenderBundleRelease wgpu.RenderBundleAddRef
+    RenderPipeline := define-object "WGPURenderPipeline" wgpu.RenderPipeline wgpu.RenderPipelineRelease wgpu.RenderPipelineAddRef
+    Sampler := define-object "WGPUSampler" wgpu.Sampler wgpu.SamplerRelease wgpu.SamplerAddRef
+    ShaderModule := define-object "WGPUShaderModule" wgpu.ShaderModule wgpu.ShaderModuleRelease wgpu.ShaderModuleAddRef
+    Surface := define-object "WGPUSurface" wgpu.Surface wgpu.SurfaceRelease wgpu.SurfaceAddRef
+    Texture := define-object "WGPUTexture" wgpu.Texture wgpu.TextureRelease wgpu.TextureAddRef
+    TextureView := define-object "WGPUTextureView" wgpu.TextureView wgpu.TextureViewRelease wgpu.TextureViewAddRef
 
     TextureCreateView := wrap-constructor wgpu.TextureCreateView TextureView
     DeviceCreateTexture := wrap-constructor wgpu.DeviceCreateTexture Texture
@@ -229,7 +223,7 @@ do
             wgpu.CommandEncoderFinish cmd-encoder desc
         imply result CommandBuffer
 
-    type ShaderStageFlags < integer : u32
+    type ShaderStageFlags < integer : u64
         let __typecall = (define-flags wgpu.ShaderStage)
 
     inline typeinit@ (...)
@@ -237,24 +231,40 @@ do
             static-assert (T < pointer)
             imply (& (local hidden = (elementof T) ...)) T
 
-    inline chained@ (K ...)
-        using wgpu
-        chaintypename := K
-        K := getattr wgpu K
-        chaintype := static-try (getattr SType chaintypename)
-        else
-            (getattr NativeSType chaintypename) as (storageof SType) as SType
+    inline make-chained@ (T)
+        inline (K ...)
+            using wgpu
+            chaintypename := K
+            K := getattr wgpu K
+            chaintype := static-try (getattr SType chaintypename)
+            else
+                (getattr NativeSType chaintypename) as (storageof SType) as SType
 
-        chained-fields passthrough-fields := split-chained-fields ...
+            chained-fields passthrough-fields := split-chained-fields ...
 
-        typeinit@
-            nextInChain = as
-                &
-                    local := K
-                        chain = typeinit
-                            sType = chaintype
-                        (chained-fields)
-                mutable@ ChainedStruct
-            (passthrough-fields)
+            typeinit@
+                nextInChain = as
+                    &
+                        local := K
+                            chain = typeinit
+                                sType = chaintype
+                            (chained-fields)
+                    mutable@ T
+                (passthrough-fields)
+    chained@ := make-chained@ wgpu.ChainedStruct
+    chained-out@ := make-chained@ wgpu.ChainedStructOut
+    unlet make-chained@
+
+    inline reconstruct-enum (name scope)
+        enum (_ name) : u64
+            Scope->CEnum scope tag
+
+    InstanceBackend := reconstruct-enum "InstanceBackend" wgpu.InstanceBackend
+    InstanceFlag := reconstruct-enum "InstanceFlag" wgpu.InstanceFlag
+    BufferUsage := reconstruct-enum "BufferUsage" wgpu.BufferUsage
+    ColorWriteMask := reconstruct-enum "ColorWriteMask" wgpu.ColorWriteMask
+    MapMode := reconstruct-enum "MapMode" wgpu.MapMode
+    ShaderStage := reconstruct-enum "ShaderStage" wgpu.ShaderStage
+    TextureUsage := reconstruct-enum "TextureUsage" wgpu.TextureUsage
 
     .. (local-scope) wgpu

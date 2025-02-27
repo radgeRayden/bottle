@@ -110,7 +110,7 @@ fn make-pipeline (layout topology winding vertex-stage fragment-stage sample-cou
                 wgpu.DepthStencilState
                     # FIXME: allow a configurable depth format
                     format = 'Depth32FloatStencil8
-                    depthWriteEnabled = true
+                    depthWriteEnabled = 'True
                     depthCompare = 'Less
                     # FIXME: configurable stencil state
                     stencilFront =

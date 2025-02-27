@@ -59,7 +59,7 @@ type+ RenderPass
         let handle =
             wgpu.CommandEncoderBeginRenderPass cmd-encoder
                 &local wgpu.RenderPassDescriptor
-                    label = dupe (f"Bottle Render Pass ${label-suffix}" as rawstring)
+                    label = f"Bottle Render Pass ${label-suffix}"
                     colorAttachmentCount = count
                     colorAttachments = color-attachments as (@ wgpu.RenderPassColorAttachment)
                     depthStencilAttachment = depth-stencil-attachment

@@ -26,10 +26,10 @@ type+ RendererBackendInfo
         self =
             this-type
                 version = typeinit (wgpu.GetVersion)
-                vendor = 'from-rawstring String p.vendor
-                architecture = 'from-rawstring String p.architecture
-                device = 'from-rawstring String p.device
-                driver = 'from-rawstring String p.description
+                vendor = p.vendor
+                architecture = p.architecture
+                device = p.device
+                driver = p.description
                 adapter = p.adapterType
                 low-level-backend = p.backendType
 

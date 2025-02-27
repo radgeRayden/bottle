@@ -9,14 +9,14 @@ ctx := context-accessor 'gpu
 fn shader-module-from-SPIRV (code)
     wgpu.DeviceCreateShaderModule
         ctx.device
-        chained@ 'ShaderModuleSPIRVDescriptor
+        chained@ 'ShaderSourceSPIRV
             codeSize = ((countof code) // 4) as u32
             code = (dupe (code as rawstring as (@ u32)))
 
 fn shader-module-from-WGSL (code)
     wgpu.DeviceCreateShaderModule
         ctx.device
-        chained@ 'ShaderModuleWGSLDescriptor
+        chained@ 'ShaderSourceWGSL
             code = (dupe (code as rawstring))
 
 fn shader-module-from-GLSL (code stage)

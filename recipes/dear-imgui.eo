@@ -1,4 +1,5 @@
-VERSION := "3d5b2e7"
+VERSION := "8bd3e20c86b1541f1da2c1f1d2444220432193fa"
+CIMGUI_VERSION := "429ffc930d63004618790680a86b6f0f1359c72b"
 SUMMARY := "Dear ImGui: Bloat-free Graphical User interface for C++ with minimal dependencies (cimgui)"
 
 fn imgui-git (platform wgpu-lib sdl-lib)
@@ -7,8 +8,12 @@ fn imgui-git (platform wgpu-lib sdl-lib)
             then
                 git-parent := (tempdir)
                 git-dir := "{git-parent}/cimgui"
-                (shell git-parent) "git clone --recursive https://github.com/cimgui/cimgui.git"
-                (shell git-dir) "git checkout {VERSION}"
+                generator-dir := "{git-dir}/generator"
+                (shell git-parent) "git clone https://github.com/cimgui/cimgui.git"
+                (shell git-dir) "git clone https://github.com/ocornut/imgui.git"
+                (shell git-dir) "git checkout {CIMGUI_VERSION}"
+                (shell "{git-dir}/imgui") "git checkout {VERSION}"
+                (shell generator-dir) "./generator.sh"
                 (shell git-dir) "chmod -R a+w .git"
                 git-dir
 
@@ -32,14 +37,14 @@ fn imgui-git (platform wgpu-lib sdl-lib)
 
         build-path
 
-cimgui-license := (download "https://raw.githubusercontent.com/cimgui/cimgui/{VERSION}/LICENSE")
-imgui-license := (download "https://raw.githubusercontent.com/ocornut/imgui/master/LICENSE.txt")
+cimgui-license := (download "https://raw.githubusercontent.com/cimgui/cimgui/{CIMGUI_VERSION}/LICENSE")
+imgui-license := (download "https://raw.githubusercontent.com/ocornut/imgui/{VERSION}/LICENSE.txt")
 
 package dear-imgui
     summary SUMMARY
     version VERSION
     platform windows-mingw
-    depends wgpu-native-release sdl3
+    depends wgpu-native sdl3
 
     preinstall-dir := (imgui-git "windows" "wgpu_native.dll" "SDL3.dll")
     alias "/lib/cimgui.dll" "{preinstall-dir}/cimgui.dll"
@@ -51,7 +56,7 @@ package dear-imgui
     summary SUMMARY
     version VERSION
     platform linux
-    depends wgpu-native-release sdl3
+    depends wgpu-native sdl3
 
     preinstall-dir := (imgui-git "linux" "libwgpu_native.so" "libSDL3.so")
     alias "/lib/libcimgui.so" "{preinstall-dir}/libcimgui.so"

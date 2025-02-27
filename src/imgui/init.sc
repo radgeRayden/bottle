@@ -37,7 +37,7 @@ fn reset-gpu-state ()
 @@ if-module-enabled 'imgui
 fn process-event (event)
     result := ig.ImplSDL3_ProcessEvent event # do we even use this result for anything?
-    io := (ig.GetIO)
+    io := (ig.GetIO_Nil)
 
     switch (event.type as sdl.EventType)
     pass 'MOUSE_MOTION

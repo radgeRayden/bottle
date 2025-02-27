@@ -12,9 +12,15 @@ spice collect-enum-fields (ET)
 
     ET as:= type
     local args : (Array Symbol)
-    for k v in ('symbols ET)
-        if (not (starts-with? (String (k as string)) "_"))
-            'append args k
+
+    # Scopes CEnum or C enum?
+    try
+        for arg in ('args ('@ ET '__fields__))
+            'append args (('@ (arg as type) 'Name) as Symbol)
+    else
+        for k v in ('symbols ET)
+            if (not (starts-with? (String (k as string)) "_"))
+                'append args k
 
     sc_argument_list_map_new (i32 (countof args))
         inline (i)
@@ -155,7 +161,7 @@ struct BottleConfig
 struct WGPUAdapterInfo
     adapter : wgpu.Adapter
     properties : wgpu.AdapterInfo
-    limits : wgpu.SupportedLimits
+    limits : wgpu.Limits
     supported-features : (Array wgpu.FeatureName)
 
 struct BottleGPUState

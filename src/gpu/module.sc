@@ -1,7 +1,7 @@
 using import Array glm hash print radl.ext radl.strfmt String struct
 import .constants ..logger .types .wgpu ..window
 
-from wgpu let chained@
+from wgpu let chained@ chained-out@
 
 using import .common
 using import ..context ..exceptions ..helpers
@@ -30,17 +30,17 @@ fn create-surface ()
     dispatch (window.get-native-info)
     case X11 (display window)
         wgpu.InstanceCreateSurface ctx.instance
-            chained@ 'SurfaceDescriptorFromXlibWindow
+            chained@ 'SurfaceSourceXlibWindow
                 display = display
                 window = typeinit window
     case Wayland (display surface)
         wgpu.InstanceCreateSurface ctx.instance
-            chained@ 'SurfaceDescriptorFromWaylandSurface
+            chained@ 'SurfaceSourceWaylandSurface
                 display = display
                 surface = surface
     case Windows (hinstance hwnd)
         wgpu.InstanceCreateSurface ctx.instance
-            chained@ 'SurfaceDescriptorFromWindowsHWND
+            chained@ 'SurfaceSourceWindowsHWND
                 hinstance = hinstance
                 hwnd = hwnd
     default
@@ -135,12 +135,15 @@ fn acquire-surface-texture ()
 
     local surface-texture : wgpu.SurfaceTexture
     wgpu.SurfaceGetCurrentTexture ctx.surface &surface-texture
+    Status := wgpu.SurfaceGetCurrentTextureStatus
 
-    if (surface-texture.status != 'Success)
+    if (surface-texture.status > Status.SuccessSuboptimal)
         logger.write-debug f"The request for the surface texture was unsuccessful: ${surface-texture.status}"
 
     switch surface-texture.status
-    case 'Success
+    pass 'SuccessSuboptimal
+    pass 'SuccessOptimal
+    do
         imply surface-texture.texture Texture
     pass 'Timeout
     pass 'Outdated
@@ -160,7 +163,7 @@ fn init ()
 
     wgpu.SetLogCallback
         fn (level message userdata)
-            message := 'from-rawstring String message
+            message := String message.data message.length
             switch level
             case 'Error
                 logger.write-fatal message
@@ -193,17 +196,24 @@ fn init ()
 
     wgpu.InstanceRequestAdapter ctx.instance
         typeinit@
-            compatibleSurface = ('rawptr ctx.surface)
+            # compatibleSurface = ('rawptr ctx.surface)
+            featureLevel = 'Core
             powerPreference = cfg.power-preference
-        fn (status adapter message userdata)
-            if (status == 'Success)
-                ctx.adapter = adapter
-            else
-                logger.write-fatal
-                    "Request for the graphics adapter failed. Verify you have the necessary drivers installed.\n"
-                    f"Could not create adapter. ${message}"
-                abort;
-        null
+        typeinit
+            mode = 'AllowProcessEvents
+            callback =
+                fn (status adapter message userdata1 userdata2)
+                    raising noreturn
+                    if (status == 'Success)
+                        ctx.adapter = adapter
+                    else
+                        logger.write-fatal
+                            "Request for the graphics adapter failed. Verify you have the necessary drivers installed.\n"
+                            f"Could not create adapter. ${(String message.data message.length)}"
+                        abort;
+
+    # NOTE: Currently not implemented
+    # wgpu.InstanceProcessEvents ctx.instance
 
     do
         local caps : wgpu.SurfaceCapabilities
@@ -222,65 +232,95 @@ fn init ()
             native-feature 'PushConstants
 
     inline make-limits-struct ()
-        wgpu.SupportedLimits
+        wgpu.Limits
             nextInChain =
                 bitcast
-                    &local wgpu.SupportedLimitsExtras
+                    &local wgpu.NativeLimits
                         chain =
                             typeinit
-                                sType = bitcast wgpu.NativeSType.SupportedLimitsExtras wgpu.SType
+                                sType = bitcast wgpu.NativeSType.NativeLimits wgpu.SType
                     mutable@ wgpu.ChainedStructOut
 
     local adapter-limits := (make-limits-struct)
     wgpu.AdapterGetLimits ctx.adapter &adapter-limits
-    limits-extras := bitcast adapter-limits.nextInChain (mutable@ wgpu.SupportedLimitsExtras)
-
-    # needs to be initialized to default values
-    local required-limits : wgpu.Limits
-    required-limits.maxUniformBufferBindingSize = constants.MAX_UNIFORM_BUFFER_SIZE
+    limits-extras := bitcast adapter-limits.nextInChain (mutable@ wgpu.NativeLimits)
 
     wgpu.AdapterRequestDevice ctx.adapter
         typeinit@
             requiredFeatureCount = (countof required-features)
             requiredFeatures = &required-features
             requiredLimits =
-                chained@ 'RequiredLimitsExtras
-                    limits =
-                        typeinit
-                            maxPushConstantSize = constants.MAX_PUSH_CONSTANT_SIZE
-                    .limits = required-limits
+                chained-out@ 'NativeLimits
+                    # customized values
+                    maxPushConstantSize = constants.MAX_PUSH_CONSTANT_SIZE
+                    .maxUniformBufferBindingSize = constants.MAX_UNIFORM_BUFFER_SIZE
+
+                    # defaults
+                    .maxTextureDimension1D = wgpu.WGPU_LIMIT_U32_UNDEFINED
+                    .maxTextureDimension2D = wgpu.WGPU_LIMIT_U32_UNDEFINED
+                    .maxTextureDimension3D = wgpu.WGPU_LIMIT_U32_UNDEFINED
+                    .maxTextureArrayLayers = wgpu.WGPU_LIMIT_U32_UNDEFINED
+                    .maxBindGroups = wgpu.WGPU_LIMIT_U32_UNDEFINED
+                    .maxBindingsPerBindGroup = wgpu.WGPU_LIMIT_U32_UNDEFINED
+                    .maxDynamicUniformBuffersPerPipelineLayout = wgpu.WGPU_LIMIT_U32_UNDEFINED
+                    .maxDynamicStorageBuffersPerPipelineLayout = wgpu.WGPU_LIMIT_U32_UNDEFINED
+                    .maxSampledTexturesPerShaderStage = wgpu.WGPU_LIMIT_U32_UNDEFINED
+                    .maxSamplersPerShaderStage = wgpu.WGPU_LIMIT_U32_UNDEFINED
+                    .maxStorageBuffersPerShaderStage = wgpu.WGPU_LIMIT_U32_UNDEFINED
+                    .maxStorageTexturesPerShaderStage = wgpu.WGPU_LIMIT_U32_UNDEFINED
+                    .maxUniformBuffersPerShaderStage = wgpu.WGPU_LIMIT_U32_UNDEFINED
+                    .maxStorageBufferBindingSize = wgpu.WGPU_LIMIT_U64_UNDEFINED
+                    .minUniformBufferOffsetAlignment = wgpu.WGPU_LIMIT_U32_UNDEFINED
+                    .minStorageBufferOffsetAlignment = wgpu.WGPU_LIMIT_U32_UNDEFINED
+                    .maxVertexBuffers = wgpu.WGPU_LIMIT_U32_UNDEFINED
+                    .maxBufferSize = wgpu.WGPU_LIMIT_U64_UNDEFINED
+                    .maxVertexAttributes = wgpu.WGPU_LIMIT_U32_UNDEFINED
+                    .maxVertexBufferArrayStride = wgpu.WGPU_LIMIT_U32_UNDEFINED
+                    .maxInterStageShaderVariables = wgpu.WGPU_LIMIT_U32_UNDEFINED
+                    .maxColorAttachments = wgpu.WGPU_LIMIT_U32_UNDEFINED
+                    .maxColorAttachmentBytesPerSample = wgpu.WGPU_LIMIT_U32_UNDEFINED
+                    .maxComputeWorkgroupStorageSize = wgpu.WGPU_LIMIT_U32_UNDEFINED
+                    .maxComputeInvocationsPerWorkgroup = wgpu.WGPU_LIMIT_U32_UNDEFINED
+                    .maxComputeWorkgroupSizeX = wgpu.WGPU_LIMIT_U32_UNDEFINED
+                    .maxComputeWorkgroupSizeY = wgpu.WGPU_LIMIT_U32_UNDEFINED
+                    .maxComputeWorkgroupSizeZ = wgpu.WGPU_LIMIT_U32_UNDEFINED
+                    .maxComputeWorkgroupsPerDimension = wgpu.WGPU_LIMIT_U32_UNDEFINED
             uncapturedErrorCallbackInfo = typeinit
                 callback =
-                    fn (err message userdata)
-                        msgstr := () -> ('from-rawstring String message)
+                    fn (device err message u1 u2)
+                        msgstr := () -> (String message.data message.length)
 
                         switch err
                         pass 'Validation
                         pass 'OutOfMemory
                         pass 'Internal
                         pass 'Unknown
-                        pass 'DeviceLost
+                        # FIXME: where is it?
+                        # pass 'DeviceLost
                         do
                             logger.write-fatal "\n" (msgstr)
                             abort;
                         default
                             ()
-                userdata = null
+        typeinit
+            mode = 'AllowProcessEvents
+            callback =
+                fn (status result msg userdata1 userdata2)
+                    if (status != wgpu.RequestDeviceStatus.Success)
+                        logger.write-fatal (String msg.data msg.length)
+                        abort;
+                    ctx.device = result
+                    ;
 
-        fn (status result msg userdata)
-            if (status != wgpu.RequestDeviceStatus.Success)
-                logger.write-fatal ('from-rawstring String msg)
-                abort;
-            ctx.device = result
-            ;
-        null
+    # NOTE: Currenlty not implemented
+    # wgpu.InstanceProcessEvents ctx.instance
 
     local device-limits := (make-limits-struct)
     wgpu.DeviceGetLimits ctx.device &device-limits
-    limits-extras := bitcast device-limits.nextInChain (mutable@ wgpu.SupportedLimitsExtras)
+    limits-extras := bitcast device-limits.nextInChain (mutable@ wgpu.NativeLimits)
 
-    ctx.supported-limits = adapter-limits.limits
-    ctx.requested-limits = device-limits.limits
+    ctx.supported-limits = adapter-limits
+    ctx.requested-limits = device-limits
 
     ctx.msaa? = cfg.msaa?
     configure-surface;
@@ -337,18 +377,7 @@ fn generate-report ()
     local global-report : wgpu.GlobalReport
     wgpu.GenerateReport ctx.instance &global-report
 
-    switch ctx.renderer-backend-info.low-level-backend
-    case 'D3D12
-        global-report.dx12
-    case 'Metal
-        global-report.metal
-    case 'Vulkan
-        global-report.vulkan
-    case 'OpenGL
-        global-report.gl
-    default
-        logger.write-fatal "unsupported renderer backend"
-        abort;
+    global-report.hub
 
 inline make-resource-cache-get (cache)
     inline get-internal-resource (k makef args...)
