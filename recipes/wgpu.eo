@@ -1,4 +1,4 @@
-VERSION := "trunk"
+VERSION := "a96fbecc2ef8f7fdf0bd1762b88508799471c923"
 TAG := "v24.0.0.1"
 SUMMARY := "Native WebGPU implementation based on wgpu-core"
 
@@ -33,7 +33,7 @@ fn release-dir (platform arch)
 bindings :=
     download "https://raw.githubusercontent.com/ScopesCommunity/eo-packages/main/bindings/wgpu.sc"
 
-license := (download "https://raw.githubusercontent.com/gfx-rs/wgpu-native/trunk/LICENSE.MIT")
+license := (download "https://raw.githubusercontent.com/gfx-rs/wgpu-native/{VERSION}/LICENSE.MIT")
 
 package wgpu-native
     platform linux unknown
