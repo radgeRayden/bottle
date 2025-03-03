@@ -134,7 +134,7 @@ fn mipmap-pipeline (color-format)
 
             wgpu.DeviceCreateRenderPipeline ctx.device
                 typeinit@
-                    label = dupe (f"mipmap-gen-pipeline-${color-format}" as rawstring)
+                    label = f"mipmap-gen-pipeline-${color-format}"
                     layout = pip-layout
                     vertex =
                         typeinit
@@ -327,7 +327,7 @@ type+ Texture
             render-pass :=
                 wgpu.CommandEncoderBeginRenderPass cmd-encoder
                     typeinit@
-                        label = dupe (f"bottle mipmap renderpass ${i}" as rawstring)
+                        label = f"bottle mipmap renderpass ${i}"
                         colorAttachmentCount = 1
                         colorAttachments =
                             typeinit@
