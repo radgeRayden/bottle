@@ -50,11 +50,15 @@ inline gen-buffer-type (parent-type prefix backing-type usage-flags)
         # if usage flags aren't statically provided, it means they must be passed at runtime
         let __typecall =
             static-if (none? usage-flags)
-                inline __typecall (cls max-elements usage-flags)
+                inline... __typecall (cls max-elements usage-flags)
                     constructor cls max-elements usage-flags
+                case (cls)
+                    bitcast null cls
             else
-                inline __typecall (cls max-elements)
+                inline... __typecall (cls max-elements)
                     constructor cls max-elements usage-flags
+                case (cls)
+                    bitcast null cls
 
         # ------------------------------------------------------------------------------------
         fn... frame-write (self, data : (Array BackingType), offset : usize, count : usize)

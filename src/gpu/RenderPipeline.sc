@@ -159,6 +159,8 @@ type+ RenderPipeline
 
         cls ... := *...
         wrap-nullable-object cls (make-pipeline ...)
+    case (cls)
+        bitcast null cls
 
     fn... get-bind-group-layout (self, index : u32)
         wrap-nullable-object BindGroupLayout (wgpu.RenderPipelineGetBindGroupLayout (view self) index)

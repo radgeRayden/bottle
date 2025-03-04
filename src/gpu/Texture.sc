@@ -422,6 +422,8 @@ type+ TextureView
                     baseArrayLayer = base-array-layer
                     arrayLayerCount = array-layer-count
                     aspect = aspect
+    case (cls)
+        bitcast null cls
 
 do
     let TextureView Texture

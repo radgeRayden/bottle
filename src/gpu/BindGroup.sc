@@ -7,7 +7,7 @@ from wgpu let typeinit@ chained@
 ctx := context-accessor 'gpu
 
 type+ BindGroup
-    inline __typecall (cls layout entries...)
+    inline... __typecall (cls layout entries...)
         local entries =
             arrayof wgpu.BindGroupEntry
                 va-map
@@ -38,6 +38,8 @@ type+ BindGroup
                     layout = layout
                     entryCount = (countof entries) as u32
                     entries = &entries
+    case (cls)
+        bitcast null cls
 
     struct BindGroupBuilder
         entries : (Array wgpu.BindGroupEntry)
