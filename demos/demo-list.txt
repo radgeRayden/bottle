@@ -3,7 +3,6 @@ gpu.buffers
 gpu.presentation
 gpu.textures
 input.tester
-input.virtual-controller
 gpu.mipmap-gen
 plonk.sprites
 plonk.shapes

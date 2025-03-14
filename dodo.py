@@ -45,6 +45,12 @@ with open('demos/demo-list.txt', 'r') as file:
     demo_list = file.read().split('\n')
     demos = [demo for demo in demo_list if demo]
 
+if platform.system() == "Linux":
+    with open('demos/demo-list-linux.txt', 'r') as file:
+        demo_list = file.read().split('\n')
+        linux_demos = [demo for demo in demo_list if demo]
+        demos = demos + linux_demos
+
 def task_demos ():
     for name in demos:
         yield {

@@ -10,7 +10,7 @@ mkdir ./dist/bin
 mkdir ./dist/obj
 
 export LDFLAGS="$(scopes -e ./setup-dist.sc)"
-DEMOS="$(cat demo-list.txt | tr '\n' ' ')"
+DEMOS="$(cat demo-list.txt demo-list-linux.txt | tr '\n' ' ')"
 for DEMO in $DEMOS; do
     scopes -e ./build.sc .$DEMO
 done
