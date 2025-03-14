@@ -13,7 +13,7 @@ fn imgui-git (platform wgpu-lib sdl-lib)
                 (shell git-dir) "git clone https://github.com/ocornut/imgui.git"
                 (shell git-dir) "git checkout {CIMGUI_VERSION}"
                 (shell "{git-dir}/imgui") "git checkout {VERSION}"
-                (shell generator-dir) "./generator.sh"
+                (shell generator-dir) "bash ./generator.sh"
                 (shell git-dir) "chmod -R a+w .git"
                 git-dir
 
@@ -44,7 +44,7 @@ package dear-imgui
     summary SUMMARY
     version VERSION
     platform windows-mingw
-    depends wgpu-native sdl3
+    depends wgpu-native-release sdl3
 
     preinstall-dir := (imgui-git "windows" "wgpu_native.dll" "SDL3.dll")
     alias "/lib/cimgui.dll" "{preinstall-dir}/cimgui.dll"
@@ -56,7 +56,7 @@ package dear-imgui
     summary SUMMARY
     version VERSION
     platform linux
-    depends wgpu-native sdl3
+    depends wgpu-native-release sdl3
 
     preinstall-dir := (imgui-git "linux" "libwgpu_native.so" "libSDL3.so")
     alias "/lib/libcimgui.so" "{preinstall-dir}/libcimgui.so"

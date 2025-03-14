@@ -6,10 +6,11 @@ DOIT_CONFIG = {'default_tasks': ['build_demos']}
 FILTER_ANSI = os.getenv("DOIT_FILTER_ANSI")
 
 def cmd(cmd):
-    prefix = "MANGOHUD=1 MANGOHUD_CONFIG=horizontal,gpu_name,gpu_power,present_mode,resolution,vram,vulkan_driver,position=bottom-left bash -c"
     if platform.system() == "Linux" and FILTER_ANSI:
+        prefix = "MANGOHUD=1 MANGOHUD_CONFIG=horizontal,gpu_name,gpu_power,present_mode,resolution,vram,vulkan_driver,position=bottom-left bash -c"
         return f"{prefix} \"{cmd} | ansi2txt\" || {cmd}"
     else:
+        prefix = "bash -c"
         return f"{prefix} \"{cmd}\""
 
 def task_eo():

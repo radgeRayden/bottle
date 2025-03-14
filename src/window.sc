@@ -49,7 +49,7 @@ fn get-native-info ()
     case 'windows
         WindowNativeInfo.Windows
             prop sdl.SDL_PROP_WINDOW_WIN32_INSTANCE_POINTER
-            prop sdl.SDL_PROP_WINDOW_WIN32_WINDOW_POINTER
+            prop sdl.SDL_PROP_WINDOW_WIN32_HWND_POINTER
     default
         static-error "OS not supported"
 
@@ -113,8 +113,9 @@ fn toggle-fullscreen ()
 fn init ()
     static-match operating-system
     case 'windows
-        sdl.SetHint sdl.SDL_HINT_WINDOWS_DPI_AWARENESS "permonitorv2"
-        sdl.SetHint sdl.SDL_HINT_WINDOWS_DPI_SCALING "0"
+        #sdl.SetHint sdl.SDL_HINT_WINDOWS_DPI_AWARENESS "permonitorv2"
+        #sdl.SetHint sdl.SDL_HINT_WINDOWS_DPI_SCALING
+        ()
     case 'linux
         sdl.SetHint sdl.SDL_HINT_APP_ID platform-cfg.app-id
         if platform-cfg.force-x11?
@@ -162,6 +163,7 @@ fn init ()
     window-flags :=
         | user-flags
             (video-driver == "wayland") sdl.SDL_WINDOW_HIGH_PIXEL_DENSITY 0:u32
+            (operating-system == 'windows) sdl.SDL_WINDOW_HIGH_PIXEL_DENSITY 0:u32
 
     handle :=
         sdl.CreateWindow

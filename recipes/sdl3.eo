@@ -17,7 +17,7 @@ fn preinstall-dir (generator)
                 mkdir "{build-path}/build"
 
         install-dir := (tempdir)
-        build-command "cmake -G \"{generator}\" .."
+        build-command "cmake -G \"{generator}\" -DSDL_OPENGLES=0 .."
         build-command "cmake --build . -j"
         build-command "cmake --install . --prefix {install-dir}"
         install-dir
