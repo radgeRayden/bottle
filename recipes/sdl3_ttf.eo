@@ -33,4 +33,15 @@ package sdl3_ttf
     in "/include" "{preinstall-dir}/include/SDL3_ttf"
     alias "/licenses/SDL3_ttf.txt" "{preinstall-dir}/share/licenses/SDL3_ttf/LICENSE.txt"
 
+package sdl3_ttf
+    summary SUMMARY
+    version VERSION
+    platform windows-mingw
+
+    preinstall-dir := (preinstall-dir "MinGW Makefiles")
+    alias "/lib/SDL3_ttf.dll" "{preinstall-dir}/bin/SDL3_ttf.dll"
+    alias "/lib/scopes/packages/sdl3_ttf.sc" bindings
+    in "/include" "{preinstall-dir}/include/SDL3_ttf"
+    alias "/licenses/SDL3_ttf.txt" "{preinstall-dir}/share/licenses/SDL3_ttf/LICENSE.txt"
+
 # TODO: windows package

@@ -6,6 +6,11 @@ cfg := context-accessor 'config 'filesystem
 
 using import ..exceptions
 
+inline getcwd (ptr size)
+    static-if (operating-system == 'windows)
+        (extern '_getcwd (function rawstring rawstring i32)) ptr (size as i32)
+    else C.bindings.getcwd
+
 for k v in physfs
     if (('typeof v) != type)
         continue;
@@ -50,7 +55,7 @@ fn init ()
         try (copy ('unwrap cfg.root))
         else
             buf := stringbuffer i8 260
-            assert ((C.bindings.extern.getcwd ('data buf)) != null)
+            assert ((getcwd ('data buf)) != null)
             String ('data buf)
 
     assert (physfs.mount root "/" true) (get-error)
