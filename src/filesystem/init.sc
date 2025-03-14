@@ -9,7 +9,8 @@ using import ..exceptions
 inline getcwd (ptr size)
     static-if (operating-system == 'windows)
         (extern '_getcwd (function rawstring rawstring i32)) ptr (size as i32)
-    else C.bindings.getcwd
+    else 
+        C.bindings.extern.getcwd ptr size
 
 for k v in physfs
     if (('typeof v) != type)
