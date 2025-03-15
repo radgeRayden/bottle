@@ -82,9 +82,7 @@ fn get-display-size (display)
 #     _ mode.w mode.h
 
 fn get-desktop-scaling-factor ()
-    let scaled = (get-size)
-    let drawable = (get-drawable-size)
-    drawable / scaled
+    sdl.GetWindowDisplayScale (get-handle) 
 
 fn get-relative-size (wratio hratio)
     dw dh := (get-desktop-size)
