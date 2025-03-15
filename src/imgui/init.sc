@@ -1,11 +1,9 @@
 import ..gpu ..window
-using import glm ..gpu.common ..context radl.ext
+using import ..gpu.common ..context radl.ext
 
 wgpu := import ..gpu.wgpu
 ig   := import .bindings
 sdl  := import sdl3
-
-# TODO: auto convert between vec2 and ImVec
 
 wgpu-device := context-accessor 'gpu 'device
 scaled-surface-size := context-accessor 'gpu 'scaled-surface-size
@@ -62,7 +60,6 @@ fn render ()
         render-pass := RenderPass (gpu.get-cmd-encoder) (ColorAttachment (gpu.get-surface-texture) (clear? = false))
         draw-data := (ig.GetDrawData)
         draw-data.DisplaySize = ig.Vec2 (|> f32 (unpack (scaled-surface-size)))
-        draw-data.FramebufferScale = ig.Vec2 (unpack (vec2 (window.get-desktop-scaling-factor)))
         ig.ImplWGPU_RenderDrawData draw-data render-pass
         'finish render-pass
     else
