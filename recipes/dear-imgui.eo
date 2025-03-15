@@ -61,5 +61,6 @@ package dear-imgui
     preinstall-dir := (imgui-git "linux" "libwgpu_native.so" "libSDL3.so")
     alias "/lib/libcimgui.so" "{preinstall-dir}/libcimgui.so"
     alias "/include/cimgui.h" "{preinstall-dir}/cimgui.h"
+    alias "/include/imgui.h" "{preinstall-dir}/imgui/imgui.h"
     alias "/licenses/cimgui.txt" cimgui-license
     alias "/licenses/dear-imgui.txt" imgui-license
