@@ -110,18 +110,12 @@ fn toggle-fullscreen ()
     set-fullscreen (not (fullscreen?))
 
 fn init ()
-    static-match operating-system
-    case 'windows
-        #sdl.SetHint sdl.SDL_HINT_WINDOWS_DPI_AWARENESS "permonitorv2"
-        #sdl.SetHint sdl.SDL_HINT_WINDOWS_DPI_SCALING
-        ()
-    case 'linux
+    static-if (operating-system == 'linux)
         sdl.SetHint sdl.SDL_HINT_APP_ID platform-cfg.app-id
         if platform-cfg.force-x11?
             sdl.SetHint sdl.SDL_HINT_VIDEO_DRIVER "x11"
         else
             sdl.SetHint sdl.SDL_HINT_VIDEO_DRIVER "wayland,x11"
-    default ()
 
     status :=
         sdl.Init
