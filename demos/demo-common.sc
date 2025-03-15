@@ -35,9 +35,16 @@ fn (key)
 @@ if-module-enabled 'imgui
 fn demo-info ()
     ig := import ..src.imgui
+
+    fn text-size (text wrap-width)
+        local size : ig.Vec2
+        ig.CalcTextSize &size text null true wrap-width
+        size
+
     if demo-wrapper-ctx.show-stats?
+        window-width := text-size "############################################################" 999:f32
         ig.SetNextWindowPos (ig.Vec2 10 10) ig.Cond.Always (ig.Vec2 0 0)
-        ig.SetNextWindowSize (ig.Vec2 245 300) ig.Cond.Always
+        ig.SetNextWindowSize (ig.Vec2 window-width.x 600) ig.Cond.Always
         ig.Begin "demo-common.fps" null
             enum-bitfield ig.WindowFlags i32
                 'NoDecoration
@@ -66,11 +73,15 @@ fn demo-info ()
         ig.End;
 
     ww wh := (bottle.window.get-size)
-    ig.SetNextWindowPos (ig.Vec2 ((f32 ww) - 120) 10) ig.Cond.Always (ig.Vec2 0 0)
+    version := (bottle.get-version)
+    version-text-size := text-size version 999:f32
+    
+    ig.SetNextWindowPos (ig.Vec2 ((f32 ww) - version-text-size.x - 25) version-text-size.y) ig.Cond.Always (ig.Vec2 0 0)
     ig.Begin "demo-common.version" null
         enum-bitfield ig.WindowFlags i32
             'NoDecoration
             'NoBackground
+
     ig.Text "%s" ((bottle.get-version) as rawstring)
     ig.End;
     ()
