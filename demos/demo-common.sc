@@ -44,6 +44,8 @@ fn demo-info ()
                 'NoBackground
         ig.Text "FPS: %d" (bottle.time.get-fps)
         ig.Text "Time Scale: %.2f" (bottle.time.get-global-time-scale)
+        ig.Text "Window Size (pixels): %dx%d" (bottle.window.get-drawable-size)
+        ig.Text "Window Size (scaled): %dx%d" (bottle.window.get-size)
         rep := (bottle.gpu.generate-report)
 
         inline n (r)
