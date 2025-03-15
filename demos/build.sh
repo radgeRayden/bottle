@@ -11,7 +11,7 @@ mkdir ./dist/obj
 
 export LDFLAGS="$(scopes -e ./setup-dist.sc)"
 if [ "$(expr substr $(uname -s) 1 10)" == "MINGW64_NT" ]; then
-    DEMOS="$(cat demo-list.txt | tr '\n' ' ')"
+    DEMOS="$(cat demo-list.txt | tr '\n' ' ' | tr '\r' ' ')"
 else
     DEMOS="$(cat demo-list.txt demo-list-linux.txt | tr '\n' ' ')"
 fi
