@@ -162,8 +162,7 @@ fn init ()
 
     window-flags :=
         | user-flags
-            (video-driver == "wayland") sdl.SDL_WINDOW_HIGH_PIXEL_DENSITY 0:u32
-            (operating-system == 'windows) sdl.SDL_WINDOW_HIGH_PIXEL_DENSITY 0:u32
+            (video-driver != "x11") sdl.SDL_WINDOW_HIGH_PIXEL_DENSITY 0:u32
 
     handle :=
         sdl.CreateWindow
