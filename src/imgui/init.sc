@@ -20,6 +20,9 @@ fn init ()
                     (wgpu-device)
                     RenderTargetFormat = (gpu.get-preferred-surface-format)
             ig.ImplWGPU_Init &info
+    
+    io := (ig.GetIO_Nil)
+    io.FontGlobalScale = (window.get-desktop-scaling-factor)
     ()
 
 @@ if-module-enabled 'imgui

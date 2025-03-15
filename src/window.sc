@@ -82,7 +82,8 @@ fn get-display-size (display)
 #     _ mode.w mode.h
 
 fn get-desktop-scaling-factor ()
-    sdl.GetWindowDisplayScale (get-handle) 
+    display := (sdl.GetPrimaryDisplay)
+    sdl.GetDisplayContentScale display
 
 fn get-relative-size (wratio hratio)
     dw dh := (get-desktop-size)
