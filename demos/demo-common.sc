@@ -53,7 +53,7 @@ fn demo-info ()
         ig.Text "Time Scale: %.2f" (bottle.time.get-global-time-scale)
         ig.Text "Window Size (pixels): %dx%d" (bottle.window.get-drawable-size)
         ig.Text "Window Size (scaled): %dx%d" (bottle.window.get-size)
-        ig.Text "Display Scale: %f" (bottle.window.get-desktop-scaling-factor)
+        ig.Text "Content Scale: %f" (bottle.window.get-display-content-scale)
         rep := (bottle.gpu.generate-report)
 
         inline n (r)

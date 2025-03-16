@@ -75,7 +75,7 @@ fn get-desktop-size ()
     assert (mode != null)
     _ mode.w mode.h
 
-fn get-desktop-scaling-factor ()
+fn get-display-content-scale ()
     display := (sdl.GetPrimaryDisplay)
     sdl.GetDisplayContentScale display
 
@@ -198,7 +198,7 @@ do
         toggle-fullscreen
         get-size
         get-drawable-size
-        get-desktop-scaling-factor
+        get-display-content-scale
         set-title
         get-title
         minimized?

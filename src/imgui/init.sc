@@ -22,7 +22,7 @@ fn init ()
             ig.ImplWGPU_Init &info
     
     io := (ig.GetIO_Nil)
-    io.FontGlobalScale = (window.get-desktop-scaling-factor)
+    io.FontGlobalScale = (window.get-display-content-scale)
     ()
 
 @@ if-module-enabled 'imgui
