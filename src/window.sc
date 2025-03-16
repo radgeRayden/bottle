@@ -75,12 +75,6 @@ fn get-desktop-size ()
     assert (mode != null)
     _ mode.w mode.h
 
-fn get-display-size (display)
-    # FIXME
-#     local mode : sdl.DisplayMode
-#     sdl.GetCurrentDisplayMode display &mode
-#     _ mode.w mode.h
-
 fn get-desktop-scaling-factor ()
     display := (sdl.GetPrimaryDisplay)
     sdl.GetDisplayContentScale display
