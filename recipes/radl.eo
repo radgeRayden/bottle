@@ -1,4 +1,4 @@
-VERSION := "master"
+VERSION := "ac705043fabd496bd15b8c2def413324318a5bb3"
 SUMMARY := "radge's utility library"
 
 src :=
@@ -8,7 +8,7 @@ src :=
 
 package radl
     summary SUMMARY
+    version VERSION
     platform linux windows-mingw unknown
     depends stb
-
     alias "/lib/scopes/packages/radl" "{src}/src"
