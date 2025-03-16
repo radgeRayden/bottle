@@ -1,4 +1,4 @@
-using import .context enum print radl.strfmt String struct
+using import .context enum print radl.ext radl.strfmt String struct
 import .logger sdl3
 
 sdl := sdl3
@@ -169,6 +169,17 @@ fn init ()
         msg := (sdl.GetError)
         logger.write-fatal f"Error while creating window: ${msg}"
         abort;
+
+    # position window within the display the user launched it from (hopefully)
+    do
+        local x : f32
+        local y : f32
+        sdl.GetGlobalMouseState &x &y
+        display := sdl.GetDisplayForPoint (typeinit@ (|> i32 x y))
+        sdl.SetWindowPosition handle 
+            |> i32
+                sdl.SDL_WINDOWPOS_CENTERED_DISPLAY display
+                sdl.SDL_WINDOWPOS_CENTERED_DISPLAY display
 
     sdl.SyncWindow handle
     actual-flags := sdl.GetWindowFlags handle
