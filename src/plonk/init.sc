@@ -27,6 +27,7 @@ enum PlonkCommand
 struct TextureCacheEntry
     binding : TextureBinding
     timestamp : f64
+    key : Texture.DumbHandleType
 
 struct PlonkState
     push-constant-layout : PushConstantLayout
@@ -50,7 +51,7 @@ struct PlonkState
     commands : (Array PlonkCommand)
 
     cached-textures : (Array TextureCacheEntry)
-    cached-texture-map : (Map TextureView.DumbHandleType usize)
+    cached-texture-map : (Map Texture.DumbHandleType usize)
 
 global ctx : PlonkState
 
@@ -126,28 +127,33 @@ fn default-transform ()
         math.orthographic-projection w h
         math.translation-matrix (vec3 (-w / 2) (-h / 2) 0)
 
-fn cache-texture-binding (_texture)
-    k := 'rawptr _texture
+fn update-texture-cache ()
+    now := (time.get-raw-time)
+    for idx in (rrange (countof ctx.cached-textures))
+        entry := ctx.cached-textures @ idx
+        old-key := entry.key
+        if ((now - entry.timestamp) > TEXTURE-CACHE-EVICTION-TIME)
+            entry = 'pop ctx.cached-textures
+            'set ctx.cached-texture-map entry.key idx
+            'discard ctx.cached-texture-map old-key
+
+# TODO: use the radl Cache structure, improve it if necessary
+fn get-texture-cache-entry (_texture)
+    k := 'get-id _texture
     now := (time.get-raw-time)
     try ('get ctx.cached-texture-map k)
     then (index)
         entry := ctx.cached-textures @ index 
         entry.timestamp = now
-        entry.binding
+        entry
     else
         'set ctx.cached-texture-map k (countof ctx.cached-textures)
         'append ctx.cached-textures
-            typeinit (copy _texture) now
-
-fn get-texture-cache-entry (texture)
-    try
-        idx := 'get ctx.cached-texture-map ('get-id texture)
-        ctx.cached-textures @ idx
-    else
-        'append ctx.cached-textures
-            typeinit
-                binding = TextureBinding (copy texture)
-                timestamp = (time.get-raw-time)
+            TextureCacheEntry
+                binding =
+                    TextureBinding (copy _texture)
+                timestamp = now
+                key = k
 
 @@ if-module-enabled 'plonk
 fn init ()
@@ -172,6 +178,7 @@ fn init ()
 fn begin-frame ()
     ctx.render-target = copy (gpu.get-surface-texture)
     ctx.transform = (default-transform)
+    update-texture-cache;
     ()
 
 fn finalize-enqueue-command (ctx)
