@@ -127,60 +127,6 @@ fn default-transform ()
         math.orthographic-projection w h
         math.translation-matrix (vec3 (-w / 2) (-h / 2) 0)
 
-fn update-texture-cache ()
-    now := (time.get-raw-time)
-    for idx in (rrange (countof ctx.cached-textures))
-        entry := ctx.cached-textures @ idx
-        old-key := entry.key
-        if ((now - entry.timestamp) > TEXTURE-CACHE-EVICTION-TIME)
-            entry = 'pop ctx.cached-textures
-            'set ctx.cached-texture-map entry.key idx
-            'discard ctx.cached-texture-map old-key
-
-# TODO: use the radl Cache structure, improve it if necessary
-fn get-texture-cache-entry (_texture)
-    k := 'get-id _texture
-    now := (time.get-raw-time)
-    try ('get ctx.cached-texture-map k)
-    then (index)
-        entry := ctx.cached-textures @ index 
-        entry.timestamp = now
-        entry
-    else
-        'set ctx.cached-texture-map k (countof ctx.cached-textures)
-        'append ctx.cached-textures
-            TextureCacheEntry
-                binding =
-                    TextureBinding (copy _texture)
-                timestamp = now
-                key = k
-
-@@ if-module-enabled 'plonk
-fn init ()
-    try # none of this is supposed to fail. If it does, we will crash as we should when trying to unwrap state.
-        attrbuf := (StorageBuffer VertexAttributes) 4096
-        buffer-binding := BindGroup (get-buffer-binding-layout) (view attrbuf)
-        ctx =
-            PlonkState
-                push-constant-layout = (push-constant-layout)
-                default-texture-binding = (default-texture-binding)
-                attribute-buffer = attrbuf
-                index-buffer = typeinit 8192
-                transform = (default-transform)
-                pipeline = copy (default-pipeline)
-                buffer-binding = buffer-binding
-                texture-binding = (default-texture-binding)
-                clear-color = (vec4 0.017 0.017 0.017 1.0)
-                render-target = dupe (nullof TextureView)
-    else ()
-
-@@ if-module-enabled 'plonk
-fn begin-frame ()
-    ctx.render-target = copy (gpu.get-surface-texture)
-    ctx.transform = (default-transform)
-    update-texture-cache;
-    ()
-
 fn finalize-enqueue-command (ctx)
     elements := (countof ctx.index-data) - ctx.index-offset
     'append ctx.commands
@@ -194,7 +140,25 @@ fn finalize-enqueue-command (ctx)
     ctx.index-offset = countof ctx.index-data
 
 fn... set-texture-binding (ctx, texture : Texture)
-    entry := get-texture-cache-entry texture
+    # bind groups and texture views are created on demand and cached.
+    :: get-texture-cache-entry
+    k := 'get-id texture
+    now := (time.get-raw-time)
+    try ('get ctx.cached-texture-map k)
+    then (index)
+        entry := ctx.cached-textures @ index 
+        entry.timestamp = now
+        entry
+    else
+        'set ctx.cached-texture-map k (countof ctx.cached-textures)
+        'append ctx.cached-textures
+            TextureCacheEntry
+                binding =
+                    TextureBinding (copy texture)
+                timestamp = now
+                key = k
+    get-texture-cache-entry (entry) ::
+
     if (('get-key ('force-unwrap ctx.texture-binding)) != ('get-key entry.binding))
         finalize-enqueue-command ctx
     ctx.texture-binding = copy entry.binding
@@ -460,6 +424,41 @@ fn... circle-line (center, radius, color : vec4 = (vec4 1),
         else segments
 
     polygon-line center segments radius 0:f32 line-width color join-kind cap-kind
+    ()
+
+@@ if-module-enabled 'plonk
+fn init ()
+    try # none of this is supposed to fail. If it does, we will crash as we should when trying to unwrap state.
+        attrbuf := (StorageBuffer VertexAttributes) 4096
+        buffer-binding := BindGroup (get-buffer-binding-layout) (view attrbuf)
+        ctx =
+            PlonkState
+                push-constant-layout = (push-constant-layout)
+                default-texture-binding = (default-texture-binding)
+                attribute-buffer = attrbuf
+                index-buffer = typeinit 8192
+                transform = (default-transform)
+                pipeline = copy (default-pipeline)
+                buffer-binding = buffer-binding
+                texture-binding = (default-texture-binding)
+                clear-color = (vec4 0.017 0.017 0.017 1.0)
+                render-target = dupe (nullof TextureView)
+    else ()
+
+@@ if-module-enabled 'plonk
+fn begin-frame ()
+    ctx.render-target = copy (gpu.get-surface-texture)
+    ctx.transform = (default-transform)
+
+    # trim texture cache
+    now := (time.get-raw-time)
+    for idx in (rrange (countof ctx.cached-textures))
+        entry := ctx.cached-textures @ idx
+        old-key := entry.key
+        if ((now - entry.timestamp) > TEXTURE-CACHE-EVICTION-TIME)
+            entry = 'pop ctx.cached-textures
+            'set ctx.cached-texture-map entry.key idx
+            'discard ctx.cached-texture-map old-key
     ()
 
 @@ if-module-enabled 'plonk
