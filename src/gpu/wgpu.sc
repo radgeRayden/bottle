@@ -55,8 +55,9 @@ inline define-object (name super release reference)
         inline __hash (self)
             hash ('rawptr (view self))
 
+        DumbHandleType := typedef (.. name "DumbHandle") < integer : u64
         inline get-id (self)
-            ptrtoint (storagecast (view self)) u64
+            bitcast (dupe (ptrtoint (view self) (storageof DumbHandleType))) DumbHandleType
 
         inline __copy (self)
             ptr := storagecast (view self)

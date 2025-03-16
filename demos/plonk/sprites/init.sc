@@ -2,9 +2,10 @@ using import glm Option struct print
 import ...demo-common bottle
 
 plonk  := bottle.plonk
+using bottle.gpu.types
 
 struct DrawState
-    sprite : plonk.TextureBinding
+    sprite : Texture
     sprite-frame : i32
 
 global draw-state : (Option DrawState)
@@ -23,9 +24,7 @@ fn ()
         draw-state =
             DrawState
                 sprite =
-                    plonk.TextureBinding
-                        Texture (bottle.asset.load-image "assets/_Run.png")
-                        min-filter = 'Nearest
+                    Texture (bottle.asset.load-image "assets/_Run.png")
     else ()
 
 @@ 'on bottle.update

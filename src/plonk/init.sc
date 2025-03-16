@@ -1,10 +1,12 @@
-using import Array enum glm Option String struct
+using import Array enum glm Map Option String struct
 
 # imported to define the implementations
 using import .TextureBinding
 
 using import .common ..context ..gpu.types ..enums ..helpers
-import ..asset ..gpu ..math ..window .shaders
+import ..asset ..gpu ..math ..window .shaders ..time
+
+TEXTURE-CACHE-EVICTION-TIME := 1.0:f64
 
 struct DrawCommand
     offset : usize
@@ -14,7 +16,7 @@ struct DrawCommand
     transform : mat4
 
 struct StartPassCommand
-    render-target : TextureView
+    render-target : TextureBinding
     clear? : bool
     clear-color : vec4
 
@@ -22,9 +24,13 @@ enum PlonkCommand
     Draw : DrawCommand
     StartPass : StartPassCommand
 
+struct TextureCacheEntry
+    binding : TextureBinding
+    timestamp : f64
+
 struct PlonkState
     push-constant-layout : PushConstantLayout
-    default-texture-binding : TextureBinding
+    default-texture-binding : (Option TextureBinding) 
 
     attribute-buffer : (StorageBuffer VertexAttributes)
     index-buffer     : (IndexBuffer u32)
@@ -35,7 +41,7 @@ struct PlonkState
     index-data  : (Array u32)
     pipeline : RenderPipeline
     buffer-binding : BindGroup
-    texture-binding : TextureBinding
+    texture-binding : (Option TextureBinding)
     render-target : TextureView
     clear-color : vec4
 
@@ -43,7 +49,10 @@ struct PlonkState
 
     commands : (Array PlonkCommand)
 
-global context : (Option PlonkState)
+    cached-textures : (Array TextureCacheEntry)
+    cached-texture-map : (Map TextureView.DumbHandleType usize)
+
+global ctx : PlonkState
 
 fn push-constant-layout ()
     local push-constant-layout : PushConstantLayout
@@ -117,12 +126,35 @@ fn default-transform ()
         math.orthographic-projection w h
         math.translation-matrix (vec3 (-w / 2) (-h / 2) 0)
 
+fn cache-texture-binding (_texture)
+    k := 'rawptr _texture
+    now := (time.get-raw-time)
+    try ('get ctx.cached-texture-map k)
+    then (index)
+        entry := ctx.cached-textures @ index 
+        entry.timestamp = now
+        entry.binding
+    else
+        'set ctx.cached-texture-map k (countof ctx.cached-textures)
+        'append ctx.cached-textures
+            typeinit (copy _texture) now
+
+fn get-texture-cache-entry (texture)
+    try
+        idx := 'get ctx.cached-texture-map ('get-id texture)
+        ctx.cached-textures @ idx
+    else
+        'append ctx.cached-textures
+            typeinit
+                binding = TextureBinding (copy texture)
+                timestamp = (time.get-raw-time)
+
 @@ if-module-enabled 'plonk
 fn init ()
     try # none of this is supposed to fail. If it does, we will crash as we should when trying to unwrap state.
         attrbuf := (StorageBuffer VertexAttributes) 4096
         buffer-binding := BindGroup (get-buffer-binding-layout) (view attrbuf)
-        context =
+        ctx =
             PlonkState
                 push-constant-layout = (push-constant-layout)
                 default-texture-binding = (default-texture-binding)
@@ -138,7 +170,6 @@ fn init ()
 
 @@ if-module-enabled 'plonk
 fn begin-frame ()
-    ctx := 'force-unwrap context
     ctx.render-target = copy (gpu.get-surface-texture)
     ctx.transform = (default-transform)
     ()
@@ -150,29 +181,27 @@ fn finalize-enqueue-command (ctx)
             typeinit
                 copy ctx.index-offset
                 elements
-                copy ctx.texture-binding
+                copy ('force-unwrap ctx.texture-binding)
                 copy ctx.pipeline
                 copy ctx.transform
     ctx.index-offset = countof ctx.index-data
 
-fn... set-texture-binding (ctx, texture-binding : TextureBinding)
-    if (('get-key ctx.texture-binding) != ('get-key texture-binding))
+fn... set-texture-binding (ctx, texture : Texture)
+    entry := get-texture-cache-entry texture
+    if (('get-key ('force-unwrap ctx.texture-binding)) != ('get-key entry.binding))
         finalize-enqueue-command ctx
-    ctx.texture-binding = copy texture-binding
+    ctx.texture-binding = copy entry.binding
 
 fn... set-pipeline (pipeline : RenderPipeline)
-    ctx := 'force-unwrap context
     if (('get-key ctx.pipeline) != ('get-key pipeline))
         finalize-enqueue-command ctx
     ctx.pipeline = pipeline
 
 fn... set-transform (transform : mat4)
-    ctx := 'force-unwrap context
     finalize-enqueue-command ctx
     ctx.transform = transform
 
-fn... set-render-target (render-target : (param? TextureView) = none, clear? : bool = true, clear-color : vec4 = (vec4))
-    ctx := 'force-unwrap context
+fn... set-render-target (render-target : (param? TextureBinding) = none, clear? : bool = true, clear-color : vec4 = (vec4))
     let render-target =
         static-if (not (none? render-target))
             render-target
@@ -241,16 +270,14 @@ fn... add-quad (ctx, position : vec2, size : vec2, rotation : f32 = 0:f32, quad 
     'append ctx.index-data (0:u32 + vtx-offset)
     ;
 
-fn... sprite (binding : TextureBinding, position : vec2, size : vec2, rotation : f32 = 0:f32, quad : Quad = (Quad (vec2 0 0) (vec2 1 1)),
+fn... sprite (texture : Texture, position : vec2, size : vec2, rotation : f32 = 0:f32, quad : Quad = (Quad (vec2 0 0) (vec2 1 1)),
                 origin : vec2 = (vec2 0.5), fliph? : bool = false, flipv? : bool = false, color : vec4 = (vec4 1))
-    ctx := 'force-unwrap context
-    binding ... := *...
-    set-texture-binding ctx binding
+    texture ... := *...
+    set-texture-binding ctx texture
     add-quad ctx ...
 
 fn... rectangle (position : vec2, size : vec2, rotation : f32 = 0, color : vec4 = (vec4 1))
-    ctx := 'force-unwrap context
-    set-texture-binding ctx ctx.default-texture-binding
+    set-texture-binding ctx ('force-unwrap ctx.default-texture-binding)
     add-quad ctx position size rotation (color = color)
 
 fn regular-polygon-point (center radius idx segments rotation-offset)
@@ -258,8 +285,7 @@ fn regular-polygon-point (center radius idx segments rotation-offset)
     center + ((vec2 (cos angle) (sin angle)) * radius)
 
 fn... polygon (center : vec2, segments : integer, radius : f32, rotation : f32 = 0:f32, color : vec4 = (vec4 1))
-    ctx := 'force-unwrap context
-    set-texture-binding ctx ctx.default-texture-binding
+    set-texture-binding ctx ('force-unwrap ctx.default-texture-binding)
     vtx-offset := u32 (countof ctx.vertex-data)
 
     segments := (max (u32 segments) 3:u32)
@@ -284,8 +310,7 @@ fn calculate-circle-segment-count (radius)
     max 5:u32 (u32 segments)
 
 fn... circle (center : vec2, radius : f32, color : vec4 = (vec4 1), segments : (param? i32) = none)
-    ctx := 'force-unwrap context
-    set-texture-binding ctx ctx.default-texture-binding
+    set-texture-binding ctx ('force-unwrap ctx.default-texture-binding)
 
     let segments =
         static-if (none? segments) (calculate-circle-segment-count radius)
@@ -297,8 +322,7 @@ fn... circle (center : vec2, radius : f32, color : vec4 = (vec4 1), segments : (
 fn... line (vertices, width : f32 = 1.0, color : vec4 = (vec4 1),
             join-kind : LineJoinKind = LineJoinKind.Bevel,
             cap-kind : LineCapKind = LineCapKind.Butt)
-    ctx := 'force-unwrap context
-    set-texture-binding ctx ctx.default-texture-binding
+    set-texture-binding ctx ('force-unwrap ctx.default-texture-binding)
 
     if ((countof vertices) < 2)
         return;
@@ -433,7 +457,6 @@ fn... circle-line (center, radius, color : vec4 = (vec4 1),
 
 @@ if-module-enabled 'plonk
 fn submit ()
-    ctx := 'force-unwrap context
     if (ctx.index-offset < (countof ctx.index-data))
         finalize-enqueue-command ctx
 
