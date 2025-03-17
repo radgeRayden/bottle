@@ -31,7 +31,7 @@ struct TextureCacheEntry
 
 struct PlonkState
     push-constant-layout : PushConstantLayout
-    default-texture-binding : (Option TextureBinding) 
+    default-texture : Texture
 
     attribute-buffer : (StorageBuffer VertexAttributes)
     index-buffer     : (IndexBuffer u32)
@@ -102,24 +102,13 @@ fn default-pipeline ()
                                         format = (gpu.get-preferred-surface-format)
                     msaa-samples = (gpu.msaa-enabled?) 4:u32 1:u32
 
-fn default-texture-binding ()
-    texture :=
-        gpu.get-internal-texture "plonk.default1x1white-texture"
-            fn ()
-                local imdata = asset.ImageData 1 1
-                for byte in imdata.data
-                    byte = 0xFF
-                Texture imdata
-    bind-group :=
-        gpu.get-internal-bind-group "plonk.default1x1white-bind-group"
-            fn (texture)
-                local bind-group = 'builder BindGroup
-                'set-layout bind-group TextureBinding.BindGroupLayout
-                'add-entry bind-group (Sampler)
-                'add-entry bind-group (TextureView texture)
-                'finalize bind-group
-            view texture
-    TextureBinding (copy texture) (copy bind-group)
+fn default-texture ()
+    gpu.get-internal-texture "plonk.default1x1white-texture"
+        fn ()
+            local imdata = asset.ImageData 1 1
+            for byte in imdata.data
+                byte = 0xFF
+            Texture imdata
 
 fn default-transform ()
     w h := (window.get-drawable-size)
@@ -248,7 +237,7 @@ fn... sprite (texture : Texture, position : vec2, size : vec2, rotation : f32 = 
     add-quad ctx ...
 
 fn... rectangle (position : vec2, size : vec2, rotation : f32 = 0, color : vec4 = (vec4 1))
-    set-texture-binding ctx ('force-unwrap ctx.default-texture-binding)
+    set-texture-binding ctx ctx.default-texture
     add-quad ctx position size rotation (color = color)
 
 fn regular-polygon-point (center radius idx segments rotation-offset)
@@ -256,7 +245,7 @@ fn regular-polygon-point (center radius idx segments rotation-offset)
     center + ((vec2 (cos angle) (sin angle)) * radius)
 
 fn... polygon (center : vec2, segments : integer, radius : f32, rotation : f32 = 0:f32, color : vec4 = (vec4 1))
-    set-texture-binding ctx ('force-unwrap ctx.default-texture-binding)
+    set-texture-binding ctx ctx.default-texture
     vtx-offset := u32 (countof ctx.vertex-data)
 
     segments := (max (u32 segments) 3:u32)
@@ -281,7 +270,7 @@ fn calculate-circle-segment-count (radius)
     max 5:u32 (u32 segments)
 
 fn... circle (center : vec2, radius : f32, color : vec4 = (vec4 1), segments : (param? i32) = none)
-    set-texture-binding ctx ('force-unwrap ctx.default-texture-binding)
+    set-texture-binding ctx ctx.default-texture
 
     let segments =
         static-if (none? segments) (calculate-circle-segment-count radius)
@@ -293,7 +282,7 @@ fn... circle (center : vec2, radius : f32, color : vec4 = (vec4 1), segments : (
 fn... line (vertices, width : f32 = 1.0, color : vec4 = (vec4 1),
             join-kind : LineJoinKind = LineJoinKind.Bevel,
             cap-kind : LineCapKind = LineCapKind.Butt)
-    set-texture-binding ctx ('force-unwrap ctx.default-texture-binding)
+    set-texture-binding ctx ctx.default-texture
 
     if ((countof vertices) < 2)
         return;
@@ -434,13 +423,13 @@ fn init ()
         ctx =
             PlonkState
                 push-constant-layout = (push-constant-layout)
-                default-texture-binding = (default-texture-binding)
+                default-texture = (default-texture)
                 attribute-buffer = attrbuf
                 index-buffer = typeinit 8192
                 transform = (default-transform)
                 pipeline = copy (default-pipeline)
                 buffer-binding = buffer-binding
-                texture-binding = (default-texture-binding)
+                texture-binding = (TextureBinding (default-texture))
                 clear-color = (vec4 0.017 0.017 0.017 1.0)
                 render-target = dupe (nullof TextureView)
     else ()
