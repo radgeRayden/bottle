@@ -18,9 +18,11 @@ else
     DEMOS="$(cat demo-list.txt demo-list-linux.txt | tr '\n' ' ')"
 fi
 
+pushd ..
 for DEMO in $DEMOS; do
-    scopes -e ./build.sc .$DEMO
+    scopes -e -m .demos.build .$DEMO
 done
+popd
 
 cp -r ./assets ./dist/bin/
 mv ./dist/bin ./bottle-demos

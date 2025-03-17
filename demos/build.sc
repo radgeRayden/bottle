@@ -3,8 +3,8 @@ using import C.stdlib
 using import radl.strfmt
 using import print
 
-obj-dir := "./dist/obj"
-bin-dir := "./dist/bin"
+obj-dir := module-dir .. "/dist/obj"
+bin-dir := module-dir .. "/dist/bin"
 
 inline build-demo (name use-genc?)
     module :=
