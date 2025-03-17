@@ -253,6 +253,8 @@ type+ Texture
             copy image-data.slices
             copy image-data.format
             image-data
+    case (cls)
+        bitcast null this-type
 
     fn... frame-write (self, image-data : ImageData, x : u32 = 0:u32, y : u32 = 0:u32, z : u32 = 0:u32, mip-level : u32 = 0:u32, aspect : wgpu.TextureAspect = 'All)
         format := self.Format
