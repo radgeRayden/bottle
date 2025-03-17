@@ -55,7 +55,16 @@ inline define-object (name super release reference)
         inline __hash (self)
             hash ('rawptr (view self))
 
-        DumbHandleType := typedef (.. name "DumbHandle") < integer : u64
+        DumbHandleType := typedef (.. "WGPUDumbHandle<" name ">") : u64 
+        type+ DumbHandleType
+            inline __== (thisT otherT)
+                static-if ((unqualified thisT) == (unqualified otherT))
+                    (a b) -> ((storagecast a) == (storagecast b))
+                else
+                    static-error "can't compare handles of different types"
+            inline __hash (self)
+                hash (storagecast self)
+
         inline get-id (self)
             bitcast (dupe (ptrtoint (view self) (storageof DumbHandleType))) DumbHandleType
 
