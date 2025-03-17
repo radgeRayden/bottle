@@ -60,11 +60,22 @@ if platform.system() == "Linux":
         linux_demos = [demo for demo in demo_list if demo]
         demos = demos + linux_demos
 
+def demo_exe_name(name):
+    sanitized_name = name.replace(".", "_")
+    if platform.system() == "Windows":
+        ext = ".exe"
+    else:
+        ext = ""
+    return f"demo_{sanitized_name}{ext}"
+
 def task_demos ():
     for name in demos:
         yield {
             'basename': f"demo.{name}",
-            'actions': [LongRunning(demo_cmd(name))],
+            # 'actions': [LongRunning(demo_cmd(name))],
+            'actions': 
+                [LongRunning(cmd(f"./demos/build.sh {name}")),
+                 LongRunning(cmd(f"pushd ./demos/bottle-demos && ./{demo_exe_name(name)}"))],
             'file_dep': [bootstrap],
             'uptodate': [False]
         }

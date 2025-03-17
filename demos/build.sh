@@ -10,7 +10,9 @@ mkdir ./dist/bin
 mkdir ./dist/obj
 
 export LDFLAGS="$(scopes -e ./setup-dist.sc)"
-if [ "$(expr substr $(uname -s) 1 10)" == "MINGW64_NT" ]; then
+if [ $# -gt 0 ]; then
+    DEMOS=$*
+elif [ "$(expr substr $(uname -s) 1 10)" == "MINGW64_NT" ]; then
     DEMOS="$(cat demo-list.txt | tr '\n' ' ' | tr '\r' ' ')"
 else
     DEMOS="$(cat demo-list.txt demo-list-linux.txt | tr '\n' ' ')"
@@ -32,4 +34,3 @@ if [ "$(expr substr $(uname -s) 1 10)" == "MINGW64_NT" ]; then
 fi
 
 zip -r bottle-demos.zip ./bottle-demos/*
-rm -r dist
