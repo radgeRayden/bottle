@@ -49,16 +49,15 @@ def task_force_bootstrap():
 def demo_cmd(name):
     return cmd(f"RUST_BACKTRACE=1 scopes -e run.sc {name}")
 
-demos = []
-with open('demos/demo-list.txt', 'r') as file:
-    demo_list = file.read().split('\n')
-    demos = [demo for demo in demo_list if demo]
-
-if platform.system() == "Linux":
-    with open('demos/demo-list-linux.txt', 'r') as file:
+def read_demo_list(path):
+    with open(path, 'r') as file:
         demo_list = file.read().split('\n')
-        linux_demos = [demo for demo in demo_list if demo]
-        demos = demos + linux_demos
+        return [demo for demo in demo_list if demo and (not demo.startswith("#"))]
+
+
+demos = read_demo_list("demos/demo-list.txt")
+if platform.system() == "Linux":
+    demos += read_demo_list("demos/demo-list-linux.txt")
 
 def demo_exe_name(name):
     sanitized_name = name.replace(".", "_")

@@ -1,3 +1,4 @@
+#; vi: commentstring=#%s syntax=scopes
 gpu.hello-triangle
 gpu.buffers
 gpu.presentation
@@ -7,5 +8,5 @@ gpu.mipmap-gen
 plonk.sprites
 plonk.shapes
 plonk.line-benchmark
-font
+#snake
 imgui
