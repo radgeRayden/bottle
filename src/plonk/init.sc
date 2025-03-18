@@ -1,4 +1,4 @@
-using import Array enum glm Map Option String struct
+using import Array enum glm Map Option String struct hash
 
 # imported to define the implementations
 using import .TextureBinding
@@ -24,10 +24,24 @@ enum PlonkCommand
     Draw : DrawCommand
     StartPass : StartPassCommand
 
+struct TextureCacheKey plain
+    texture-handle : Texture.DumbHandleType
+    filter-mode : FilterMode
+
+    # TODO: make some shorthands for this type of thing
+    inline __hash (self)
+        va-lfold (hash 0)
+            (_? a b) -> (hash b (hash (getattr self (keyof a.Type))))
+            this-type.__fields__
+    inline __== (thisT otherT)
+        static-if ((unqualified thisT) == (unqualified otherT))
+            inline (self other)
+                (storagecast self) == (storagecast other)
+
 struct TextureCacheEntry
     binding : TextureBinding
     timestamp : f64
-    key : Texture.DumbHandleType
+    key : TextureCacheKey
 
 struct PlonkState
     push-constant-layout : PushConstantLayout
@@ -43,6 +57,7 @@ struct PlonkState
     pipeline : RenderPipeline
     buffer-binding : BindGroup
     texture-binding : (Option TextureBinding)
+    # texture-filtering : wgpu.
     render-target : TextureView
     clear-color : vec4
 
@@ -51,7 +66,7 @@ struct PlonkState
     commands : (Array PlonkCommand)
 
     cached-textures : (Array TextureCacheEntry)
-    cached-texture-map : (Map Texture.DumbHandleType usize)
+    cached-texture-map : (Map TextureCacheKey usize)
 
 global ctx : PlonkState
 
@@ -131,7 +146,7 @@ fn finalize-enqueue-command (ctx)
 fn... set-texture-binding (ctx, texture : Texture)
     # bind groups and texture views are created on demand and cached.
     :: get-texture-cache-entry
-    k := 'get-id texture
+    k := TextureCacheKey ('get-id texture) FilterMode.Nearest
     now := (time.get-raw-time)
     try ('get ctx.cached-texture-map k)
     then (index)
