@@ -10,12 +10,14 @@ mkdir ./dist/bin
 mkdir ./dist/obj
 
 export LDFLAGS="$(scopes -e ./setup-dist.sc)"
+
+DEMO_REGEXP="^[^#].+"
 if [ $# -gt 0 ]; then
     DEMOS=$*
 elif [ "$(expr substr $(uname -s) 1 10)" == "MINGW64_NT" ]; then
-    DEMOS="$(cat demo-list.txt | tr '\n' ' ' | tr '\r' ' ')"
+    DEMOS="$(cat demo-list.txt | grep -E $DEMO_REGEXP | tr '\n' ' ' | tr '\r' ' ')"
 else
-    DEMOS="$(cat demo-list.txt demo-list-linux.txt | tr '\n' ' ')"
+    DEMOS="$(cat demo-list.txt demo-list-linux.txt | grep -E $DEMO_REGEXP | tr '\n' ' ')"
 fi
 
 pushd ..
@@ -35,4 +37,6 @@ if [ "$(expr substr $(uname -s) 1 10)" == "MINGW64_NT" ]; then
     cp /mingw64/bin/libwinpthread-1.dll ./bottle-demos/
 fi
 
-zip -r bottle-demos.zip ./bottle-demos/*
+if [ $# -eq 0 ]; then
+    zip -r bottle-demos.zip ./bottle-demos/*
+fi
