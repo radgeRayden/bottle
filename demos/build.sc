@@ -1,7 +1,4 @@
-using import String
-using import C.stdlib
-using import radl.strfmt
-using import print
+using import String C.stdlib radl.strfmt print
 
 obj-dir := module-dir .. "/dist/obj"
 bin-dir := module-dir .. "/dist/bin"
@@ -19,7 +16,21 @@ inline build-demo (name use-genc?)
 
     name as:= string
 
-    main := (typify (module as Closure) i32 (@ rawstring))
+    inline typify-main (f)
+        typify (f as Closure) i32 (@ rawstring)
+
+    let main extra-lflags = 
+        if (('typeof module) == Closure)
+            _ (typify-main module) S""
+        else
+            scope := (module as Scope)
+            main := typify-main ('@ scope 'main)
+            try (('@ scope 'extra-lflags) as String)
+            then (extra-lflags)
+                _ main (copy extra-lflags)
+            else
+                _ main S""
+
     obj-name := .. "obj" name ".o"
 
     let compilef = compile-object
@@ -48,13 +59,6 @@ inline build-demo (name use-genc?)
     libflags := (getenv "LDFLAGS")
     assert (libflags != null)
     libflags := string libflags
-
-    let extra-lflags =
-        static-match operating-system
-        case 'linux
-            "-levdev"
-        default
-            ""
 
     cmd := f"gcc -o ${bin-dir}/${exe-name} ${obj-dir}/${obj-name} -I../include -lm ${extra-lflags} -L${bin-dir} ${libflags} -Wl,-rpath '-Wl,$ORIGIN'"
     print "+" cmd

@@ -322,6 +322,9 @@ fn ()
 sugar-if main-module?
     bottle.run;
 else
-    fn main (argc argv)
-        bottle.run;
-        0
+    do
+        extra-lflags := S"-levdev"
+        fn main (argc argv)
+            bottle.run;
+            0
+        local-scope;
