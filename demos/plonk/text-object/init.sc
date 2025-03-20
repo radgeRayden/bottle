@@ -1,11 +1,13 @@
 using import Array glm itertools Map Option String struct
 import bottle ...demo-common UTF-8
+using bottle.gpu.types
+
 plonk := bottle.plonk
 
 test-string := "Hello World\nHello LÖVE discord server"
 
 struct FontAtlas
-    binding : plonk.TextureBinding
+    texture : Texture
     character-mappings : (Map i32 plonk.Quad)
     tofu : plonk.Quad
 
@@ -42,7 +44,7 @@ struct TextObject
                         deref atlas.tofu
 
                 position := pen + (vec2 0 metrics.y-offset)
-                plonk.sprite atlas.binding position (vec2 32 32) 0:f32 quad (origin = (vec2))
+                plonk.sprite atlas.texture position (vec2 32 32) 0:f32 quad (origin = (vec2))
                 pen + (vec2 metrics.advance 0)
 
 struct DemoContext
@@ -77,11 +79,7 @@ fn ()
 
         local text-object =
             TextObject
-                font-atlas =
-                    typeinit
-                        plonk.TextureBinding
-                            Texture image-font
-                            min-filter = 'Nearest
+                font-atlas = typeinit (Texture image-font)
                 font-metrics =
                     ImageFontMetrics
                         advance = 14
@@ -110,6 +108,7 @@ fn ()
 @@ 'on bottle.render
 fn ()
     ctx := 'force-unwrap ctx
+    plonk.set-texture-filtering 'Nearest 'Nearest
     'draw ctx.text-object (vec2 0 600) 1000
 
 sugar-if main-module?

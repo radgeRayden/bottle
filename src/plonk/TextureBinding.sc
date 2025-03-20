@@ -26,8 +26,10 @@ type+ TextureBinding
         texture-view := TextureView texture
         sampler :=
             gpu.get-internal-sampler f"plonk.sampler-${wrap-mode}-${min-filter}"
-                fn ()
+                fn (wrap-mode min-filter)
                     Sampler wrap-mode min-filter
+                wrap-mode
+                min-filter
 
         super-type.__typecall cls
             texture = texture

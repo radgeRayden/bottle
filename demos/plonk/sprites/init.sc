@@ -42,6 +42,7 @@ fn ()
     using import itertools
     for x y in (dim 20 20)
         quad := Quad (vec2 (ctx.sprite-frame / 10) 0) (vec2 (1 / 10) 1)
+        plonk.set-texture-filtering 'Nearest 'Nearest
         plonk.sprite ctx.sprite (vec2 (x * 20) (y * 20)) (vec2 100 100) 0:f32 quad
     ()
 

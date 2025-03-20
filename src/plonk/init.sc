@@ -26,7 +26,8 @@ enum PlonkCommand
 
 struct TextureCacheKey plain
     texture-handle : Texture.DumbHandleType
-    filter-mode : FilterMode
+    filter-min : FilterMode
+    filter-mag : FilterMode
 
     # TODO: make some shorthands for this type of thing
     inline __hash (self)
@@ -57,7 +58,8 @@ struct PlonkState
     pipeline : RenderPipeline
     buffer-binding : BindGroup
     texture-binding : (Option TextureBinding)
-    # texture-filtering : wgpu.
+    texture-filter-min : FilterMode
+    texture-filter-mag : FilterMode
     render-target : TextureView
     clear-color : vec4
 
@@ -143,10 +145,14 @@ fn finalize-enqueue-command (ctx)
                 copy ctx.transform
     ctx.index-offset = countof ctx.index-data
 
-fn... set-texture-binding (ctx, texture : Texture)
+fn... set-texture-filtering (filter-min : FilterMode = 'Nearest, filter-mag : FilterMode = 'Nearest)
+    ctx.texture-filter-min = filter-min
+    ctx.texture-filter-mag = filter-mag
+
+fn... set-texture-binding (ctx, texture : Texture, filter-min : FilterMode, filter-mag : FilterMode)
     # bind groups and texture views are created on demand and cached.
     :: get-texture-cache-entry
-    k := TextureCacheKey ('get-id texture) FilterMode.Nearest
+    k := TextureCacheKey ('get-id texture) filter-min filter-mag
     now := (time.get-raw-time)
     try ('get ctx.cached-texture-map k)
     then (index)
@@ -158,11 +164,13 @@ fn... set-texture-binding (ctx, texture : Texture)
         'append ctx.cached-textures
             TextureCacheEntry
                 binding =
-                    TextureBinding (copy texture)
+                    # FIXME: needs configurable wrap mode
+                    TextureBinding (copy texture) 'ClampToEdge filter-min filter-mag
                 timestamp = now
                 key = k
     get-texture-cache-entry (entry) ::
 
+    # FIXME: this check doesn't trigger a cache invalidation if only filtering changes
     if (('get-key ('force-unwrap ctx.texture-binding)) != ('get-key entry.binding))
         finalize-enqueue-command ctx
     ctx.texture-binding = copy entry.binding
@@ -248,7 +256,7 @@ fn... add-quad (ctx, position : vec2, size : vec2, rotation : f32 = 0:f32, quad 
 fn... sprite (texture : Texture, position : vec2, size : vec2, rotation : f32 = 0:f32, quad : Quad = (Quad (vec2 0 0) (vec2 1 1)),
                 origin : vec2 = (vec2 0.5), fliph? : bool = false, flipv? : bool = false, color : vec4 = (vec4 1))
     texture ... := *...
-    set-texture-binding ctx texture
+    set-texture-binding ctx texture ctx.texture-filter-min ctx.texture-filter-mag
     add-quad ctx ...
 
 fn... rectangle (position : vec2, size : vec2, rotation : f32 = 0, color : vec4 = (vec4 1))
@@ -529,5 +537,6 @@ fn submit ()
 
 do
     let init begin-frame sprite rectangle rectangle-line circle circle-line polygon polygon-line line submit
+    let set-texture-filtering
     let Quad LineJoinKind LineCapKind TextureBinding
     local-scope;
