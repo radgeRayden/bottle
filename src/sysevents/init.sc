@@ -61,6 +61,8 @@ inline dispatch (handler)
 
         case 'WINDOW_PIXEL_SIZE_CHANGED
             gpu.flag-surface-outdated;
+            edata := event.window
+            callbacks.window-resized edata.data1 edata.data2
 
         case 'WINDOW_ENTER_FULLSCREEN
             window-ctx.fullscreen? = true
