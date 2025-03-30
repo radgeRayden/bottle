@@ -94,7 +94,7 @@ fn get-title ()
     String (sdl.GetWindowTitle (get-handle))
 
 fn set-fullscreen (value)
-    if ((sdl.SetWindowFullscreen (get-handle) value) != 0)
+    if (not (sdl.SetWindowFullscreen (get-handle) value))
         logger.write-debug f"Failed to set window to fullscreen: ${(sdl.GetError)}"
 
 fn fullscreen? ()
