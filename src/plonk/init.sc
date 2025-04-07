@@ -128,7 +128,7 @@ fn default-texture ()
             Texture imdata
 
 fn default-transform ()
-    w h := (window.get-drawable-size)
+    w h := (window.get-size)
     *
         math.orthographic-projection w h
         math.translation-matrix (vec3 (-w / 2) (-h / 2) 0)
