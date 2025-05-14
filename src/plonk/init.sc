@@ -260,7 +260,7 @@ fn... sprite (texture : Texture, position : vec2, size : vec2, rotation : f32 = 
     add-quad ctx ...
 
 fn... rectangle (position : vec2, size : vec2, rotation : f32 = 0, color : vec4 = (vec4 1))
-    set-texture-binding ctx ctx.default-texture
+    set-texture-binding ctx ctx.default-texture ctx.texture-filter-min ctx.texture-filter-mag
     add-quad ctx position size rotation (color = color)
 
 fn regular-polygon-point (center radius idx segments rotation-offset)
@@ -268,7 +268,7 @@ fn regular-polygon-point (center radius idx segments rotation-offset)
     center + ((vec2 (cos angle) (sin angle)) * radius)
 
 fn... polygon (center : vec2, segments : integer, radius : f32, rotation : f32 = 0:f32, color : vec4 = (vec4 1))
-    set-texture-binding ctx ctx.default-texture
+    set-texture-binding ctx ctx.default-texture ctx.texture-filter-min ctx.texture-filter-mag
     vtx-offset := u32 (countof ctx.vertex-data)
 
     segments := (max (u32 segments) 3:u32)
@@ -293,7 +293,7 @@ fn calculate-circle-segment-count (radius)
     max 5:u32 (u32 segments)
 
 fn... circle (center : vec2, radius : f32, color : vec4 = (vec4 1), segments : (param? i32) = none)
-    set-texture-binding ctx ctx.default-texture
+    set-texture-binding ctx ctx.default-texture ctx.texture-filter-min ctx.texture-filter-mag
 
     let segments =
         static-if (none? segments) (calculate-circle-segment-count radius)
@@ -305,7 +305,7 @@ fn... circle (center : vec2, radius : f32, color : vec4 = (vec4 1), segments : (
 fn... line (vertices, width : f32 = 1.0, color : vec4 = (vec4 1),
             join-kind : LineJoinKind = LineJoinKind.Bevel,
             cap-kind : LineCapKind = LineCapKind.Butt)
-    set-texture-binding ctx ctx.default-texture
+    set-texture-binding ctx ctx.default-texture ctx.texture-filter-min ctx.texture-filter-mag
 
     if ((countof vertices) < 2)
         return;
