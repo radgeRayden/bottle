@@ -10,7 +10,6 @@ inline callback-chain (cb f...)
             ()
         f...
 
-callback-chain 'load imgui.init plonk.init
 callback-chain 'begin-frame imgui.begin-frame plonk.begin-frame
 callback-chain 'end-frame plonk.submit imgui.end-frame imgui.render
 callback-chain 'invalidate-frame imgui.reset-gpu-state
@@ -28,6 +27,8 @@ fn run ()
     gpu.init;
     time.init;
     audio.init;
+    imgui.init;
+    plonk.init;
     callbacks.load;
 
     USE_DT_ACCUMULATOR? := cfg.time.use-delta-accumulator?
