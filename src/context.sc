@@ -1,5 +1,5 @@
 using import Array glm hash Map Option print radl.Cache radl.strfmt Set String struct
-import .gpu.wgpu .logger sdl3 .types
+import .gpu.wgpu sdl3 .types .enums
 
 wgpu := gpu.wgpu
 sdl  := sdl3
