@@ -1,3 +1,11 @@
+using import enum
+
+enum LogLevel plain
+    Debug
+    Info
+    Warning
+    Fatal
+
 wgpu := import ..gpu.wgpu
 
 do
@@ -17,4 +25,6 @@ do
     from (import radl.IO.FileStream) let FileMode
     from (import ..plonk.common) let LineJoinKind LineCapKind
 
-    locals;
+    let LogLevel
+
+    local-scope;

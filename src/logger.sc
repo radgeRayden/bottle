@@ -1,11 +1,5 @@
-using import .callbacks enum FunctionChain print slice String radl.strfmt
+using import .callbacks enum FunctionChain print slice String radl.strfmt .enums
 String+ := import radl.String+
-
-enum LogLevel plain
-    Debug
-    Info
-    Warning
-    Fatal
 
 min-level := LogLevel.Debug
 
