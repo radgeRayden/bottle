@@ -15,27 +15,6 @@ inline getcwd (ptr size)
     else 
         C.bindings.extern.getcwd ptr size
 
-for k v in physfs
-    if (('typeof v) != type)
-        continue;
-
-    local old-symbols : (Array Symbol)
-    T := (v as type)
-    if (T < CEnum)
-        for k v in ('symbols T)
-            original-symbol  := k as Symbol
-            original-name    := original-symbol as string
-            match? start end := 'match? str"^PHYSFS_" original-name
-
-            if match?
-                field := (Symbol (rslice original-name end))
-                'set-symbol T field v
-                'append old-symbols original-symbol
-
-        for sym in old-symbols
-            sc_type_del_symbol T sym
-run-stage;
-
 fn get-error ()
     err := (physfs.getLastErrorCode)
     msg := (physfs.getErrorByCode err)
