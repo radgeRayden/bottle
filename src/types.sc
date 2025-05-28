@@ -1,6 +1,8 @@
 ..
     import .asset.ImageData
-    import .gpu.types
-    import .filesystem.FileStream
     import .font
+    import .gpu.types
     import .plonk.types
+    do
+        from (import .filesystem.types) let FileStream
+        local-scope;

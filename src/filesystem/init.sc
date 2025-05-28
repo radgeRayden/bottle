@@ -1,6 +1,9 @@
 using import Array Buffer Option slice String print
 import C.bindings physfs
 
+# implementation
+import .FileStream
+
 using import ..context
 cfg := context-accessor 'config 'filesystem
 

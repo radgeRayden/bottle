@@ -1,10 +1,7 @@
-import ..logger physfs
-using import radl.strfmt
+import physfs
+using import radl.strfmt .types
 
-vvv bind API
-do
-    FileHandle := (mutable@ physfs.File)
-
+type+ PhysfsFile
     fn open-file (path mode)
         T := (typeof mode)
         switch mode
@@ -48,11 +45,4 @@ do
     fn eof? (handle)
         (physfs.eof handle) as bool
 
-    inline log-error (prefix)
-        err := (physfs.getLastErrorCode)
-        msg := (physfs.getErrorByCode err)
-        logger.write-warning f"${prefix}:" msg
-
-    local-scope;
-
-(import radl.IO.FileStream) API
+()

@@ -2,9 +2,8 @@ using import Buffer String
 stbi := import stb.image
 
 import ..filesystem
-using import ..filesystem.FileStream
+using import ..types ..enums
 using import .ImageData
-using import ..gpu.types
 
 fn... load-image (filename : String)
     local w : i32

@@ -14,7 +14,7 @@ do
     from (import .keyconstants) let KeyboardKey
     from (import .mousebuttons) let MouseButton
     from (import .controllerconstants) let ControllerAxis ControllerButton
-    from (import ..filesystem.FileStream) let FileMode
+    from (import radl.IO.FileStream) let FileMode
     from (import ..plonk.common) let LineJoinKind LineCapKind
 
     locals;
