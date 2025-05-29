@@ -153,7 +153,9 @@ fn... set-texture-binding (ctx, texture : Texture, filter-min : FilterMode, filt
     # bind groups and texture views are created on demand and cached.
     :: get-texture-cache-entry
     k := TextureCacheKey ('get-id texture) filter-min filter-mag
+    # PERF: cache this timestamp per frame, or maybe use a frame count
     now := (time.get-raw-time)
+    # PERF: need an early out if it's the same texture as we're already using
     try ('get ctx.cached-texture-map k)
     then (index)
         entry := ctx.cached-textures @ index 
