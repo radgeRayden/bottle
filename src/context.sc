@@ -1,5 +1,5 @@
 using import Array glm hash Map Option print radl.Cache radl.strfmt Set String struct
-import .gpu.wgpu sdl3 .types .enums
+import .gpu.wgpu sdl3 .types .enums .exceptions
 
 wgpu := gpu.wgpu
 sdl  := sdl3
@@ -213,17 +213,51 @@ struct BottleWindowState
 struct BottleSysEventsState
     application-quit? : bool
 
+inline callback-init (T...)
+    static-typify
+        fn (...)
+            ()
+        T...
+
+struct BottleCallbacks
+    cb := (T...) -> (@ (function void T...))
+
+    configure : (cb (mutable& (viewof BottleConfig)))
+    load : (cb ())
+    update : (cb f64)
+    begin-frame : (cb ())
+    render : (@ (raises (function void) exceptions.GPUError))
+    end-frame : (@ (raises (function void) exceptions.GPUError))
+    log-write : (cb enums.LogLevel (viewof String) (viewof String) (viewof String))
+    controller-added : (cb u32)
+    controller-axis-moved : (cb u32 enums.ControllerAxis i16)
+    controller-button-pressed : (cb u32 enums.ControllerButton)
+    controller-button-released : (cb u32 enums.ControllerButton)
+    controller-removed : (cb u32)
+    key-pressed : (cb enums.KeyboardKey)
+    key-released : (cb enums.KeyboardKey)
+    mouse-moved : (cb f32 f32 f32 f32)
+    mouse-pressed : (cb enums.MouseButton f32 f32 i32)
+    mouse-released : (cb enums.MouseButton f32 f32 i32)
+    quit : (@ (function bool))
+    text-input : (cb (viewof String))
+    wheel-scrolled : (cb f32 f32)
+    window-resized : (cb i32 i32)
+
+    unlet cb
+
 struct BottleContext
     config : BottleConfig
     gpu : BottleGPUState
     window : BottleWindowState
     sysevents : BottleSysEventsState
+    callbacks : BottleCallbacks
 
 global context : BottleContext
 
 inline if-module-enabled (name)
     inline (f)
-        inline (...)
+        fn (...)
             enabled? := getattr context.config.enabled-modules name
             let f =
                 static-if (inline? f)

@@ -1,23 +1,22 @@
-import .audio .callbacks .filesystem .gpu .imgui .plonk .sysevents .time .window
+import .audio .exceptions .filesystem .gpu .imgui .plonk .sysevents .time .window .callbacks
 using import .context
 
-inline callback-chain (cb f...)
-    cb := getattr callbacks cb
-    'clear cb
-    va-map
-        inline (f)
-            'append cb f
-            ()
-        f...
+@@ 'on callbacks.begin-frame
+fn "main.begin-frame" ()
+    imgui.begin-frame;
+    plonk.begin-frame;
 
-callback-chain 'begin-frame imgui.begin-frame plonk.begin-frame
-callback-chain 'end-frame plonk.submit imgui.end-frame imgui.render
-callback-chain 'invalidate-frame imgui.reset-gpu-state
+@@ 'on callbacks.end-frame
+fn "main.end-frame" ()
+    plonk.submit;
+    imgui.end-frame;
+    imgui.render;
 
 fn run ()
     raising noreturn
 
     cfg := ((context-accessor 'config))
+    callbacks.assign-callbacks;
 
     callbacks.configure cfg
     'apply-env-overrides cfg
@@ -41,15 +40,7 @@ fn run ()
         time.step;
         dt := (time.get-delta-time)
 
-        if USE_DT_ACCUMULATOR?
-            dt-accumulator += dt
-
-            while (dt-accumulator > FIXED_TIMESTEP)
-                callbacks.fixed-update FIXED_TIMESTEP
-                dt-accumulator -= FIXED_TIMESTEP
-            callbacks.update dt
-        else
-            callbacks.update dt
+        callbacks.update dt
 
         try
             gpu.begin-frame;
@@ -62,7 +53,6 @@ fn run ()
 
             switch ex
             case 'ObjectCreationFailed
-                # assert false "unhandled GPU Object creation failure"
                 abort;
             case 'DiscardedFrame
                 ()
@@ -78,5 +68,4 @@ fn run ()
 
 do
     let run
-    using callbacks
     locals;

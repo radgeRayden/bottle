@@ -318,6 +318,7 @@ fn (dt)
 @@ 'on bottle.quit
 fn ()
     ctx = (AppState)
+    true
 
 sugar-if main-module?
     bottle.run;

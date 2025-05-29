@@ -1,4 +1,5 @@
-using import .callbacks enum FunctionChain print slice String radl.strfmt .enums
+import .callbacks
+using import enum .context FunctionChain print slice String radl.strfmt .enums
 String+ := import radl.String+
 
 min-level := LogLevel.Debug
@@ -34,7 +35,7 @@ inline make-log-macro (level anchor?)
             path := (sc_anchor_path anchor) as string
             relpath := rslice path ((countof (String+.common-prefix (String path) (String project-dir))) + 1)
             lineinfo := f"${relpath}:${sc_anchor_lineno anchor}:${sc_anchor_column anchor}:" as string
-            `(log-write [log-level] [lineinfo] [prefix] args)
+            `(callbacks.log-write [log-level] [lineinfo] [prefix] (va-format " " [args]))
         else
             `()
 

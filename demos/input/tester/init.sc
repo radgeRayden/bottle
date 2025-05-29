@@ -20,6 +20,7 @@ fn ()
 @@ 'on bottle.controller-added
 fn (id)
     'append ctx.controllers (sdl.OpenGamepad id)
+    ()
 
 @@ 'on bottle.controller-removed
 fn (id)

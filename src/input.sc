@@ -309,7 +309,7 @@ fn get-controller (id)
 
 # HOOKS
 # ================================================================================
-let cb = (import .sysevents.callbacks)
+let cb = (import .callbacks)
 
 @@ 'on cb.controller-added
 fn (id)

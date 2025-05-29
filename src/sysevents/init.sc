@@ -1,5 +1,5 @@
-using import ..context struct
-import .callbacks ..gpu ..enums ..imgui ..window
+using import ..context struct String
+import ..callbacks ..gpu ..enums ..imgui ..window
 
 sdl := import sdl3
 ctx := context-accessor 'sysevents
@@ -57,7 +57,7 @@ inline dispatch (handler)
 
         case 'TEXT_INPUT
             edata := event.text
-            callbacks.text-input edata.text
+            callbacks.text-input ('from-rawstring String edata.text)
 
         case 'WINDOW_PIXEL_SIZE_CHANGED
             gpu.flag-surface-outdated;

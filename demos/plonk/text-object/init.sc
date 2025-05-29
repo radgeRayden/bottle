@@ -107,9 +107,11 @@ fn ()
 
 @@ 'on bottle.render
 fn ()
+    raising bottle.exceptions.GPUError
     ctx := 'force-unwrap ctx
     plonk.set-texture-filtering 'Nearest 'Nearest
     'draw ctx.text-object (vec2 0 600) 1000
+    ()
 
 sugar-if main-module?
     bottle.run;

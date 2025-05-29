@@ -34,6 +34,8 @@ fn (key)
 @@ 'on bottle.render
 @@ if-module-enabled 'imgui
 fn demo-info ()
+    raising bottle.exceptions.GPUError
+
     ig := import ..src.imgui
 
     fn text-size (text wrap-width)
