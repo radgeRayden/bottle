@@ -17,6 +17,23 @@ spice chain-callback (T f)
         'set-symbol T 'CallbackInitExpression expr
         f
 
+typedef BottleCallbackDefinitions
+
+spice assign-callbacks ()
+    expr := (sc_expression_new)
+    for k v in ('symbols BottleCallbackDefinitions)
+        k as:= Symbol
+        T := 'typeof v
+        let init-expr =
+            try 
+                '@ T 'CallbackInitExpression
+            else 
+                f := '@ T 'DefaultCallback
+                spice-quote
+                    'append (getattr ctx [k]) [f]
+        sc_expression_append expr init-expr
+    expr
+
 run-stage;
 
 inline BottleCallback (name f)
@@ -52,17 +69,6 @@ inline BottleCallback (name f)
         inline chain (self f)
             'append (getattr ctx Name) f
 
-typedef BottleCallbackDefinitions
-
-spice add-callback (name)
-    name as:= Symbol
-    f := fn (...) ()
-    sc_template_set_name (sc_closure_get_template f) name
-    spice-quote
-        'set-symbol BottleCallbackDefinitions [name] ((BottleCallback [name] [f]))
-
-run-stage;
-
 let callbacks... =
     'configure
     'load
@@ -85,26 +91,17 @@ let callbacks... =
     'wheel-scrolled
     'window-resized
 
-va-map add-callback callbacks...
+va-map
+    inline add-callback (name)
+        name as:= Symbol
+        f := fn (...) ()
+        sc_template_set_name (sc_closure_get_template f) name
+        'set-symbol BottleCallbackDefinitions name ((BottleCallback name f))
+    callbacks...
 
 # quit callback is special because it returns a value
 type+ BottleCallbackDefinitions
     quit := ((BottleCallback 'quit (fn "quit" (...) true)))
-
-spice assign-callbacks ()
-    expr := (sc_expression_new)
-    for k v in ('symbols BottleCallbackDefinitions)
-        k as:= Symbol
-        T := 'typeof v
-        let init-expr =
-            try 
-                '@ T 'CallbackInitExpression
-            else 
-                f := '@ T 'DefaultCallback
-                spice-quote
-                    'append (getattr ctx [k]) [f]
-        sc_expression_append expr init-expr
-    expr
 
 run-stage;
 
