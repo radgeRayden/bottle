@@ -15,6 +15,7 @@ fn (cfg)
 
 @@ 'on bottle.render
 fn ()
+    raising bottle.exceptions.GPUError
     if gui-state.window-opened?
         ig.Begin "file explorer" &gui-state.window-opened? 0
         ig.Text "hello world"

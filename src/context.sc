@@ -220,14 +220,15 @@ inline callback-init (T...)
         T...
 
 struct BottleCallbacks
-    cb := (T...) -> (@ (function void T...))
+    cb := (T...) -> (Array (@ (function void T...)))
 
     configure : (cb (mutable& (viewof BottleConfig)))
     load : (cb ())
     update : (cb f64)
     begin-frame : (cb ())
-    render : (@ (raises (function void) exceptions.GPUError))
-    end-frame : (@ (raises (function void) exceptions.GPUError))
+    render : (Array (@ (raises (function void) exceptions.GPUError)))
+    end-frame : (Array (@ (raises (function void) exceptions.GPUError)))
+    quit : (Array (@ (function bool)))
     log-write : (cb enums.LogLevel (viewof String) (viewof String) (viewof String))
     controller-added : (cb u32)
     controller-axis-moved : (cb u32 enums.ControllerAxis i16)
@@ -239,7 +240,6 @@ struct BottleCallbacks
     mouse-moved : (cb f32 f32 f32 f32)
     mouse-pressed : (cb enums.MouseButton f32 f32 i32)
     mouse-released : (cb enums.MouseButton f32 f32 i32)
-    quit : (@ (function bool))
     text-input : (cb (viewof String))
     wheel-scrolled : (cb f32 f32)
     window-resized : (cb i32 i32)

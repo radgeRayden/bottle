@@ -1,4 +1,4 @@
-using import FunctionChain struct .context
+using import struct .context
 
 ctx := context-accessor 'callbacks
 
@@ -7,17 +7,14 @@ spice callback-name (name)
 
 spice chain-callback (T f)
     T as:= type
-    try ('@ T 'Callback)
-    then (parent)
-        let newf =
-            spice-quote
-                fn (...)
-                    parent ...
-                    f ...
-        'set-symbol T 'Callback newf
-        newf
+    try ('@ T 'CallbackInitExpression)
+    then (expr)
+        sc_expression_append expr `('append (getattr ctx T.Name) f)
+        f
     else
-        'set-symbol T 'Callback f
+        expr := (sc_expression_new)
+        sc_expression_append expr `('append (getattr ctx T.Name) f)
+        'set-symbol T 'CallbackInitExpression expr
         f
 
 run-stage;
@@ -25,6 +22,7 @@ run-stage;
 inline BottleCallback (name f)
     typedef (.. "BottleCallback" ":" (tostring name)) : (storageof Nothing)
         DefaultCallback := f
+        Name := name
 
         inline on (self)
             inline (f)
@@ -33,14 +31,26 @@ inline BottleCallback (name f)
         inline __typecall (cls)
             bitcast none this-type
 
-        inline __call (cls ...)
-            (getattr ctx name) ...
+        inline __call (self ...)
+            chain := getattr ctx Name
+            fT := (typeof chain) . ElementType
+            retT := returnof fT
+            static-if (retT == void)
+                for cb in chain (cb ...)
+            else
+                fold (result = (retT)) for cb in chain
+                    cb ...
 
         inline replace (self f)
-            (getattr ctx name) = f
+            chain := getattr ctx Name
+            'clear chain
+            'append chain f
 
         inline __= (lhs rhs)
             'replace lhs rhs
+
+        inline chain (self f)
+            'append (getattr ctx Name) f
 
 typedef BottleCallbackDefinitions
 
@@ -86,12 +96,14 @@ spice assign-callbacks ()
     for k v in ('symbols BottleCallbackDefinitions)
         k as:= Symbol
         T := 'typeof v
-        let f =
-            try ('@ T 'Callback)
-            else ('@ T 'DefaultCallback)
-        sc_expression_append expr
-            spice-quote
-                (getattr ctx [k]) = [f]
+        let init-expr =
+            try 
+                '@ T 'CallbackInitExpression
+            else 
+                f := '@ T 'DefaultCallback
+                spice-quote
+                    'append (getattr ctx [k]) [f]
+        sc_expression_append expr init-expr
     expr
 
 run-stage;
