@@ -7,35 +7,40 @@ spice callback-name (name)
 
 spice chain-callback (T f)
     T as:= type
-    try ('@ T 'callback)
+    try ('@ T 'Callback)
     then (parent)
         let newf =
             spice-quote
                 fn (...)
                     parent ...
                     f ...
-        'set-symbol T 'callback newf
+        'set-symbol T 'Callback newf
         newf
     else
-        'set-symbol T 'callback f
+        'set-symbol T 'Callback f
         f
 
 run-stage;
 
-typedef BottleCallback
-    inline __typecall (cls name f)
-        typedef (.. "BottleCallback" ":" (tostring name))
-            default-callback := f
+inline BottleCallback (name f)
+    typedef (.. "BottleCallback" ":" (tostring name)) : (storageof Nothing)
+        DefaultCallback := f
 
-            inline on (self)
-                inline (f)
-                    chain-callback self f
+        inline on (self)
+            inline (f)
+                chain-callback this-type f
 
-            inline __typecall (cls ...)
-                (getattr ctx name) ...
+        inline __typecall (cls)
+            bitcast none this-type
 
-            inline replace (self f)
-                (getattr ctx name) = f
+        inline __call (cls ...)
+            (getattr ctx name) ...
+
+        inline replace (self f)
+            (getattr ctx name) = f
+
+        inline __= (lhs rhs)
+            'replace lhs rhs
 
 typedef BottleCallbackDefinitions
 
@@ -44,7 +49,7 @@ spice add-callback (name)
     f := fn (...) ()
     sc_template_set_name (sc_closure_get_template f) name
     spice-quote
-        'set-symbol BottleCallbackDefinitions [name] (BottleCallback [name] [f])
+        'set-symbol BottleCallbackDefinitions [name] ((BottleCallback [name] [f]))
 
 run-stage;
 
@@ -74,16 +79,16 @@ va-map add-callback callbacks...
 
 # quit callback is special because it returns a value
 type+ BottleCallbackDefinitions
-    quit := (BottleCallback 'quit (fn "quit" (...) true))
+    quit := ((BottleCallback 'quit (fn "quit" (...) true)))
 
 spice assign-callbacks ()
     expr := (sc_expression_new)
     for k v in ('symbols BottleCallbackDefinitions)
         k as:= Symbol
-        v as:= type
+        T := 'typeof v
         let f =
-            try ('@ v 'callback)
-            else ('@ v 'default-callback)
+            try ('@ T 'Callback)
+            else ('@ T 'DefaultCallback)
         sc_expression_append expr
             spice-quote
                 (getattr ctx [k]) = [f]
