@@ -7,7 +7,21 @@ let demo =
     else
         S"gpu.hello-triangle"
 
-use-genc? := (argc > 1) and (('from-rawstring String (argv @ 1)) == "-genc")
+local use-genc? : bool
+local live-reload? : bool
+
+if (argc > 1)
+    for i in (range 1 argc)
+        arg := 'from-rawstring String (argv @ i)
+        match arg
+        case "--genc"
+            use-genc? = true
+        case "--live-reload"
+            live-reload? = true
+        default
+            ()
+
+run-stage;
 
 import-string := .. ".demos." demo
 

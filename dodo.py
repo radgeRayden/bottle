@@ -46,9 +46,6 @@ def task_force_bootstrap():
         'file_dep': ["eo"],
     }
 
-def demo_cmd(name):
-    return cmd(f"RUST_BACKTRACE=1 scopes -e run.sc {name}")
-
 def read_demo_list(path):
     with open(path, 'r') as file:
         demo_list = file.read().split('\n')
@@ -67,14 +64,14 @@ def demo_exe_name(name):
         ext = ""
     return f"demo_{sanitized_name}{ext}"
 
+def demo_cmd(name):
+    return cmd(f"RUST_BACKTRACE=1 scopes -e run.sc {name} --live-reload")
+
 def task_demos ():
     for name in demos:
         yield {
             'basename': f"demo.{name}",
-            # 'actions': [LongRunning(demo_cmd(name))],
-            'actions': 
-                [LongRunning(cmd(f"./demos/build.sh {name}")),
-                 LongRunning(cmd(f"pushd ./demos/bottle-demos && ./{demo_exe_name(name)}"))],
+            'actions': [LongRunning(demo_cmd(name))],
             'file_dep': [bootstrap],
             'uptodate': [False]
         }
