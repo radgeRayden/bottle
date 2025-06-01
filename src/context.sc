@@ -26,10 +26,6 @@ spice collect-enum-fields (ET)
         inline (i)
             arg := args @ i
             `arg
-
-spice inline? (f)
-    `[(sc_template_is_inline (sc_closure_get_template (f as Closure)))]
-
 run-stage;
 
 @@ memo
