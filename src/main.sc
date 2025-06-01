@@ -18,6 +18,10 @@ fn run ()
     cfg := ((context-accessor 'config))
     callbacks.assign-callbacks;
 
+    live-ctx := ((context-accessor 'live))
+    if live-ctx.live?
+        live-ctx.default-callbacks = copy ((context-accessor 'callbacks))
+
     callbacks.configure cfg
     'apply-env-overrides cfg
 

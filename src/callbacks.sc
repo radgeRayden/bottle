@@ -1,12 +1,19 @@
-using import struct .context
+using import struct .context 
+import .exceptions
 
 ctx := context-accessor 'callbacks
+live-ctx := context-accessor 'live
 
 spice callback-name (name)
     `[(name as Symbol as string)]
 
 spice chain-callback (T f)
     T as:= type
+
+    if live-ctx.live?
+        return
+            `('append (getattr ctx T.Name) f)
+
     try ('@ T 'CallbackInitExpression)
     then (expr)
         sc_expression_append expr `('append (getattr ctx T.Name) f)
@@ -74,8 +81,6 @@ let callbacks... =
     'load
     'update
     'begin-frame
-    'render
-    'end-frame
     'log-write
     'controller-added
     'controller-axis-moved
@@ -102,6 +107,8 @@ va-map
 # quit callback is special because it returns a value
 type+ BottleCallbackDefinitions
     quit := ((BottleCallback 'quit (fn "quit" (...) true)))
+    render := ((BottleCallback 'render (fn "render" (...) (raising exceptions.GPUError))))
+    end-frame := ((BottleCallback 'end-frame (fn "end-frame" (...) (raising exceptions.GPUError))))
 
 run-stage;
 

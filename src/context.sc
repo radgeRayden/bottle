@@ -1,4 +1,4 @@
-using import Array glm hash Map Option print radl.Cache radl.strfmt Set String struct
+using import Array glm hash Map Option print radl.Cache radl.strfmt Set String struct radl.FileWatcher
 import .gpu.wgpu sdl3 .types .enums .exceptions
 
 wgpu := gpu.wgpu
@@ -246,12 +246,21 @@ struct BottleCallbacks
 
     unlet cb
 
+struct BottleLiveState
+    live? : bool
+    default-callbacks : BottleCallbacks
+    watcher : FileWatcher
+    name : String
+    path : String
+    first-load? : bool = true
+
 struct BottleContext
     config : BottleConfig
     gpu : BottleGPUState
     window : BottleWindowState
     sysevents : BottleSysEventsState
     callbacks : BottleCallbacks
+    live : BottleLiveState
 
 global context : BottleContext
 

@@ -1,16 +1,8 @@
-using import Array radl.FileWatcher struct
+using import Array radl.FileWatcher struct .context print
+import .main .callbacks
 
-#
-# name argc argv := (script-launch-args)
-# let filename =
-#     if (argc > 0)
-#         'from-rawstring String (argv @ 0)
-#     else
-#         error "no file selected"
-#
-# global fw : FileWatcher
-# 'watch fw filename
-#
+ctx := context-accessor 'live
+callbacks-ctx := context-accessor 'callbacks
 
 struct LiveGlobalVariable
     data : voidstar
@@ -30,7 +22,7 @@ inline gen-dropf (T)
 inline new-live-variable (var)
     'append module-storage
         LiveGlobalVariable
-            data = &var as voidstar
+            data = (dupe &var) as voidstar
             dropf = gen-dropf (typeof var)
     var
 
@@ -43,4 +35,47 @@ sugar live-variable (name rest...)
                 [sym] [name] (unquote-splice rest...)
                 [new-live-variable] [name]
 
-()
+run-stage;
+
+let module-scope =
+    do
+        let global = live-variable
+        local-scope;
+
+fn reload-module ()
+    (callbacks-ctx) = copy ctx.default-callbacks
+    load-module (ctx.name as string) (ctx.path as string) __env
+    callbacks.load;
+
+fn on-file-update (path ev-type)
+    'clear module-storage
+    if (ev-type == 'Modified)
+        try
+            reload-module;
+            ()
+        except (ex)
+            print ('dump ex)
+
+@@ 'on callbacks.update
+fn process-file-events (dt)
+    if ctx.first-load?
+        try!
+            reload-module;
+        ctx.first-load? = false
+    else
+        any-events? := 'dispatch-events ctx.watcher
+        if any-events? (print "source reloaded:" ctx.name)
+    ()
+
+fn init (name argc argv)
+    ctx.live? = true
+    ctx.name = name
+    ctx.path = find-module-path project-dir name __env
+    set-globals! (.. module-scope (globals))
+    try!
+        'watch ctx.watcher ctx.path on-file-update
+    main.run;
+
+do
+    let init
+    local-scope;
