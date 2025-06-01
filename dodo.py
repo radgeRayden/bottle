@@ -65,13 +65,25 @@ def demo_exe_name(name):
     return f"demo_{sanitized_name}{ext}"
 
 def demo_cmd(name):
-    return cmd(f"RUST_BACKTRACE=1 scopes -e run.sc {name} --live-reload")
+    return cmd(f"RUST_BACKTRACE=1 scopes -e run.sc {name}")
 
 def task_demos ():
     for name in demos:
         yield {
             'basename': f"demo.{name}",
             'actions': [LongRunning(demo_cmd(name))],
+            'file_dep': [bootstrap],
+            'uptodate': [False]
+        }
+
+def live_demo_cmd(name):
+    return cmd(f"RUST_BACKTRACE=1 scopes -e run.sc {name} --live-reload")
+
+def task_live_code ():
+    for name in demos:
+        yield {
+            'basename': f"live.{name}",
+            'actions': [LongRunning(live_demo_cmd(name))],
             'file_dep': [bootstrap],
             'uptodate': [False]
         }
