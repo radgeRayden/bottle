@@ -68,7 +68,8 @@ fn run ()
     window.shutdown;
     filesystem.shutdown;
     audio.shutdown;
-    ()
+
+    (context-accessor 'sysevents) . exit-status
 
 do
     let run

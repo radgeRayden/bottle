@@ -11,10 +11,11 @@ fn really-quit! ()
 fn really-quit? ()
     ctx.application-quit?
 
-fn quit ()
+fn... quit (exit-status : i32 = 0)
     local ev : sdl.Event
     ev.type = sdl.EventType.QUIT
     sdl.PushEvent &ev
+    ctx.exit-status = exit-status
     ;
 
 inline dispatch (handler)

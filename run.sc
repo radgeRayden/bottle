@@ -42,5 +42,3 @@ else
 
     f := (compile (typify (module as Closure) i32 (@ rawstring))) as (@ (function i32 i32 (@ rawstring)))
     f argc argv
-
-0

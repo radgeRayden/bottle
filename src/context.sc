@@ -208,6 +208,7 @@ struct BottleWindowState
 
 struct BottleSysEventsState
     application-quit? : bool
+    exit-status : i32
 
 inline callback-init (T...)
     static-typify
