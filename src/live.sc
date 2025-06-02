@@ -1,5 +1,5 @@
-using import Array radl.FileWatcher struct .context print
-import .main .callbacks
+using import Array radl.FileWatcher struct .context print radl.strfmt
+import .main .callbacks .time
 
 ctx := context-accessor 'live
 callbacks-ctx := context-accessor 'callbacks
@@ -54,17 +54,16 @@ fn on-file-update (path ev-type)
             reload-module;
             ()
         except (ex)
-            print ('dump ex)
+            print ('format ex)
 
 @@ 'on callbacks.update
 fn process-file-events (dt)
     if ctx.first-load?
-        try!
-            reload-module;
+        on-file-update ctx.path FileEventType.Modified
         ctx.first-load? = false
     else
         any-events? := 'dispatch-events ctx.watcher
-        if any-events? (print "source reloaded:" ctx.name)
+        if any-events? (print f"source reloaded: ${ctx.name}. time: ${(time.get-raw-time)}")
     ()
 
 fn init (name argc argv)
@@ -72,8 +71,10 @@ fn init (name argc argv)
     ctx.name = name
     ctx.path = find-module-path project-dir name __env
     set-globals! (.. module-scope (globals))
-    try!
+    try
         'watch ctx.watcher ctx.path on-file-update
+    except (ex)
+        print "could not watch file:" ex
     main.run;
 
 do
