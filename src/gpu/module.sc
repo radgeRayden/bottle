@@ -312,7 +312,7 @@ fn init ()
                     ctx.device = result
                     ;
 
-    # NOTE: Currenlty not implemented
+    # NOTE: Currently not implemented
     # wgpu.InstanceProcessEvents ctx.instance
 
     local device-limits := (make-limits-struct)
