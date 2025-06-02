@@ -29,7 +29,7 @@ sugar-if use-genc?
     using import compiler.target.C
     hook-compile-function;
 
-if live-reload?
+sugar-if live-reload?
     import .demos.demo-common
     ((import .src.live) . init) (import-string as string) argc argv
 else
