@@ -57,7 +57,7 @@ fn run ()
 
             switch ex
             case 'ObjectCreationFailed
-                abort;
+                ()
             case 'DiscardedFrame
                 ()
             default ()
