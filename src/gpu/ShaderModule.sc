@@ -35,7 +35,7 @@ fn shader-module-from-GLSL (code stage)
 
 type+ ShaderModule
     inline... __typecall (cls, source : String, source-language : ShaderLanguage, stage : (param? wgpu.ShaderStage) = none)
-        let module =
+        inline module ()
             static-match source-language
             case ShaderLanguage.WGSL
                 shader-module-from-WGSL source
@@ -49,7 +49,9 @@ type+ ShaderModule
             default
                 static-error "invalid shader source type"
 
-        wrap-nullable-object cls module
+        imply
+            capture-validation-error module
+            cls
 
     case (cls, f : Closure, source-language : ShaderLanguage, stage : wgpu.ShaderStage)
         vvv bind target

@@ -57,13 +57,15 @@ type+ FragmentStage
 
 fn make-pipeline-layout (layouts count ranges push-constant-count)
     layouts as:= pointer (storageof wgpu.BindGroupLayout)
-    wgpu.DeviceCreatePipelineLayout ctx.device
-        chained@ 'PipelineLayoutExtras
-            .label = "Bottle Pipeline Layout"
-            .bindGroupLayoutCount = count
-            .bindGroupLayouts = layouts
-            pushConstantRangeCount = push-constant-count
-            pushConstantRanges = ranges
+    imply
+        wgpu.DeviceCreatePipelineLayout ctx.device
+            chained@ 'PipelineLayoutExtras
+                .label = "Bottle Pipeline Layout"
+                .bindGroupLayoutCount = count
+                .bindGroupLayouts = layouts
+                pushConstantRangeCount = push-constant-count
+                pushConstantRanges = ranges
+        PipelineLayout
 
 type+ PipelineLayout
     inline... __typecall (cls, bind-group-layouts : (Array BindGroupLayout), push-constant-layout : (param? PushConstantLayout) = none)
@@ -74,15 +76,12 @@ type+ PipelineLayout
             else
                 _ null 0:usize
 
-        wrap-nullable-object cls
-            make-pipeline-layout (dupe layouts-ptr) layouts-count (dupe ranges-ptr) ranges-count
+        capture-validation-error make-pipeline-layout (dupe layouts-ptr) layouts-count (dupe ranges-ptr) ranges-count
     case (cls, bind-group-layouts : (array BindGroupLayout))
         local layouts = bind-group-layouts
-        wrap-nullable-object cls
-            make-pipeline-layout &layouts (countof layouts) null 0:usize
+        capture-validation-error make-pipeline-layout &layouts (countof layouts) null 0:usize
     case (cls)
-        wrap-nullable-object cls
-            make-pipeline-layout null 0:usize null 0:usize
+        capture-validation-error make-pipeline-layout null 0:usize null 0:usize
 
 type+ PushConstantLayout
     inline... add-range (self, visibility : wgpu.ShaderStage, name : String, storage : type)
@@ -130,22 +129,24 @@ fn make-pipeline (layout topology winding vertex-stage fragment-stage sample-cou
         else null
 
     local fragment-state = dupe (imply (move fragment-stage) FragmentState)
-    wgpu.DeviceCreateRenderPipeline ctx.device
-        typeinit@
-            label = "Bottle Render Pipeline"
-            layout = layout
-            vertex = (dupe (bitcast (imply (move vertex-stage) VertexState) wgpu.VertexState))
-            primitive =
-                wgpu.PrimitiveState
-                    topology = topology
-                    frontFace = winding
-            multisample =
-                wgpu.MultisampleState
-                    count = sample-count
-                    mask = ~0:u32
-                    alphaToCoverageEnabled = false
-            fragment = &fragment-state as (@ wgpu.FragmentState)
-            depthStencil = depth-stencil-state
+    imply
+        wgpu.DeviceCreateRenderPipeline ctx.device
+            typeinit@
+                label = "Bottle Render Pipeline"
+                layout = layout
+                vertex = (dupe (bitcast (imply (move vertex-stage) VertexState) wgpu.VertexState))
+                primitive =
+                    wgpu.PrimitiveState
+                        topology = topology
+                        frontFace = winding
+                multisample =
+                    wgpu.MultisampleState
+                        count = sample-count
+                        mask = ~0:u32
+                        alphaToCoverageEnabled = false
+                fragment = &fragment-state as (@ wgpu.FragmentState)
+                depthStencil = depth-stencil-state
+        RenderPipeline
 
 type+ RenderPipeline
     inline... __typecall (cls,
@@ -157,12 +158,13 @@ type+ RenderPipeline
                           msaa-samples : u32 = 1:u32,
                           depth-testing? : bool = false) # TODO: make this configurable
 
+
         cls ... := *...
-        wrap-nullable-object cls (make-pipeline ...)
+        capture-validation-error make-pipeline ...
     case (cls)
         bitcast null cls
 
     fn... get-bind-group-layout (self, index : u32)
-        wrap-nullable-object BindGroupLayout (wgpu.RenderPipelineGetBindGroupLayout (view self) index)
-
-()
+        imply
+            capture-validation-error wgpu.RenderPipelineGetBindGroupLayout (view self) index
+            BindGroupLayout

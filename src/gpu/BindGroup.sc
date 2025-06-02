@@ -1,5 +1,5 @@
 using import Array struct
-using import ..context ..helpers .types
+using import .common ..context ..helpers .types
 
 import .wgpu
 from wgpu let typeinit@ chained@
@@ -30,14 +30,15 @@ type+ BindGroup
 
                     va-range (va-countof entries...)
 
-        using import .common
-        wrap-nullable-object cls
-            wgpu.DeviceCreateBindGroup ctx.device
+        imply
+            capture-validation-error wgpu.DeviceCreateBindGroup 
+                ctx.device
                 typeinit@
                     label = "bottle bind group"
                     layout = layout
                     entryCount = (countof entries) as u32
                     entries = &entries
+            cls
     case (cls)
         bitcast null cls
 
@@ -67,13 +68,15 @@ type+ BindGroup
             using import .common
 
             ptr count := 'data self.entries
-            wrap-nullable-object BindGroup
-                wgpu.DeviceCreateBindGroup ctx.device
+            imply
+                capture-validation-error wgpu.DeviceCreateBindGroup 
+                    ctx.device
                     typeinit@
                         label = "bottle bind group"
                         layout = self.layout
                         entryCount = count
                         entries = dupe ptr
+                BindGroup
 
     inline builder (cls)
         (BindGroupBuilder)

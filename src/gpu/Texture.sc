@@ -230,7 +230,8 @@ type+ Texture
             else format
 
         handle :=
-            wgpu.DeviceCreateTexture ctx.device
+            capture-validation-error wgpu.DeviceCreateTexture 
+                ctx.device
                 &local wgpu.TextureDescriptor
                     label = f"Bottle Texture ${format}"
                     usage = usage
@@ -240,7 +241,7 @@ type+ Texture
                     mipLevelCount = (mipmap-levels == 0) (max-mipmap-count width height slices) mipmap-levels
                     sampleCount = sample-count
 
-        self := wrap-nullable-object cls handle
+        self := imply handle cls
 
         static-if (not (none? image-data))
             'frame-write (view self) image-data
@@ -390,8 +391,9 @@ type+ Texture
 
 type+ TextureView
     inline... __typecall (cls, source-texture : Texture)
-        wrap-nullable-object cls
-            wgpu.TextureCreateView source-texture null
+        imply
+            capture-validation-error wgpu.TextureCreateView source-texture null
+            cls
     case (cls, source-texture : Texture,
             dimension : wgpu.TextureViewDimension = '2D,
             base-mip : u32 = 0:u32,
@@ -413,8 +415,9 @@ type+ TextureView
             else
                 format
 
-        wrap-nullable-object cls
-            wgpu.TextureCreateView source-texture
+        imply
+            capture-validation-error wgpu.TextureCreateView 
+                source-texture
                 typeinit@
                     label = "bottle texture view"
                     format = view-format
@@ -424,6 +427,7 @@ type+ TextureView
                     baseArrayLayer = base-array-layer
                     arrayLayerCount = array-layer-count
                     aspect = aspect
+            cls
     case (cls)
         bitcast null cls
 

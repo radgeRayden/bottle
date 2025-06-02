@@ -7,8 +7,9 @@ type+ Sampler
     inline... __typecall (cls, wrap-mode : wgpu.AddressMode = wgpu.AddressMode.ClampToEdge,
         filter-mode : wgpu.FilterMode = wgpu.FilterMode.Linear)
 
-        wrap-nullable-object cls
-            wgpu.DeviceCreateSampler ctx.device
+        imply
+            capture-validation-error wgpu.DeviceCreateSampler 
+                ctx.device
                 typeinit@
                     addressModeU = wrap-mode
                     addressModeV = wrap-mode
@@ -20,5 +21,6 @@ type+ Sampler
                     mipmapFilter = (bitcast filter-mode wgpu.MipmapFilterMode)
                     maxAnisotropy = 1
                     # FIXME: incomplete, inflexible
+            cls
 
 ()

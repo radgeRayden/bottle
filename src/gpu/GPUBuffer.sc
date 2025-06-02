@@ -1,4 +1,4 @@
-using import Array property struct ..context ..exceptions ..helpers .types
+using import Array property struct .common ..context ..exceptions ..helpers .types
 
 import .wgpu
 from wgpu let typeinit@ chained@
@@ -40,11 +40,8 @@ inline gen-buffer-type (parent-type prefix backing-type usage-flags)
         inline constructor (cls max-elements usage-flags)
             # TODO: ensure size obeys alignment rules
             size   := max-elements * (sizeof BackingType)
-            handle := make-buffer size usage-flags
-
-            using import .common
             bitcast
-                wrap-nullable-object wgpu.Buffer handle
+                capture-validation-error make-buffer size usage-flags
                 cls
 
         # if usage flags aren't statically provided, it means they must be passed at runtime

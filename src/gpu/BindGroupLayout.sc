@@ -1,5 +1,5 @@
 using import Array struct radl.ext
-using import ..context .types
+using import .common ..context .types
 import .wgpu
 
 ctx := context-accessor 'gpu
@@ -56,15 +56,15 @@ type+ BindGroupLayout
                             multisampled = multisampled?
 
         fn finalize (self)
-            using import .common
-
             ptr count := 'data self.entries
-            wrap-nullable-object BindGroupLayout
-                wgpu.DeviceCreateBindGroupLayout ctx.device
+            imply
+                capture-validation-error wgpu.DeviceCreateBindGroupLayout 
+                    ctx.device
                     typeinit@
                         label = "bottle bind group layout"
                         entryCount = count
                         entries = dupe ptr
+                BindGroupLayout
 
     inline builder (cls)
         (BindGroupLayoutBuilder)

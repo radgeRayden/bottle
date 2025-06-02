@@ -1,4 +1,4 @@
-using import Array glm String struct
+using import Array glm String struct radl.ext
 
 using import .common
 using import ..exceptions
@@ -56,15 +56,15 @@ type+ RenderPass
                     stencilReadOnly = false
                 &attachment
 
-        let handle =
-            wgpu.CommandEncoderBeginRenderPass cmd-encoder
-                &local wgpu.RenderPassDescriptor
+        imply
+            capture-validation-error wgpu.CommandEncoderBeginRenderPass 
+                cmd-encoder
+                typeinit@
                     label = f"Bottle Render Pass ${label-suffix}"
                     colorAttachmentCount = count
                     colorAttachments = color-attachments as (@ wgpu.RenderPassColorAttachment)
                     depthStencilAttachment = depth-stencil-attachment
-
-        wrap-nullable-object cls handle
+            cls
 
     inline finish (self)
         wgpu.RenderPassEncoderEnd ('rawptr self)
