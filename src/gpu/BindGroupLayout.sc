@@ -58,7 +58,7 @@ type+ BindGroupLayout
         fn finalize (self)
             ptr count := 'data self.entries
             imply
-                capture-validation-error wgpu.DeviceCreateBindGroupLayout 
+                (wrap-object-creation wgpu.DeviceCreateBindGroupLayout) 
                     ctx.device
                     typeinit@
                         label = "bottle bind group layout"

@@ -8,7 +8,7 @@ type+ Sampler
         filter-mode : wgpu.FilterMode = wgpu.FilterMode.Linear)
 
         imply
-            capture-validation-error wgpu.DeviceCreateSampler 
+            (wrap-object-creation wgpu.DeviceCreateSampler) 
                 ctx.device
                 typeinit@
                     addressModeU = wrap-mode

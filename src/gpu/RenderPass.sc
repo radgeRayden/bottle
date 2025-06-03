@@ -57,7 +57,7 @@ type+ RenderPass
                 &attachment
 
         imply
-            capture-validation-error wgpu.CommandEncoderBeginRenderPass 
+            (wrap-object-creation wgpu.CommandEncoderBeginRenderPass)
                 cmd-encoder
                 typeinit@
                     label = f"Bottle Render Pass ${label-suffix}"

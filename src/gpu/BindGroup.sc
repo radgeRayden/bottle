@@ -31,7 +31,7 @@ type+ BindGroup
                     va-range (va-countof entries...)
 
         imply
-            capture-validation-error wgpu.DeviceCreateBindGroup 
+            (wrap-object-creation wgpu.DeviceCreateBindGroup) 
                 ctx.device
                 typeinit@
                     label = "bottle bind group"
@@ -69,7 +69,7 @@ type+ BindGroup
 
             ptr count := 'data self.entries
             imply
-                capture-validation-error wgpu.DeviceCreateBindGroup 
+                (wrap-object-creation wgpu.DeviceCreateBindGroup) 
                     ctx.device
                     typeinit@
                         label = "bottle bind group"

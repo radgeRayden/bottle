@@ -230,7 +230,7 @@ type+ Texture
             else format
 
         handle :=
-            capture-validation-error wgpu.DeviceCreateTexture 
+            (wrap-object-creation wgpu.DeviceCreateTexture)
                 ctx.device
                 &local wgpu.TextureDescriptor
                     label = f"Bottle Texture ${format}"
@@ -392,7 +392,7 @@ type+ Texture
 type+ TextureView
     inline... __typecall (cls, source-texture : Texture)
         imply
-            capture-validation-error wgpu.TextureCreateView source-texture null
+            (wrap-object-creation wgpu.TextureCreateView) source-texture null
             cls
     case (cls, source-texture : Texture,
             dimension : wgpu.TextureViewDimension = '2D,
@@ -416,7 +416,7 @@ type+ TextureView
                 format
 
         imply
-            capture-validation-error wgpu.TextureCreateView 
+            (wrap-object-creation wgpu.TextureCreateView) 
                 source-texture
                 typeinit@
                     label = "bottle texture view"

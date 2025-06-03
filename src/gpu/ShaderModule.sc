@@ -50,7 +50,7 @@ type+ ShaderModule
                 static-error "invalid shader source type"
 
         imply
-            capture-validation-error module
+            (wrap-object-creation module);
             cls
 
     case (cls, f : Closure, source-language : ShaderLanguage, stage : wgpu.ShaderStage)

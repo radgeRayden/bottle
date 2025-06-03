@@ -76,12 +76,12 @@ type+ PipelineLayout
             else
                 _ null 0:usize
 
-        capture-validation-error make-pipeline-layout (dupe layouts-ptr) layouts-count (dupe ranges-ptr) ranges-count
+        (wrap-object-creation make-pipeline-layout) (dupe layouts-ptr) layouts-count (dupe ranges-ptr) ranges-count
     case (cls, bind-group-layouts : (array BindGroupLayout))
         local layouts = bind-group-layouts
-        capture-validation-error make-pipeline-layout &layouts (countof layouts) null 0:usize
+        (wrap-object-creation make-pipeline-layout) &layouts (countof layouts) null 0:usize
     case (cls)
-        capture-validation-error make-pipeline-layout null 0:usize null 0:usize
+        (wrap-object-creation make-pipeline-layout) null 0:usize null 0:usize
 
 type+ PushConstantLayout
     inline... add-range (self, visibility : wgpu.ShaderStage, name : String, storage : type)
@@ -160,11 +160,11 @@ type+ RenderPipeline
 
 
         cls ... := *...
-        capture-validation-error make-pipeline ...
+        (wrap-object-creation make-pipeline) ...
     case (cls)
         bitcast null cls
 
     fn... get-bind-group-layout (self, index : u32)
         imply
-            capture-validation-error wgpu.RenderPipelineGetBindGroupLayout (view self) index
+            (capture-validation-error wgpu.RenderPipelineGetBindGroupLayout) (view self) index
             BindGroupLayout

@@ -41,7 +41,7 @@ inline gen-buffer-type (parent-type prefix backing-type usage-flags)
             # TODO: ensure size obeys alignment rules
             size   := max-elements * (sizeof BackingType)
             bitcast
-                capture-validation-error make-buffer size usage-flags
+                (wrap-object-creation make-buffer) size usage-flags
                 cls
 
         # if usage flags aren't statically provided, it means they must be passed at runtime
