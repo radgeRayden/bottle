@@ -73,9 +73,9 @@ fn init (name argc argv)
     set-globals! (.. module-scope (globals))
     try
         'watch ctx.watcher ctx.path on-file-update
+        main.run;
     except (ex)
         print "could not watch file:" ex
-    main.run;
 
 do
     let init
