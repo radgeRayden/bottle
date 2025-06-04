@@ -1,10 +1,8 @@
-using import Array glm itertools Map Option String struct
+using import Array glm itertools Map Option radl.IO.FileStream String struct
 import bottle ...demo-common UTF-8
 using bottle.gpu.types
 
 plonk := bottle.plonk
-
-test-string := "Hello World\nHello LÖVE discord server"
 
 struct FontAtlas
     texture : Texture
@@ -18,10 +16,13 @@ struct ImageFontMetrics
 
 struct TextObject
     codepoints : (Array i32)
+    geometry : (Array plonk.Quad)
     font-atlas : FontAtlas
     font-metrics : ImageFontMetrics
+    wrap : f32
 
     fn... set-text (self, text : String)
+        'clear self.codepoints
         ->>
             text
             UTF-8.decoder
@@ -29,11 +30,17 @@ struct TextObject
             self.codepoints
         ()
 
-    fn draw (self position max-width)
+    fn update-geometry (self)
+    fn get-max-width (self)
+    fn set-wrap (self)
+        'update-geometry self
+
+    fn draw (self position)
         metrics := self.font-metrics
         atlas := self.font-atlas
 
         fold (pen = position) for c in self.codepoints
+            ww wh := (bottle.window.get-size)
             if (c == c"\n")
                 vec2 0 (pen.y - metrics.line-height)
             else
@@ -45,7 +52,10 @@ struct TextObject
 
                 position := pen + (vec2 0 metrics.y-offset)
                 plonk.sprite atlas.texture position (vec2 32 32) 0:f32 quad (origin = (vec2))
-                pen + (vec2 metrics.advance 0)
+                if  (pen.x >= (f32 (ww - 50)))
+                    vec2 0 (pen.y - metrics.line-height)
+                else
+                    pen + (vec2 metrics.advance 0)
 
 struct DemoContext
     text-object : TextObject
@@ -97,20 +107,20 @@ fn ()
             'set text-object.font-atlas.character-mappings (i32 c) (get-quad (first-cell + i))
         text-object.font-atlas.tofu = get-quad (first-cell + 30)
 
+        test-string := try! ('read-all-string (FileStream "assets/example.txt" FileMode.Read))
         'set-text text-object test-string
 
         ctx =
             DemoContext
                 text-object = text-object
-
-    else ()
+    else (assert false)
 
 @@ 'on bottle.render
 fn ()
     raising bottle.exceptions.GPUError
     ctx := 'force-unwrap ctx
     plonk.set-texture-filtering 'Nearest 'Nearest
-    'draw ctx.text-object (vec2 0 600) 1000
+    'draw ctx.text-object (vec2 0 600)
     ()
 
 sugar-if main-module?
