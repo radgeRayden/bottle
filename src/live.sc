@@ -76,6 +76,7 @@ fn init (name argc argv)
         main.run;
     except (ex)
         print "could not watch file:" ex
+        1
 
 do
     let init
