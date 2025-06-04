@@ -1,5 +1,5 @@
-using import Array radl.FileWatcher struct .context print radl.strfmt
-import .main .callbacks .time
+using import Array radl.FileWatcher struct .context print radl.strfmt radl.ext radl.shorthands
+import .main .callbacks .time .exceptions
 
 ctx := context-accessor 'live
 callbacks-ctx := context-accessor 'callbacks
@@ -47,14 +47,30 @@ fn reload-module ()
     load-module (ctx.name as string) (ctx.path as string) __env
     callbacks.load;
 
+fn strip-color-codes (str)
+    using import radl.String+ slice
+    loop (result = str)
+        has-code? start end := scan result "\x1b"
+        if has-code?
+            lhs rhs := lslice result start, rslice result end
+            code-complete? start end := scan rhs "m"
+            if code-complete?
+                .. lhs (rslice rhs end)
+            else (return result)
+        else
+            return result
+
 fn on-file-update (path ev-type)
     'clear module-storage
     if (ev-type == 'Modified)
         try
             reload-module;
+            ctx.last-error = ""
             ()
         except (ex)
-            print ('format ex)
+            err := 'format ex
+            print err
+            ctx.last-error = (strip-color-codes err)
 
 @@ 'on callbacks.update
 fn process-file-events (dt)
@@ -65,6 +81,22 @@ fn process-file-events (dt)
         any-events? := 'dispatch-events ctx.watcher
         if any-events? (print f"source reloaded: ${ctx.name}. time: ${(time.get-raw-time)}")
     ()
+
+@@ 'on callbacks.render
+fn ()
+    raising exceptions.GPUError
+    ig := import .imgui
+    import .window
+
+    ww wh := (window.get-size)
+    ig.SetNextWindowPos (ig.Vec2 0 0) ig.Cond.Always (ig.Vec2 0 0)
+    ig.SetNextWindowSize (ig.Vec2 (|> f32 ww wh)) ig.Cond.Always
+    ig.Begin "live.error-display" null
+        enum-bitfield ig.WindowFlags i32
+            'NoDecoration
+            'NoBackground
+    ig.Text "%s" ((view ctx.last-error) as rawstring)
+    ig.End;
 
 fn init (name argc argv)
     ctx.live? = true

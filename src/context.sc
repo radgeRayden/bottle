@@ -250,6 +250,7 @@ struct BottleLiveState
     name : String
     path : String
     first-load? : bool = true
+    last-error : String
 
 struct BottleContext
     config : BottleConfig
