@@ -1,4 +1,4 @@
-using import Array glm itertools Map Option radl.IO.FileStream String struct
+using import Array glm itertools Map Option radl.IO.FileStream String struct print slice
 import bottle ...demo-common UTF-8
 using bottle.gpu.types
 
@@ -6,20 +6,24 @@ plonk := bottle.plonk
 
 struct FontAtlas
     texture : Texture
-    character-mappings : (Map i32 plonk.Quad)
+    glyphs : (Map i32 plonk.Quad)
     tofu : plonk.Quad
 
 struct ImageFontMetrics
-    advance : f32
+    spacing : f32
     line-height : f32
     y-offset : f32
 
+struct GlyphDrawInfo plain
+    quad : plonk.Quad
+    uv : plonk.Quad
+
 struct TextObject
     codepoints : (Array i32)
-    geometry : (Array plonk.Quad)
     font-atlas : FontAtlas
     font-metrics : ImageFontMetrics
     wrap : f32
+    geometry : (Array GlyphDrawInfo)
 
     fn... set-text (self, text : String)
         'clear self.codepoints
@@ -29,33 +33,56 @@ struct TextObject
             filter ((x) -> (x > 0))
             self.codepoints
         ()
-
-    fn update-geometry (self)
-    fn get-max-width (self)
-    fn set-wrap (self)
         'update-geometry self
 
-    fn draw (self position)
+    fn update-geometry (self)
+        atlas-size := self.font-atlas.texture.Size
         metrics := self.font-metrics
-        atlas := self.font-atlas
+        local scratch-word : (Array plonk.Quad)
+        'reserve scratch-word (countof self.codepoints)
+        local pen : vec2
+        local word-width : f32
 
-        fold (pen = position) for c in self.codepoints
-            ww wh := (bottle.window.get-size)
-            if (c == c"\n")
-                vec2 0 (pen.y - metrics.line-height)
-            else
-                let quad =
-                    try
-                        'get atlas.character-mappings c
-                    else
-                        deref atlas.tofu
+        'clear self.geometry
+        for idx c in (enumerate self.codepoints)
+            inline finish-word ()
+                if (word-width + pen.x > self.wrap)
+                    pen = vec2 0 (pen.y - metrics.line-height)
+                for g in scratch-word
+                    'append self.geometry
+                        GlyphDrawInfo
+                            quad = plonk.Quad pen ((vec2 atlas-size.xy) * g.extent)
+                            uv = g
+                    pen.x += (g.extent.x * (f32 atlas-size.x)) + metrics.spacing
+                'clear scratch-word
+                word-width = 0
 
-                position := pen + (vec2 0 metrics.y-offset)
-                plonk.sprite atlas.texture position (vec2 32 32) 0:f32 quad (origin = (vec2))
-                if  (pen.x >= (f32 (ww - 50)))
-                    vec2 0 (pen.y - metrics.line-height)
-                else
-                    pen + (vec2 metrics.advance 0)
+            switch c
+            case c"\n"
+                finish-word;
+                pen = vec2 0 (pen.y - metrics.line-height)
+            case c" "
+                finish-word;
+                glyph := 'getdefault self.font-atlas.glyphs c self.font-atlas.tofu
+                character-width := glyph.extent.x * (f32 atlas-size.x)
+                pen += vec2 (character-width + metrics.spacing) 0
+            case c"\t"
+                finish-word;
+            default
+                glyph := 'getdefault self.font-atlas.glyphs c self.font-atlas.tofu
+                character-width := glyph.extent.x * (f32 atlas-size.x)
+                'append scratch-word glyph
+                word-width += character-width + metrics.spacing
+
+    fn set-wrap (self width)
+        width := f32 width
+        if (width != self.wrap)
+            self.wrap = width
+            'update-geometry self
+
+    fn draw (self position)
+        for g in self.geometry
+            plonk.sprite self.font-atlas.texture (position + g.quad.start) g.quad.extent 0:f32 g.uv (origin = (vec2))
 
 struct DemoContext
     text-object : TextObject
@@ -68,6 +95,7 @@ fn (cfg)
     cfg.window.title = "TextObject: the text rendering"
     cfg.window.width = 520
     cfg.window.height = 320
+    cfg.gpu.present-mode = 'FifoRelaxed
 
 @@ 'on bottle.load
 fn ()
@@ -92,9 +120,10 @@ fn ()
                 font-atlas = typeinit (Texture image-font)
                 font-metrics =
                     ImageFontMetrics
-                        advance = 14
+                        spacing = -8
                         line-height = 24
                         y-offset = 5
+                wrap = 400
 
         font-string := S"!\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_ abcdefghijklmnopqrstuvwxyz(|)~"
         first-cell := 33
@@ -104,7 +133,7 @@ fn ()
                 vec2 ((1 / 16) * (f32 (cell % cells-h))) ((1 / 8) * (f32 (cell // cells-h)))
                 vec2 (1 / 16) (1 / 8)
         for i c in (enumerate font-string)
-            'set text-object.font-atlas.character-mappings (i32 c) (get-quad (first-cell + i))
+            'set text-object.font-atlas.glyphs (i32 c) (get-quad (first-cell + i))
         text-object.font-atlas.tofu = get-quad (first-cell + 30)
 
         test-string := try! ('read-all-string (FileStream "assets/example.txt" FileMode.Read))
@@ -115,12 +144,19 @@ fn ()
                 text-object = text-object
     else (assert false)
 
+@@ 'on bottle.update
+fn "update" (dt)
+    ctx := 'force-unwrap ctx
+    ww wh := (bottle.window.get-size)
+    'set-wrap ctx.text-object ww
+
 @@ 'on bottle.render
 fn ()
     raising bottle.exceptions.GPUError
     ctx := 'force-unwrap ctx
     plonk.set-texture-filtering 'Nearest 'Nearest
-    'draw ctx.text-object (vec2 0 600)
+    ww wh := (bottle.window.get-size)
+    'draw ctx.text-object (vec2 0 (wh - 80))
     ()
 
 sugar-if main-module?
