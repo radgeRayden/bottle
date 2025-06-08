@@ -13,6 +13,7 @@ struct ImageFontMetrics
     spacing : f32
     line-height : f32
     y-offset : f32
+    scale : f32
 
 struct GlyphDrawInfo plain
     quad : plonk.Quad
@@ -47,32 +48,32 @@ struct TextObject
         for idx c in (enumerate self.codepoints)
             inline finish-word ()
                 if (word-width + pen.x > self.wrap)
-                    pen = vec2 0 (pen.y - metrics.line-height)
+                    pen = vec2 0 (pen.y - metrics.line-height * metrics.scale)
                 for g in scratch-word
                     'append self.geometry
                         GlyphDrawInfo
-                            quad = plonk.Quad pen ((vec2 atlas-size.xy) * g.extent)
+                            quad = plonk.Quad pen ((vec2 atlas-size.xy) * g.extent * metrics.scale)
                             uv = g
-                    pen.x += (g.extent.x * (f32 atlas-size.x)) + metrics.spacing
+                    pen.x += ((g.extent.x * (f32 atlas-size.x)) + metrics.spacing) * metrics.scale
                 'clear scratch-word
                 word-width = 0
 
             switch c
             case c"\n"
                 finish-word;
-                pen = vec2 0 (pen.y - metrics.line-height)
+                pen = vec2 0 (pen.y - metrics.line-height * metrics.scale)
             case c" "
                 finish-word;
                 glyph := 'getdefault self.font-atlas.glyphs c self.font-atlas.tofu
                 character-width := glyph.extent.x * (f32 atlas-size.x)
-                pen += vec2 (character-width + metrics.spacing) 0
+                pen += vec2 ((character-width + metrics.spacing) * metrics.scale) 0
             case c"\t"
                 finish-word;
             default
                 glyph := 'getdefault self.font-atlas.glyphs c self.font-atlas.tofu
                 character-width := glyph.extent.x * (f32 atlas-size.x)
                 'append scratch-word glyph
-                word-width += character-width + metrics.spacing
+                word-width += (character-width + metrics.spacing) * metrics.scale
 
     fn set-wrap (self width)
         width := f32 width
@@ -123,6 +124,7 @@ fn ()
                         spacing = -8
                         line-height = 24
                         y-offset = 5
+                        scale = 2
                 wrap = 400
 
         font-string := S"!\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_ abcdefghijklmnopqrstuvwxyz(|)~"
