@@ -6,13 +6,13 @@ case 'windows
 default
     error "Unsupported OS"
 
-using import include
+using import include Array slice
 
-header := include "SDL3_ttf/SDL3_ttf.h"
+header := include "SDL3_ttf/SDL_ttf.h"
 
 vvv bind sdl3_ttf
 do
-    using header.define filter "^TTF_(.+)$"
+    using header.extern filter "^TTF_(.+)$"
     using header.typedef filter "^TTF_(.+)$"
     using header.define filter "^(SDL_TTF_.+)$"
     local-scope;

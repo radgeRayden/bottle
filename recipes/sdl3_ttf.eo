@@ -1,4 +1,4 @@
-VERSION := "a90b6938ddf2104f53d682d9c8388c6c173e98f0"
+VERSION := "release-3.2.2"
 SUMMARY := "Support for TrueType (.ttf) font files with Simple Directmedia Layer."
 
 archive :=
@@ -15,7 +15,7 @@ fn preinstall-dir (generator)
                 mkdir "{build-path}/build"
 
         install-dir := (tempdir)
-        build-command "cmake -G \"{generator}\" .."
+        build-command "cmake -G \"{generator}\" -DSDLTTF_HARFBUZZ=ON .."
         build-command "cmake --build . -j"
         build-command "cmake --install . --prefix {install-dir}"
         install-dir
@@ -43,5 +43,3 @@ package sdl3_ttf
     alias "/lib/scopes/packages/sdl3_ttf.sc" bindings
     in "/include" "{preinstall-dir}/include/SDL3_ttf"
     alias "/licenses/SDL3_ttf.txt" "{preinstall-dir}/share/licenses/SDL3_ttf/LICENSE.txt"
-
-# TODO: windows package
