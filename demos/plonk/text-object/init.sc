@@ -1,4 +1,4 @@
-using import Array glm itertools Map Option radl.IO.FileStream String struct print slice
+using import Array enum glm itertools Map Option radl.IO.FileStream String struct print slice
 import bottle ...demo-common UTF-8
 using bottle.gpu.types
 
@@ -19,12 +19,19 @@ struct GlyphDrawInfo plain
     quad : plonk.Quad
     uv : plonk.Quad
 
+enum TextAlignment plain
+    Left
+    Right
+    Center
+    Justify
+
 struct TextObject
     codepoints : (Array i32)
     font-atlas : FontAtlas
     font-metrics : ImageFontMetrics
     wrap : f32
     geometry : (Array GlyphDrawInfo)
+    alignment : TextAlignment
 
     fn... set-text (self, text : String)
         'clear self.codepoints
@@ -43,11 +50,26 @@ struct TextObject
         'reserve scratch-word (countof self.codepoints)
         local pen : vec2
         local word-width : f32
+        local line-start : i32
+        local line-end : i32
 
         'clear self.geometry
         for idx c in (enumerate self.codepoints)
+            inline realign (line)
+                switch self.alignment
+                case 'Right
+                    last-char := ('last line) . quad
+                    free-space := self.wrap - last-char.start.x - last-char.extent.x
+                    for i in (rrange 0 (countof line))
+                        quad := (line @ i) . quad
+                        quad.start.x += free-space
+                default
+                    ()
+                line-start = line-end + 1
+
             inline finish-word ()
                 if (word-width + pen.x > self.wrap)
+                    realign (slice (view self.geometry) line-start (line-end + 1))
                     pen = vec2 0 (pen.y - metrics.line-height * metrics.scale)
                 for g in scratch-word
                     'append self.geometry
@@ -56,11 +78,16 @@ struct TextObject
                             uv = g
                     pen.x += ((g.extent.x * (f32 atlas-size.x)) + metrics.spacing) * metrics.scale
                 'clear scratch-word
+                line-end = i32 ((countof self.geometry) - 1)
                 word-width = 0
 
             switch c
             case c"\n"
                 finish-word;
+                if (idx > 0)
+                    line-end = (i32 (countof self.geometry))
+                    realign (slice (view self.geometry) line-start line-end)
+                    line-start = i32 (countof self.geometry)
                 pen = vec2 0 (pen.y - metrics.line-height * metrics.scale)
             case c" "
                 finish-word;
@@ -122,10 +149,11 @@ fn ()
                 font-metrics =
                     ImageFontMetrics
                         spacing = -8
-                        line-height = 24
+                        line-height = 14
                         y-offset = 5
                         scale = 2
                 wrap = 400
+                alignment = 'Right
 
         font-string := S"!\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_ abcdefghijklmnopqrstuvwxyz(|)~"
         first-cell := 33
