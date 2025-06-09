@@ -23,7 +23,6 @@ enum TextAlignment plain
     Left
     Right
     Center
-    Justify
 
 struct TextObject
     codepoints : (Array i32)
@@ -51,32 +50,31 @@ struct TextObject
         local pen : vec2
         local word-width : f32
         local line-start : i32
-        local line-end : i32
 
         'clear self.geometry
         for idx c in (enumerate self.codepoints)
-            inline realign (line)
+            inline end-line ()
                 switch self.alignment
                 case 'Right
-                    last-char := ('last line) . quad
+                    last-char := ('last self.geometry) . quad
                     free-space := self.wrap - last-char.start.x - last-char.extent.x
-                    for i in (rrange 0 (countof line))
-                        quad := (line @ i) . quad
+                    for i in (range line-start (countof self.geometry))
+                        quad := (self.geometry @ i) . quad
                         quad.start.x += free-space
                 case 'Center
-                    last-char := ('last line) . quad
+                    last-char := ('last self.geometry) . quad
                     free-space := self.wrap - last-char.start.x - last-char.extent.x
                     left-offset := floor (free-space / 2)
-                    for i in (rrange 0 (countof line))
-                        quad := (line @ i) . quad
+                    for i in (range line-start (countof self.geometry))
+                        quad := (self.geometry @ i) . quad
                         quad.start.x += left-offset
                 default
                     ()
-                line-start = line-end + 1
+                line-start = i32 (countof self.geometry)
 
             inline finish-word ()
                 if (word-width + pen.x > self.wrap)
-                    realign (slice (view self.geometry) line-start (line-end + 1))
+                    end-line;
                     pen = vec2 0 (pen.y - metrics.line-height * metrics.scale)
                 for g in scratch-word
                     'append self.geometry
@@ -85,16 +83,13 @@ struct TextObject
                             uv = g
                     pen.x += ((g.extent.x * (f32 atlas-size.x)) + metrics.spacing) * metrics.scale
                 'clear scratch-word
-                line-end = i32 ((countof self.geometry) - 1)
                 word-width = 0
 
             switch c
             case c"\n"
                 finish-word;
                 if (idx > 0)
-                    line-end = (i32 (countof self.geometry))
-                    realign (slice (view self.geometry) line-start line-end)
-                    line-start = i32 (countof self.geometry)
+                    end-line;
                 pen = vec2 0 (pen.y - metrics.line-height * metrics.scale)
             case c" "
                 finish-word;
