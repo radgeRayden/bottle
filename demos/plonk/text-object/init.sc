@@ -63,6 +63,13 @@ struct TextObject
                     for i in (rrange 0 (countof line))
                         quad := (line @ i) . quad
                         quad.start.x += free-space
+                case 'Center
+                    last-char := ('last line) . quad
+                    free-space := self.wrap - last-char.start.x - last-char.extent.x
+                    left-offset := floor (free-space / 2)
+                    for i in (rrange 0 (countof line))
+                        quad := (line @ i) . quad
+                        quad.start.x += left-offset
                 default
                     ()
                 line-start = line-end + 1
@@ -153,7 +160,7 @@ fn ()
                         y-offset = 5
                         scale = 2
                 wrap = 400
-                alignment = 'Right
+                alignment = 'Center
 
         font-string := S"!\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_ abcdefghijklmnopqrstuvwxyz(|)~"
         first-cell := 33
