@@ -19,9 +19,7 @@ libs... :=
             "physfs"
             # "scopesrt"
             "fontdue_native"
-            "miniaudio"
             "SDL3"
-            "stb"
             "wgpu_native"
             "cimgui"
 

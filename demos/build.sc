@@ -59,8 +59,10 @@ inline build-demo (name use-genc?)
     libflags := (getenv "LDFLAGS")
     assert (libflags != null)
     libflags := string libflags
+    bottle-c := module-dir .. "/bottle.c"
+    include-path := project-dir .. "/include"
 
-    cmd := f"gcc -o ${bin-dir}/${exe-name} ${obj-dir}/${obj-name} -I../include -lm ${extra-lflags} -L${bin-dir} ${libflags} -Wl,-rpath '-Wl,$ORIGIN'"
+    cmd := f"gcc -o ${bin-dir}/${exe-name} ${obj-dir}/${obj-name} -I${include-path} ${bottle-c} -lm ${extra-lflags} -L${bin-dir} ${libflags} -Wl,-rpath '-Wl,$ORIGIN'"
     print "+" cmd
     status := system cmd
     if (status == -1)
