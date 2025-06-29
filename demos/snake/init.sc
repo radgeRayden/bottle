@@ -1,19 +1,27 @@
-using import Array
-using import enum
-using import glm
-using import itertools
-using import Option
-using import String
-using import struct
+using import Array enum glm itertools Option String struct radl.ext
 import ..demo-common
 
 import bottle
+using bottle.types
 plonk := bottle.plonk
 audio := bottle.audio
 
 TILE-SIZE := 32
 SCREEN-WIDTH SCREEN-HEIGHT := 800, 608
 TILES-W TILES-H := SCREEN-WIDTH // TILE-SIZE, SCREEN-HEIGHT // TILE-SIZE
+
+struct SpriteAtlas
+    texture : Texture
+    columns : i32
+    rows : i32
+
+    fn... get-quad (self column row)
+        plonk.Quad
+            start = vec2 ((1 / self.columns) * (f32 column)) ((1 / self.rows) * (f32 row))
+            extent = vec2 (1 / self.columns) (1 / self.rows)
+    case (self index)
+        index as:= i32
+        this-function self (index % self.columns) (index // self.columns)
 
 enum SpriteIndices plain
     SnakeHead
@@ -44,8 +52,8 @@ struct SnakeSegment plain
     corner? : bool
 
 struct GameResources
-    atlas : plonk.SpriteAtlas
-    font-atlas : plonk.SpriteAtlas
+    atlas : SpriteAtlas
+    # font-atlas : SpriteAtlas
 
 struct GameState
     score : i32
@@ -68,7 +76,7 @@ inline xy->idx (x y)
 
 global resources : (Option GameResources)
 global game-state : GameState
-global rng : bottle.random.RNG 0
+global rng = bottle.random.RNG 0
 
 @@ 'on bottle.configure
 fn (cfg)
@@ -178,13 +186,13 @@ fn ()
         using bottle.types
         using bottle.enums
 
-        font-data := 'read-all-bytes (FileStream "assets/monogram.ttf" FileMode.Read)
-        font := bottle.font.Font font-data 39
+        # font-data := 'read-all-bytes (FileStream "assets/monogram.ttf" FileMode.Read)
+        # font := bottle.font.Font font-data 39
 
         resources =
             GameResources
-                atlas = plonk.SpriteAtlas (bottle.asset.load-image "assets/snake.png") 6 1
-                font-atlas = plonk.SpriteAtlas ('pack-atlas font char" " char"~") 1 95
+                atlas = SpriteAtlas (Texture (bottle.asset.load-image "assets/snake.png")) 6 1
+                # font-atlas = SpriteAtlas ('pack-atlas font char" " char"~") 1 95
     else ()
 
     setup-game;
@@ -236,6 +244,17 @@ fn (dt)
         if (not debug-mode?)
             update-snake;
 
+fn render-ui ()
+    ig := bottle.imgui
+    ig.SetNextWindowPos (ig.Vec2 10 10) ig.Cond.Always (ig.Vec2 0 0)
+    ig.SetNextWindowSize (ig.Vec2 100 50) ig.Cond.Always
+    ig.Begin "score" null
+        enum-bitfield ig.WindowFlags i32
+            'NoDecoration
+            'NoBackground
+    ig.Text "score: %d" game-state.score
+    ig.End;
+
 @@ 'on bottle.render
 fn ()
     ctx := 'force-unwrap resources
@@ -245,7 +264,7 @@ fn ()
         fliph? flipv? := (va-option fliph? flip... false), (va-option flipv? flip... false)
         tile-size := (vec2 TILE-SIZE)
         drawpos := (vec2 position) * tile-size + (tile-size / 2)
-        plonk.sprite ctx.atlas drawpos tile-size (rotation as f32) ('get-quad ctx.atlas tile)
+        plonk.sprite ctx.atlas.texture drawpos tile-size (rotation as f32) ('get-quad ctx.atlas tile)
             fliph? = fliph?
             flipv? = flipv?
 
@@ -299,8 +318,10 @@ fn ()
             draw-tile segment.position tile rotation (fliph? = fliph?) (flipv? = flipv?)
 
     using import radl.strfmt
-    for i c in (enumerate f"score: ${game-state.score}")
-        plonk.sprite ctx.font-atlas (vec2 (i * 15) 0) (vec2 15 31) 0:f32 ('get-quad ctx.font-atlas (c - char" "))
+    # for i c in (enumerate f"score: ${game-state.score}")
+    #     plonk.sprite ctx.font-atlas.texture (vec2 (i * 15) 0) (vec2 15 31) 0:f32 ('get-quad ctx.font-atlas (c - char" "))
+
+    render-ui;
     ()
 
 sugar-if main-module?

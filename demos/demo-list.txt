@@ -9,5 +9,5 @@ plonk.sprites
 plonk.shapes
 plonk.line-benchmark
 plonk.text-object
-#snake
+snake
 imgui
