@@ -17,7 +17,7 @@ fn shader-module-from-WGSL (code)
     wgpu.DeviceCreateShaderModule
         ctx.device
         chained@ 'ShaderSourceWGSL
-            code = (dupe (code as rawstring))
+            code = (view code)
 
 fn shader-module-from-GLSL (code stage)
     local defines =
@@ -29,7 +29,7 @@ fn shader-module-from-GLSL (code stage)
         ctx.device
         chained@ 'ShaderModuleGLSLDescriptor
             stage = stage
-            code = (dupe (code as rawstring))
+            code = (view code)
             defineCount = (countof defines)
             defines = &defines
 
