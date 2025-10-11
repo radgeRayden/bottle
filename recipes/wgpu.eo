@@ -1,5 +1,5 @@
 VERSION := "a96fbecc2ef8f7fdf0bd1762b88508799471c923"
-TAG := "v25.0.2.1"
+TAG := "v27.0.2.0"
 SUMMARY := "Native WebGPU implementation based on wgpu-core"
 
 update-url "https://raw.githubusercontent.com/ScopesCommunity/eo-packages/main/recipes/wgpu.eo"
