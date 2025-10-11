@@ -19,7 +19,7 @@ type+ RendererBackendInfo
                 s := self
                 f"${s.device} (${s.adapter}) - driver ${s.driver}"
 
-    fn collect-info (self)
+    fn query (self)
         local p : wgpu.AdapterInfo
         wgpu.AdapterGetInfo ctx.adapter &p
 

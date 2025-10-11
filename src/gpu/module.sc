@@ -331,7 +331,7 @@ fn init ()
     ctx.queue = (wgpu.DeviceGetQueue ctx.device)
     ctx.cmd-encoder = wgpu.DeviceCreateCommandEncoder ctx.device (typeinit@)
 
-    'collect-info ctx.renderer-backend-info
+    'query ctx.renderer-backend-info
     ;
 
 fn begin-frame ()
@@ -379,6 +379,9 @@ fn generate-report ()
 
     global-report.hub
 
+fn get-renderer-info ()
+    ctx.renderer-backend-info
+
 inline make-resource-cache-get (cache)
     inline get-internal-resource (k makef args...)
         'get (getattr ctx.internal-resources cache) k makef args...
@@ -389,7 +392,7 @@ do
         get-surface-texture get-msaa-resolve-source \
         msaa-enabled? get-present-mode set-present-mode
     let flag-surface-outdated
-    let generate-report
+    let generate-report get-renderer-info
 
     get-internal-texture := make-resource-cache-get 'textures
     get-internal-sampler := make-resource-cache-get 'samplers
