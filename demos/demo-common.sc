@@ -30,6 +30,13 @@ fn (key)
         bottle.window.toggle-fullscreen;
     if (key == 'F4)
         demo-wrapper-ctx.show-stats? = not demo-wrapper-ctx.show-stats?
+    if (key == KeyboardKey.Minus)
+        bottle.time.set-global-time-scale
+            (bottle.time.get-global-time-scale) - 0.1
+    if (key == KeyboardKey.Equals)
+        bottle.time.set-global-time-scale
+            (bottle.time.get-global-time-scale) + 0.1
+
 
 @@ 'on bottle.render
 @@ if-module-enabled 'imgui
