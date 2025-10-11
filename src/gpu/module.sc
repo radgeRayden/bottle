@@ -230,6 +230,7 @@ fn init ()
         arrayof wgpu.FeatureName
             'Depth32FloatStencil8
             native-feature 'PushConstants
+            native-feature 'SpirvShaderPassthrough
 
     inline make-limits-struct ()
         wgpu.Limits

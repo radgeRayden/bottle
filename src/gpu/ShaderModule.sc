@@ -6,12 +6,22 @@ from wgpu let typeinit@ chained@
 
 ctx := context-accessor 'gpu
 
++use-shader-passthrough+ := false
+
 fn shader-module-from-SPIRV (code)
-    wgpu.DeviceCreateShaderModule
-        ctx.device
-        chained@ 'ShaderSourceSPIRV
-            codeSize = ((countof code) // 4) as u32
-            code = (dupe (code as rawstring as (@ u32)))
+    static-if +use-shader-passthrough+
+        wgpu.DeviceCreateShaderModuleSpirV
+            ctx.device
+            typeinit@
+                sourceSize = ((countof code) // 4) as u32
+                source = (dupe (code as rawstring as (@ u32)))
+
+    else
+        wgpu.DeviceCreateShaderModule
+            ctx.device
+            chained@ 'ShaderSourceSPIRV
+                codeSize = ((countof code) // 4) as u32
+                code = (dupe (code as rawstring as (@ u32)))
 
 fn shader-module-from-WGSL (code)
     wgpu.DeviceCreateShaderModule
