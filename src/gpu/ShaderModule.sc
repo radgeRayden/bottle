@@ -5,17 +5,15 @@ import .wgpu
 from wgpu let typeinit@ chained@
 
 ctx := context-accessor 'gpu
-
-+use-shader-passthrough+ := false
+cfg := context-accessor 'config 'gpu
 
 fn shader-module-from-SPIRV (code)
-    static-if +use-shader-passthrough+
+    if (cfg.use-spirv-passthrough? and (ctx.renderer-backend-info.low-level-backend == 'Vulkan))
         wgpu.DeviceCreateShaderModuleSpirV
             ctx.device
             typeinit@
                 sourceSize = ((countof code) // 4) as u32
                 source = (dupe (code as rawstring as (@ u32)))
-
     else
         wgpu.DeviceCreateShaderModule
             ctx.device

@@ -86,6 +86,16 @@ fn env-wgpu-enable-validation (value)
     default
         true
 
+@@ from-environment "BOTTLE_WGPU_ENABLE_SPIRV_PASSTHROUGH" false
+fn env-wgpu-enable-spirv-passthrough (value)
+    match value
+    case "false"
+        false
+    case "0"
+        false
+    default
+        true
+
 @@ from-environment "BOTTLE_DISABLED_MODULES" (() -> ((Array String)))
 fn env-disabled-modules (value)
     using import radl.String+
@@ -126,6 +136,7 @@ struct BottleConfig
             wgpu-low-level-backend : wgpu.InstanceBackend = 'Primary
             wgpu-log-level : wgpu.LogLevel = 'Warn
             enable-validation? : bool = false
+            use-spirv-passthrough? : bool = false
     enabled-modules :
         struct BottleEnabledModules plain
             plonk = true
@@ -149,6 +160,7 @@ struct BottleConfig
             self.gpu.wgpu-low-level-backend = (env-wgpu-backend)
             self.gpu.wgpu-log-level         = (env-wgpu-log-level)
             self.gpu.enable-validation?     = (env-wgpu-enable-validation)
+            self.gpu.use-spirv-passthrough? = (env-wgpu-enable-spirv-passthrough)
 
             disabled-modules := (env-disabled-modules)
             for module in (env-disabled-modules)
