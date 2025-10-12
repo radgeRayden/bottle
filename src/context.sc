@@ -49,24 +49,25 @@ inline match-string-enum (ET value)
 
 # STARTUP CONFIGURATION
 # =====================
-inline from-environment (name def)
+inline from-environment (name)
     inline (handler)
+        fT := static-typify handler String
+        retT := returnof fT
+        Result := Option retT
+
         fn ()
             using import C.stdlib
             env-var := getenv name
 
             if (env-var == null)
-                static-if ((typeof def) == Closure)
-                    (def)
-                else
-                    def
+                Result none
             else
                 env-var := 'from-rawstring String env-var
-                try (handler env-var)
+                try (Result (handler env-var))
                 else
                     using import radl.strfmt
                     print f"Unrecognized option for ${name}: ${env-var}"
-                    def
+                    Result none
 
 @@ from-environment "BOTTLE_WGPU_INSTANCE_BACKEND" wgpu.InstanceBackend.Primary
 fn env-wgpu-backend (value)
@@ -156,15 +157,20 @@ struct BottleConfig
         may-disable-module 'imgui
 
     fn apply-env-overrides (self)
-        if (not self.ignore-environment-variables?)
-            self.gpu.wgpu-low-level-backend = (env-wgpu-backend)
-            self.gpu.wgpu-log-level         = (env-wgpu-log-level)
-            self.gpu.enable-validation?     = (env-wgpu-enable-validation)
-            self.gpu.use-spirv-passthrough? = (env-wgpu-enable-spirv-passthrough)
+        inline override (var handler)
+            try (var = ('unwrap (handler)))
+            else ()
 
-            disabled-modules := (env-disabled-modules)
-            for module in (env-disabled-modules)
-                'disable-module-by-name self module
+        if (not self.ignore-environment-variables?)
+            override self.gpu.wgpu-low-level-backend env-wgpu-backend
+            override self.gpu.wgpu-log-level         env-wgpu-log-level
+            override self.gpu.enable-validation?     env-wgpu-enable-validation
+            override self.gpu.use-spirv-passthrough? env-wgpu-enable-spirv-passthrough
+
+            try ('unwrap (env-disabled-modules))
+            then (disabled-modules)
+                for module in disabled-modules
+                    'disable-module-by-name self module
 
 struct WGPUAdapterInfo
     adapter : wgpu.Adapter
