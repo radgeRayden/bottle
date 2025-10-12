@@ -47,6 +47,17 @@ inline match-string-enum (ET value)
                 raise;
         hash (tolower value)
 
+inline match-string-boolean (value)
+    match value
+    case ""
+        false
+    case "false"
+        false
+    case "0"
+        false
+    default
+        true
+
 # STARTUP CONFIGURATION
 # =====================
 inline from-environment (name)
@@ -69,35 +80,23 @@ inline from-environment (name)
                     print f"Unrecognized option for ${name}: ${env-var}"
                     Result none
 
-@@ from-environment "BOTTLE_WGPU_INSTANCE_BACKEND" wgpu.InstanceBackend.Primary
+@@ from-environment "BOTTLE_WGPU_INSTANCE_BACKEND"
 fn env-wgpu-backend (value)
     match-string-enum wgpu.InstanceBackend value
 
-@@ from-environment "BOTTLE_WGPU_LOG_LEVEL" wgpu.LogLevel.Warn
+@@ from-environment "BOTTLE_WGPU_LOG_LEVEL"
 fn env-wgpu-log-level (value)
     match-string-enum wgpu.LogLevel value
 
-@@ from-environment "BOTTLE_WGPU_ENABLE_VALIDATION" false
+@@ from-environment "BOTTLE_WGPU_ENABLE_VALIDATION"
 fn env-wgpu-enable-validation (value)
-    match value
-    case "false"
-        false
-    case "0"
-        false
-    default
-        true
+    match-string-boolean value
 
-@@ from-environment "BOTTLE_WGPU_ENABLE_SPIRV_PASSTHROUGH" false
+@@ from-environment "BOTTLE_WGPU_ENABLE_SPIRV_PASSTHROUGH"
 fn env-wgpu-enable-spirv-passthrough (value)
-    match value
-    case "false"
-        false
-    case "0"
-        false
-    default
-        true
+    match-string-boolean value
 
-@@ from-environment "BOTTLE_DISABLED_MODULES" (() -> ((Array String)))
+@@ from-environment "BOTTLE_DISABLED_MODULES"
 fn env-disabled-modules (value)
     using import radl.String+
     split value S","
