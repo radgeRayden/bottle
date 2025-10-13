@@ -41,6 +41,12 @@ spice assign-callbacks ()
         sc_expression_append expr init-expr
     expr
 
+fn clear-callback-initializers ()
+    for k v in ('symbols BottleCallbackDefinitions)
+        k as:= Symbol
+        T := 'typeof v
+        sc_type_del_symbol T 'CallbackInitExpression
+
 run-stage;
 
 inline BottleCallback (name f)
@@ -113,7 +119,8 @@ type+ BottleCallbackDefinitions
 run-stage;
 
 do
+    let BottleCallbackDefinitions
     using (mixin BottleCallbackDefinitions)
-    let assign-callbacks
+    let assign-callbacks clear-callback-initializers
 
     local-scope;

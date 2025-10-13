@@ -21,9 +21,11 @@ else
 fi
 
 pushd ..
+SC_BUILD_COMMAND="scopes -e -m .demos.build"
 for DEMO in $DEMOS; do
-    scopes -e -m .demos.build .$DEMO
+    SC_BUILD_COMMAND="$SC_BUILD_COMMAND .$DEMO"
 done
+$SC_BUILD_COMMAND
 popd
 
 cp -r ./assets ./dist/bin/

@@ -1,9 +1,15 @@
 using import String C.stdlib radl.strfmt print
+import callbacks
 
 obj-dir := module-dir .. "/dist/obj"
 bin-dir := module-dir .. "/dist/bin"
 
 inline build-demo (name use-genc?)
+    unload-module (Symbol (find-module-path "." 'bottle __env))
+    unload-module (Symbol (find-module-path "." 'main __env))
+    unload-module (Symbol (find-module-path module-dir '..init __env))
+    callbacks.clear-callback-initializers;
+
     module :=
         require-from module-dir name 
             'bind-symbols __env
@@ -71,12 +77,14 @@ inline build-demo (name use-genc?)
         status >> 8
 
 name argc argv := (script-launch-args)
-let demo =
-    if (argc > 0)
-        string (argv @ 0)
-    else
-        error "missing demo argument"
-use-genc? := (argc > 1) and (('from-rawstring String (argv @ 1)) == "-genc")
-run-stage;
+# let demo =
+#     if (argc > 0)
+#         string (argv @ 0)
+#     else
+#         error "missing demo argument"
+# use-genc? := (argc > 1) and (('from-rawstring String (argv @ 1)) == "-genc")
+# run-stage;
 
-build-demo demo use-genc?
+for i in (range argc)
+    demo := 'from-rawstring String (argv @ i)
+    build-demo demo false
