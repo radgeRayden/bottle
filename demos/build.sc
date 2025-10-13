@@ -4,6 +4,43 @@ import callbacks
 obj-dir := module-dir .. "/dist/obj"
 bin-dir := module-dir .. "/dist/bin"
 
+libs... :=
+    va-map
+        inline (libname)
+            let filename =
+                static-match operating-system
+                case 'windows
+                    f"${libname}.dll"
+                case 'linux
+                    f"lib${libname}.so"
+                default
+                    error "unsupported OS"
+            filename as string
+        _
+            "physfs"
+            # "scopesrt"
+            "fontdue_native"
+            "SDL3"
+            "wgpu_native"
+            "cimgui"
+
+patched-search-path := (cons (.. compiler-dir "/bin") __env.library-search-path)
+libpaths... :=
+    va-map
+        inline get-libpath (libname)
+            find-library libname patched-search-path
+        libs...
+
+va-map
+    inline copy-lib (path)
+        cmd := f"cp \"${path}\" ${bin-dir}"
+        print2 "+" cmd
+        system cmd
+    libpaths...
+
+libflags :=
+    static-fold (libs = S"") for lib in (va-each libs...)
+        f"${libs} -l:${lib} "
 inline build-demo (name use-genc?)
     unload-module (Symbol (find-module-path "." 'bottle __env))
     unload-module (Symbol (find-module-path "." 'main __env))
@@ -61,10 +98,6 @@ inline build-demo (name use-genc?)
         default
             f"demo${name}"
 
-    inline cmd (cmd)
-    libflags := (getenv "LDFLAGS")
-    assert (libflags != null)
-    libflags := string libflags
     bottle-c := module-dir .. "/bottle.c"
     include-path := project-dir .. "/include"
 

@@ -9,8 +9,6 @@ mkdir ./dist
 mkdir ./dist/bin
 mkdir ./dist/obj
 
-export LDFLAGS="$(scopes -e ./setup-dist.sc)"
-
 DEMO_REGEXP="^[^#].+"
 if [ $# -gt 0 ]; then
     DEMOS=$*
@@ -21,11 +19,7 @@ else
 fi
 
 pushd ..
-SC_BUILD_COMMAND="scopes -e -m .demos.build"
-for DEMO in $DEMOS; do
-    SC_BUILD_COMMAND="$SC_BUILD_COMMAND .$DEMO"
-done
-$SC_BUILD_COMMAND
+scopes -e -m .demos.build $DEMOS
 popd
 
 cp -r ./assets ./dist/bin/
