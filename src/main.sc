@@ -34,10 +34,6 @@ fn run ()
     plonk.init;
     callbacks.load;
 
-    USE_DT_ACCUMULATOR? := cfg.time.use-delta-accumulator?
-    FIXED_TIMESTEP     := cfg.time.fixed-timestep
-    local dt-accumulator : f64
-
     while (not (sysevents.really-quit?))
         sysevents.dispatch imgui.process-event
 
