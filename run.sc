@@ -21,7 +21,7 @@ if (argc > 1)
         default
             ()
 
-import-string := .. ".demos." demo
+import-string := .. ".demos" demo
 
 run-stage;
 

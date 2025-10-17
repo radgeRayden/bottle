@@ -89,7 +89,7 @@ def demo_cmd(name):
 def task_demos():
     for name in demos:
         yield {
-            "basename": f"demo.{name}",
+            "basename": f"demo{name}",
             "actions": [LongRunning(demo_cmd(name))],
             "file_dep": [bootstrap],
             "uptodate": [False],
@@ -103,7 +103,7 @@ def live_demo_cmd(name):
 def task_live_code():
     for name in demos:
         yield {
-            "basename": f"live.{name}",
+            "basename": f"live{name}",
             "actions": [LongRunning(live_demo_cmd(name))],
             "file_dep": [bootstrap],
             "uptodate": [False],
