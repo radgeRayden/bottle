@@ -224,6 +224,8 @@ type+ Texture
                 wgpu.TextureUsage.TextureBinding
                 (render-target? wgpu.TextureUsage.RenderAttachment (bitcast 0:u64 wgpu.TextureUsage))
 
+        # FIXME: clear error when neither format nor imagedata are provided
+
         let format =
             static-if (none? format)
                 image-data.format
@@ -338,6 +340,7 @@ type+ Texture
                                 loadOp = 'Clear
                                 storeOp = 'Store
                                 clearValue = typeinit 1.0 1.0 1.0 1.0
+                                depthSlice = wgpu.WGPU_DEPTH_SLICE_UNDEFINED
 
             wgpu.RenderPassEncoderSetPipeline render-pass pipeline
             wgpu.RenderPassEncoderSetBindGroup render-pass 0 bind-group 0 null
