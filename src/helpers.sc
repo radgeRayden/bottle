@@ -3,7 +3,7 @@ inline... &local (T : type, ...)
         local := T ...
 case (value)
     &
-        local dummy-name = value
+        local = copy value
 
 @@ memo
 inline param? (pT)
