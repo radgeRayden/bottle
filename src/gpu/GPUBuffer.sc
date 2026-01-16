@@ -84,7 +84,10 @@ inline gen-buffer-type (parent-type prefix backing-type usage-flags)
             if ((byte-offset + data-size) > byte-capacity)
                 raise GPUError.InvalidInput
 
-            write-buffer (view self) (&local data) byte-offset data-size
+            let data =
+                static-if (&? data) &data
+                else (&local data)
+            write-buffer (view self) data byte-offset data-size
             ()
         # ------------------------------------------------------------------------------------
 
