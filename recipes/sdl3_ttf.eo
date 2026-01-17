@@ -15,6 +15,7 @@ fn preinstall-dir (generator)
                 mkdir "{build-path}/build"
 
         install-dir := (tempdir)
+        build-command "../external/download.sh"
         build-command "cmake -G \"{generator}\" -DSDLTTF_HARFBUZZ=ON .."
         build-command "cmake --build . -j"
         build-command "cmake --install . --prefix {install-dir}"
