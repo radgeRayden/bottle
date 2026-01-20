@@ -33,6 +33,7 @@ def task_eo_init():
     return {
         "actions": [cmd("./eo init && touch ./.eo/initialized")],
         "targets": [".eo/initialized"],
+        "file_dep": ["eo"],
         "uptodate": [is_eo_initialized],
     }
 
@@ -45,6 +46,7 @@ def task_bootstrap():
         "verbosity": 2,
         "actions": [cmd("yes | ./eo sync && ./eo install -y bootstrap")],
         "targets": [bootstrap],
+        "file_dep": ["eo", ".eo/initialized"],
         "uptodate": [False],
     }
 
@@ -54,11 +56,11 @@ def task_force_bootstrap():
         "verbosity": 2,
         "actions": [
             cmd("rm -rf .eo lib include"),
-            cmd("./eo init"),
+            cmd("./eo init && touch ./.eo/initialized"),
             cmd("./eo install -y bootstrap"),
         ],
-        "uptodate": [False],
         "file_dep": ["eo"],
+        "uptodate": [False],
     }
 
 
